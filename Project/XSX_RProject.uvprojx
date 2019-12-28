@@ -10,6 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>5060422::V5.06 update 4 (build 422)::ARMCC</pArmCC>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
@@ -48,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>XSX_RProject</OutputName>
+          <OutputName>UBC_Infantry</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -137,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -399,41 +400,6 @@
               <FileType>1</FileType>
               <FilePath>..\APP\stm32f4xx_it.c</FilePath>
             </File>
-            <File>
-              <FileName>control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\control.c</FilePath>
-            </File>
-            <File>
-              <FileName>kalman.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\kalman.c</FilePath>
-            </File>
-            <File>
-              <FileName>kalman_filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\kalman_filter.c</FilePath>
-            </File>
-            <File>
-              <FileName>crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>magazine.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\magazine.c</FilePath>
-            </File>
-            <File>
-              <FileName>friction.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\friction.c</FilePath>
-            </File>
-            <File>
-              <FileName>super_cap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\super_cap.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -488,66 +454,6 @@
               <FileName>iwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\iwdg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>TASK</GroupName>
-          <Files>
-            <File>
-              <FileName>Task_Start.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TASK\Task_Start.c</FilePath>
-            </File>
-            <File>
-              <FileName>Task_Chassis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TASK\Task_Chassis.c</FilePath>
-            </File>
-            <File>
-              <FileName>Task_Revolver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TASK\Task_Revolver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Task_Gimbal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TASK\Task_Gimbal.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>AppInfo</GroupName>
-          <Files>
-            <File>
-              <FileName>Info_Update.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\AppInfo\Info_Update.c</FilePath>
-            </File>
-            <File>
-              <FileName>Info_Transmitter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\AppInfo\Info_Transmitter.c</FilePath>
-            </File>
-            <File>
-              <FileName>judge.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\judge.c</FilePath>
-            </File>
-            <File>
-              <FileName>vision.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\vision.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>TIMER_TASK</GroupName>
-          <Files>
-            <File>
-              <FileName>Timer_Send_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TIMER_TASK\Timer_Send_Task.c</FilePath>
             </File>
           </Files>
         </Group>

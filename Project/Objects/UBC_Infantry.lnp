@@ -54,7 +54,7 @@
 ".\objects\timers.o"
 ".\objects\heap_4.o"
 ".\objects\port.o"
---strict --scatter ".\Objects\XSX_RProject.sct"
+--strict --scatter ".\Objects\UBC_Infantry.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
---list ".\Listings\XSX_RProject.map" -o .\Objects\XSX_RProject.axf
+--list ".\Listings\UBC_Infantry.map" -o .\Objects\UBC_Infantry.axf

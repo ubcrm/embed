@@ -6,6 +6,6 @@
 
 
 void CAN2_Init(void);
-void CAN2_Revolver_QueueSend(float output);
+
 
 #endif 

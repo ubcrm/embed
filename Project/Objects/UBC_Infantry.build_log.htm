@@ -27,14 +27,27 @@ Project File Date:  12/23/2019
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-".\Objects\XSX_RProject.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+compiling can1.c...
+..\BSP\can1.c(81): warning:  #177-D: variable "speed_measure"  was declared but never referenced
+  	int16_t speed_measure,rota_measure,current_measure;
+..\BSP\can1.c(81): warning:  #177-D: variable "rota_measure"  was declared but never referenced
+  	int16_t speed_measure,rota_measure,current_measure;
+..\BSP\can1.c(81): warning:  #177-D: variable "current_measure"  was declared but never referenced
+  	int16_t speed_measure,rota_measure,current_measure;
+..\BSP\can1.c: 3 warnings, 0 errors
+compiling system.c...
+linking...
+Program Size: Code=45104 RO-data=3944 RW-data=256 ZI-data=79256  
+FromELF: creating hex file...
+".\Objects\UBC_Infantry.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_Target_1
   C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

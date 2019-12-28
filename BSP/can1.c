@@ -5,7 +5,7 @@
 extern QueueHandle_t CAN1_Queue;					//CAN1消息队列句柄
 
 /**
-  * @brief  底盘电机及云台初始化
+  * @brief  Initialize gimbal and chassis
   * @param  void
   * @retval void
   * @attention 201~204对应底盘,205,206对应云台
@@ -17,22 +17,25 @@ void CAN1_Init(void)
 	CAN_FilterInitTypeDef can_fil_str;
 	NVIC_InitTypeDef  NVIC_InitStructure;//接收中断
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
+	
+	RCC_APB1PeriphResetCmd(RCC_APB1Periph_CAN1, ENABLE);
+  RCC_APB1PeriphResetCmd(RCC_APB1Periph_CAN1, DISABLE);
 	
 	/**********************************************************/
 	gpio_str.GPIO_Mode=GPIO_Mode_AF;
 	gpio_str.GPIO_OType=GPIO_OType_PP;
-	gpio_str.GPIO_Pin=GPIO_Pin_11| GPIO_Pin_12;
+	gpio_str.GPIO_Pin=GPIO_Pin_0| GPIO_Pin_1;
 	gpio_str.GPIO_PuPd=GPIO_PuPd_UP;
 	gpio_str.GPIO_Speed=GPIO_Speed_100MHz;
-	GPIO_Init(GPIOA,&gpio_str);
+	GPIO_Init(GPIOD,&gpio_str);
 	
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource11,GPIO_AF_CAN1);
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource12,GPIO_AF_CAN1);
+	GPIO_PinAFConfig(GPIOD,GPIO_PinSource0,GPIO_AF_CAN1);
+	GPIO_PinAFConfig(GPIOD,GPIO_PinSource1,GPIO_AF_CAN1);
 	/**********************************************************/
 	
-	can_str.CAN_ABOM=DISABLE;
+	can_str.CAN_ABOM=ENABLE;
 	can_str.CAN_AWUM=DISABLE;
 	can_str.CAN_BS1=CAN_BS1_9tq;//Tbs1范围CAN_BS1_1tq ~CAN_BS1_16tq
 	can_str.CAN_BS2=CAN_BS2_4tq;//Tbs2范围CAN_BS2_1tq ~	CAN_BS2_8tq
@@ -91,9 +94,9 @@ void CAN1_Chassis_Send(float *PID_chassis)
 	CanTxMsg can_msg;
 
 	can_msg.StdId=0x200;	 // 标准标识符
-    can_msg.IDE=CAN_ID_STD;		  
-    can_msg.RTR=CAN_RTR_DATA;		  // 消息类型为数据帧，一帧8位
-    can_msg.DLC=8;							 // 发送8帧信息
+  can_msg.IDE=CAN_ID_STD;		  
+  can_msg.RTR=CAN_RTR_DATA;		  // 消息类型为数据帧，一帧8位
+  can_msg.DLC=8;							 // 发送8帧信息
 	
 	can_msg.Data[0]=(u8)((int16_t)PID_chassis[0]>>8);
 	can_msg.Data[1]=(u8)((int16_t)PID_chassis[0]);
@@ -106,6 +109,8 @@ void CAN1_Chassis_Send(float *PID_chassis)
 	
 	CAN_Transmit(CAN1, &can_msg);
 }
+
+
 
 
 /**

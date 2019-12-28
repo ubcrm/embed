@@ -164,22 +164,21 @@ void SYSTEM_InitPeripheral(void)
 	
 	Delay_init(168);//配置时钟
 	CAN1_Init();//底盘和云台电机初始化
+	/*
 	USART2_Init();//接收机初始化
 	UART5_Init();//裁判系统初始化
 	TIM4_Init();//摩擦轮初始化
 	TIM1_Init();//弹仓舵机初始化
 	LASER_Init();//红外瞄准初始化
+	
 	CAN2_Init();//拨盘电机初始化
 	UART4_Init();//视觉串口初始化
-//	MPU_TempPID_Init_IO();//MPU温度漂移初始化,会造成陀螺仪角度读取出现单位脉冲，影响云台稳定性
+	MPU_TempPID_Init_IO();//MPU温度漂移初始化,会造成陀螺仪角度读取出现单位脉冲，影响云台稳定性
 	Led_Init();//指示灯初始化
-	SuperCap_ADC_Init();//电容电量读取初始化
-	SuperCap_DAC_Init();//电容充电控制初始化
-	SuperCap_IO_Init();//电容IO口初始化
-	IWDG_Init(4,30000);
+	IWDG_Init(4,30000);*/
 	
 	//祖传MPU初始化
-	MPU_Init();
+	//MPU_Init();
 	while (mpu_dmp_init( )) 
 	{
 			ulCurrentTime = xTaskGetTickCount();
@@ -208,7 +207,7 @@ void SYSTEM_InitPeripheral(void)
 //系统初始化
 void System_Init(void)
 {
-	Parameter_Init();//参数初始化	
-	REMOTE_vResetData();//遥控初始化
+	//Parameter_Init();//参数初始化	
+	//REMOTE_vResetData();//遥控初始化
 	SYSTEM_InitPeripheral();//外设初始化
 }

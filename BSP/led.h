@@ -4,8 +4,8 @@
 #include "system.h"
 
 
-#define Green_On  	     GPIO_ResetBits(GPIOC,GPIO_Pin_10)
-#define Green_Off  	     GPIO_SetBits(GPIOC,GPIO_Pin_10)
+#define Green_On  	     GPIO_ResetBits(GPIOF,GPIO_Pin_14)
+#define Green_Off  	     GPIO_SetBits(GPIOF,GPIO_Pin_14)
 
 #define Red_On	    	 GPIO_ResetBits(GPIOC,GPIO_Pin_11)
 #define Red_Off	    	 GPIO_SetBits(GPIOC,GPIO_Pin_11)
