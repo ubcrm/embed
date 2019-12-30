@@ -83,6 +83,8 @@ void CAN2_Init(void)
 
 
 
+
+
 void CAN2_RX0_IRQHandler(void)
 {
 	CanRxMsg RxMessage;

@@ -53,11 +53,11 @@ void CAN1_Init(void)
 	can_fil_str.CAN_FilterIdHigh=0x0000;//ID最大化
 	can_fil_str.CAN_FilterIdLow=0x0000;
 	can_fil_str.CAN_FilterMaskIdHigh    =   0x0000;
-    can_fil_str.CAN_FilterMaskIdLow     =   0x0000;
-    can_fil_str.CAN_FilterMode          =   CAN_FilterMode_IdMask;
-    can_fil_str.CAN_FilterNumber        =   0;//过滤器0
-    can_fil_str.CAN_FilterScale         =   CAN_FilterScale_32bit;//32位 
-    CAN_FilterInit(&can_fil_str);
+	can_fil_str.CAN_FilterMaskIdLow     =   0x0000;
+	can_fil_str.CAN_FilterMode          =   CAN_FilterMode_IdMask;
+	can_fil_str.CAN_FilterNumber        =   0;//过滤器0
+	can_fil_str.CAN_FilterScale         =   CAN_FilterScale_32bit;//32位 
+	CAN_FilterInit(&can_fil_str);
 	/******************************************************************/
 
 	CAN_ITConfig(CAN1,CAN_IT_FMP0,ENABLE);//FIFO0消息挂号中断允许,每接收一次进一次中断	    
@@ -85,29 +85,30 @@ void CAN1_RX0_IRQHandler(void)
 
 
 /**
-  * @brief  底盘
+  * @brief  Revolver M2008 P36
   * @param  
   * @retval void
   */
-void CAN1_Chassis_Send(float *PID_chassis)
+void CAN1_Revolver_Send(float input)
 {
 	CanTxMsg can_msg;
 
-	can_msg.StdId=0x200;	 // 标准标识符
+	can_msg.StdId=0x1FF; 
   can_msg.IDE=CAN_ID_STD;		  
-  can_msg.RTR=CAN_RTR_DATA;		  // 消息类型为数据帧，一帧8位
-  can_msg.DLC=8;							 // 发送8帧信息
+  can_msg.RTR=CAN_RTR_DATA;		
+  can_msg.DLC=0x08;						
 	
-	can_msg.Data[0]=(u8)((int16_t)PID_chassis[0]>>8);
-	can_msg.Data[1]=(u8)((int16_t)PID_chassis[0]);
-	can_msg.Data[2]=(u8)((int16_t)PID_chassis[1]>>8);
-	can_msg.Data[3]=(u8)((int16_t)PID_chassis[1]);
-	can_msg.Data[4]=(u8)((int16_t)PID_chassis[2]>>8);
-	can_msg.Data[5]=(u8)((int16_t)PID_chassis[2]);
-	can_msg.Data[6]=(u8)((int16_t)PID_chassis[3]>>8);
-	can_msg.Data[7]=(u8)((int16_t)PID_chassis[3]);  
+	can_msg.Data[0]=0;
+	can_msg.Data[1]=0;
+	can_msg.Data[2]=(u8)((int16_t)input>>8);
+	can_msg.Data[3]=(u8)((int16_t)input);
+	can_msg.Data[4]=0;
+	can_msg.Data[5]=0;
+	can_msg.Data[6]=0;
+	can_msg.Data[7]=0;  
 	
 	CAN_Transmit(CAN1, &can_msg);
+	Green_Off;
 }
 
 
@@ -122,10 +123,10 @@ void CAN1_Cloud_Send(float *PID_6623)
 {
 	CanTxMsg can_msg;
 	
-	can_msg.StdId=0x1FF;	 // 标准标识符为0x1FF
+	can_msg.StdId=0x1FF;	 
     can_msg.IDE=CAN_ID_STD;		  
-    can_msg.RTR=CAN_RTR_DATA;		  // 消息类型为数据帧，一帧8位
-    can_msg.DLC=8;							 // 发送8帧信息
+    can_msg.RTR=CAN_RTR_DATA;		 
+    can_msg.DLC=8;							 
 	
 	can_msg.Data[0]=(u8)((int16_t)PID_6623[0]>>8);//yaw
 	can_msg.Data[1]=(u8)((int16_t)PID_6623[0]);

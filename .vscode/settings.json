@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "timer_send_task.h": "c",
+        "system.h": "c",
+        "can1.h": "c"
+    }
+}

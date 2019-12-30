@@ -6,6 +6,6 @@
 
 void CAN1_Init(void);
 void CAN1_Cloud_Send(float*);
-void CAN1_Chassis_Send(float *PID_chassis);
+void CAN1_Revolver_Send(float input);
 
 #endif

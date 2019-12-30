@@ -54,6 +54,9 @@
 ".\objects\timers.o"
 ".\objects\heap_4.o"
 ".\objects\port.o"
+".\objects\timer_send_task.o"
+".\objects\task_revolver.o"
+".\objects\task_start.o"
 --strict --scatter ".\Objects\UBC_Infantry.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

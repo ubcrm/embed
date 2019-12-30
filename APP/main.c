@@ -1,5 +1,6 @@
-
 #include "system.h"
+#include "Timer_Send_Task.h"
+#include "Task_Start.h"
 #include "can1.h"
 #include "led.h"
 
@@ -8,15 +9,15 @@ int main(void)
 {
 	System_Init();
 
-	float* PID_chassis;
-	PID_chassis[0] = 10 * 256;
-	PID_chassis[1] = 0;
-	PID_chassis[2] = 0;
-	PID_chassis[3] = 0;
+  //Initializes timers for CAN
+	Timer_Send_Create();
 	
+    //Start Tasks
+	App_Task_Create();
+	
+	//Task scheduler
+	vTaskStartScheduler();
 
-	while(1){
-		CAN1_Chassis_Send(PID_chassis);
-		delay_ms(20);
-	}
+	while(1);
+	
 }

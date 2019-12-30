@@ -41,5 +41,7 @@
 .\objects\main.o: ..\FreeRTOS\include\list.h
 .\objects\main.o: ..\FreeRTOS\include\queue.h
 .\objects\main.o: ..\FreeRTOS\include\timers.h
+.\objects\main.o: ..\TIMER_TASK\Timer_Send_Task.h
+.\objects\main.o: ..\TASK\Task_Start.h
 .\objects\main.o: ..\BSP\can1.h
 .\objects\main.o: ..\BSP\led.h
