@@ -1,0 +1,40 @@
+#include "Start_Task.h"
+
+#include "FreeRTOSConfig.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "test_task.h"
+
+#define START_TASK_PRIO 1
+#define START_STK_SIZE 512
+static TaskHandle_t StartTask_Handler;
+
+#define TEST_TASK_PRIO 2
+#define TEST_STK_SIZE 256
+static TaskHandle_t TestTask_Handler;
+
+void start_task(void *pvParameters)
+{
+    taskENTER_CRITICAL();
+
+		xTaskCreate((TaskFunction_t) testTask,
+								(const char *)"test_task",
+								(uint16_t) TEST_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)TEST_TASK_PRIO,
+                (TaskHandle_t *)&TestTask_Handler);
+
+    vTaskDelete(StartTask_Handler); //Delete start task
+    taskEXIT_CRITICAL();            //Exit critical
+}
+
+void startTask(void)
+{
+    xTaskCreate((TaskFunction_t)start_task,          //Task function
+                (const char *)"start_task",          //Task name
+                (uint16_t)START_STK_SIZE,            //Task stack size
+                (void *)NULL,                        //Inputs to task functions
+                (UBaseType_t)START_TASK_PRIO,        //Task priority
+                (TaskHandle_t *)&StartTask_Handler); //Task handler
+}
