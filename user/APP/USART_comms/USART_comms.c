@@ -13,8 +13,26 @@ void Serial_sendString(volatile char *str)
 	}
 }
 
+//This function is bad don't use
 void Serial_sendInt(int num)
 {
-	USART_SendData(USART6, num);
+	/*
+	int *temp;
+  int n = 0;
+	while(num > 10){
+		temp[n] = num%10;
+		num/=10;
+		n++;
+	}
+	temp[n] = num; //Breaks num into each bit
+	
+	char *str;
+	for (int i = 0; i <= n; i++) {
+		str[i] = '0' + temp[n-i];
+	}
+	
+	Serial_sendString(str);
+	*/
+	Serial_sendString((char*) num);
 }
 
