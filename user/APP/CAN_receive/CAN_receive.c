@@ -27,7 +27,6 @@
 #include "delay.h"
 
 
-//Chassis motor data read M3508
 #define get_motor_measure(ptr, rx_message)                                                     \
     {                                                                                          \
         (ptr)->last_ecd = (ptr)->ecd;                                                          \
@@ -37,15 +36,6 @@
         (ptr)->temperate = (rx_message)->Data[6];                                              \
     }
 
-//Gimbal motor data read GM6020
-#define get_gimbal_motor_measuer(ptr, rx_message)                                              \
-    {                                                                                          \
-        (ptr)->last_ecd = (ptr)->ecd;                                                          \
-        (ptr)->ecd = (uint16_t)((rx_message)->Data[0] << 8 | (rx_message)->Data[1]);           \
-        (ptr)->given_current = (uint16_t)((rx_message)->Data[2] << 8 | (rx_message)->Data[3]); \
-        (ptr)->speed_rpm = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]);     \
-        (ptr)->temperate = (rx_message)->Data[6];                                              \
-    }
 
 //CAN received data handler
 static void CAN_hook(CanRxMsg *rx_message);
@@ -203,12 +193,12 @@ static void CAN_hook(CanRxMsg *rx_message)
     {
     case CAN_YAW_MOTOR_ID:
     {
-        get_gimbal_motor_measuer(&motor_yaw, rx_message);
+        get_motor_measure(&motor_yaw, rx_message);
         break;
     }
     case CAN_PIT_MOTOR_ID:
     {
-        get_gimbal_motor_measuer(&motor_pit, rx_message);
+        get_motor_measure(&motor_pit, rx_message);
         break;
     }
     case CAN_TRIGGER_MOTOR_ID:
