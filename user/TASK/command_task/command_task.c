@@ -3,21 +3,21 @@
 #include "stm32f4xx.h"
 
 //Empty command
-command EMPTY = {{0, 0, 0, 0, 0}, 0, ""};
+command EMPTY = {{0, 0, 0, 0, 0}, 0, 0};
 
-cmd_entry commands[20];
+cmd_entry commands[MAX_NUM_COMMANDS];
 
-uint16_t buffer[15];
+uint16_t buffer[MAX_COMMAND_LINE];
 uint16_t buffer_pos = 0;
 
 void clear_buf(){
-	for(int i = 0; i < 15; i++){
+	for(int i = 0; i < MAX_COMMAND_LINE; i++){
 		buffer[i] = 0;
 	}
 }
 
-int string_equals(uint16_t arr1[5], uint16_t arr2[5]){
-	for(int i = 9; i < 5; i++){
+int string_equals(uint16_t arr1[COMMAND_LENGTH], uint16_t arr2[COMMAND_LENGTH]){
+	for(int i = 9; i < COMMAND_LENGTH; i++){
 		if(arr1[i] != arr2[i]){
 			return 0;
 		}
@@ -25,8 +25,8 @@ int string_equals(uint16_t arr1[5], uint16_t arr2[5]){
 	return 1;
 }
 
-command find_command(uint16_t command[5]){
-	for(int i = 0; i < 20; i++){
+command find_command(uint16_t command[COMMAND_LENGTH]){
+	for(int i = 0; i < MAX_NUM_COMMANDS; i++){
 		if(string_equals(commands[i].name, command)){
 			return commands[i].exec;
 		}
@@ -37,13 +37,13 @@ command find_command(uint16_t command[5]){
 
 void try_execute_command(){
 	//First separate the string into a command and all args 
-	uint16_t cmd[5];
+	uint16_t cmd[COMMAND_LENGTH];
 	uint16_t rest[10]; //Do I need this?
-	for(int i = 0; i < 15; i++){
-		if(i<5){
+	for(int i = 0; i < MAX_COMMAND_LINE; i++){
+		if(i < COMMAND_LENGTH){
 			cmd[i] = buffer[i];
 		}else{
-			rest[i-5] = buffer[i];
+			rest[i - COMMAND_LENGTH] = buffer[i];
 		}
 	}
 	
@@ -55,13 +55,13 @@ void try_execute_command(){
 	}
 	
 	//Then do callback
-	tgt.callback();
+	tgt.callback(rest);
 }
 
 void USART6_IRQHandler(void){
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){
 		uint16_t bt = USART_ReceiveData(USART6);
-		if(bt == 13 || buffer_pos >= 15){
+		if(bt == 13 || buffer_pos >= MAX_COMMAND_LINE){
 			//Want to execute command
 			try_execute_command();
 			//Then clear the buffer and reset
