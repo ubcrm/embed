@@ -38,7 +38,7 @@ typedef enum
 
 } can_msg_id_e;
 
-//
+//GM6020 and M3508
 typedef struct
 {
     uint16_t ecd;
