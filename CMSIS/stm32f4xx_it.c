@@ -31,6 +31,11 @@
 #include "stm32f4xx_it.h"
 #include "main.h"
 
+#include "USART_comms.h"
+
+uint16_t buffer_rx[100] = {0};
+int count_rx = 0;
+
 /** @addtogroup Template_Project
   * @{
   */
@@ -166,6 +171,26 @@ void SysTick_Handler(void)
 /**
   * @}
   */ 
+	
+
+void USART6_IRQHandler(void)
+{
+	//Serial_sendString("interupt");
+	// make sure USART6 was intended to be called for this interrupt
+	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
+		uint16_t USART_Data = USART_ReceiveData(USART6);
+		
+		// Serial_sendInt(USART_Data + 1);
+		
+		if (count_rx >= 100 || USART_Data == 13)
+		{
+			Serial_sendStringPart((volatile char*) buffer_rx, count_rx);
+			count_rx = 0;
+		} else {
+			buffer_rx[count_rx++] = USART_Data;
+		}
+	}
+}
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

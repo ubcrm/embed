@@ -30,10 +30,15 @@ void Serial_sendStringPart(volatile char *str, int length)
 
 void Serial_sendInt(int num)
 {
+	Serial_sendString("here 1");
 	const int digits = num_digits(num) + 3;
+	Serial_sendString("here 2");
 	char str[digits];
-	sprintf(str, "%d", num);
+	Serial_sendString("here 3");
+	sprintf(str, "%d\n\r", num);
+	Serial_sendString("here 4");
 	Serial_sendString(str);
+	Serial_sendString("here 5");
 }
 
 // assumes n is not the min or max int possible
