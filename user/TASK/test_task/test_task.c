@@ -21,11 +21,8 @@ int count_rx = 0;
 void testTask(void *pvParameters)
 {
     while(1) {
-			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
-			
 				Serial_sendString("here");
-				Serial_sendInt(5);			  
-			  //Serial_sendInt(yaw_raw_data->speed_rpm);
+				Serial_sendInt(5);
 			  delay_ms(100);
     }
     
