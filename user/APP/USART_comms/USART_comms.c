@@ -16,6 +16,17 @@ void Serial_sendString(volatile char *str)
 	}
 }
 
+void Serial_sendStringPart(volatile char *str, int length)
+{
+	int i = 0;
+	while (*str && i < length) {
+		// Once previous byte is finished being transmitted, transmit next byte
+		while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
+		USART_SendData(USART6, *str);
+		str++;
+		i++;
+	}
+}
 
 void Serial_sendInt(int num)
 {
