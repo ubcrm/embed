@@ -33,7 +33,7 @@
 
 #include "USART_comms.h"
 
-uint16_t buffer_rx[100] = {0};
+volatile char buffer_rx[100];
 int count_rx = 0;
 
 /** @addtogroup Template_Project
@@ -173,22 +173,35 @@ void SysTick_Handler(void)
   */ 
 	
 
+// Interrupt handler for USART 6. This is called on the reception of every
+// byte on USART6
 void USART6_IRQHandler(void)
 {
-	//Serial_sendString("interupt");
 	// make sure USART6 was intended to be called for this interrupt
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
 		uint16_t USART_Data = USART_ReceiveData(USART6);
 		
-		// Serial_sendInt(USART_Data + 1);
-		
-		if (count_rx >= 100 || USART_Data == 13)
-		{
-			Serial_sendStringPart((volatile char*) buffer_rx, count_rx);
+		// This just echos everything back once a CR (carriage return)
+		// character (13 in ascii) is received. Windows (or Putty, idk)
+		// appends a CR to enter/return so it should work 
+		if (USART_Data == 13) {
+			buffer_rx[count_rx] = 0;
+			serial_send_string(buffer_rx);
+			
 			count_rx = 0;
-		} else {
+			for (int i = 0; i < 100; i++) {
+				buffer_rx[i] = 0;
+			}
+			
+		} else if (count_rx < 100 - 1) {
 			buffer_rx[count_rx++] = USART_Data;
+		} else {
+			count_rx = 0;
+			for (int i = 0; i < 100; i++) {
+				buffer_rx[i] = 0;
+			}
 		}
+		
 	}
 }
 

@@ -21,6 +21,7 @@ void USART_6_INIT(void)
 	GPIO_PinAFConfig(GPIOG, GPIO_PinSource14, GPIO_AF_USART6);	// Tx
 	GPIO_PinAFConfig(GPIOG, GPIO_PinSource9, GPIO_AF_USART6);		// Rx
 
+	// Configure GPIO pin settings
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_9;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -31,7 +32,7 @@ void USART_6_INIT(void)
 	USART_DeInit(USART6);
 
 	// Configure UART - this all needs to match the config on the Pi
-	USART_InitStructure.USART_BaudRate = 9600;
+	USART_InitStructure.USART_BaudRate = 115200;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;			// These are the default settings
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;					// All set by USART_StructInit()
 	USART_InitStructure.USART_Parity = USART_Parity_No;					// These details are here for clarity

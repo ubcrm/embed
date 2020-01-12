@@ -2,11 +2,9 @@
 #include "USART_comms.h"
 #include <stdio.h>
 
-int num_digits (int n);
-
 // Sends one string over USART
-// example usage: Serial_sendString("Nando eats Nando's at Nando's");
-void Serial_sendString(volatile char *str)
+// Example usage: Serial_sendString("Nando eats Nando's at Nando's");
+void serial_send_string(volatile char *str)
 {
 	while (*str) {
 		// Once previous byte is finished being transmitted, transmit next byte
@@ -16,45 +14,49 @@ void Serial_sendString(volatile char *str)
 	}
 }
 
-void Serial_sendStringPart(volatile char *str, int length)
+// Send (a part of) an array
+// ** Assumes length <= length of array
+void serial_send_int_array(volatile int *arr, int length)
 {
-	int i = 0;
-	while (*str && i < length) {
+	for (int i = 0; i < length; i++) {
 		// Once previous byte is finished being transmitted, transmit next byte
 		while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
-		USART_SendData(USART6, *str);
-		str++;
-		i++;
+		USART_SendData(USART6, *arr);
+		arr++;
 	}
 }
 
-void Serial_sendInt(int num)
+// THIS DOES NOT WORK - to send ints do the following
+/*
+char str[number of digits your number is + 1];
+sprintf(str, "%d", number);
+serial_send_string(str);
+*/
+// Send an integer over serial as its ASCII value
+void serial_send_int(int num)
 {
-	Serial_sendString("here 1");
-	const int digits = num_digits(num) + 3;
-	Serial_sendString("here 2");
+	serial_send_string("in send int");
+	// Make a string with room for num and EOL characters
+	const int digits = num_digits(num) + 3; //4;
 	char str[digits];
-	Serial_sendString("here 3");
+	serial_send_string("down here");
+	
+	// Turn num into a string with the format "%d\n\r"
+	// and store the result in str
 	sprintf(str, "%d\n\r", num);
-	Serial_sendString("here 4");
-	Serial_sendString(str);
-	Serial_sendString("here 5");
+	
+	// Make volatile to avoid potential issues if not volatile
+	// volatile char* num_as_string = str;
+	// serial_send_string(num_as_string);
+	serial_send_string(str);
 }
 
-// assumes n is not the min or max int possible
-int num_digits (int n) {
-    if (n < 0) n = -n;
-    if (n < 10) return 1;
-    if (n < 100) return 2;
-    if (n < 1000) return 3;
-    if (n < 10000) return 4;
-    if (n < 100000) return 5;
-    if (n < 1000000) return 6;
-    if (n < 10000000) return 7;
-    if (n < 100000000) return 8;
-    if (n < 1000000000) return 9;
-    /*      2147483647 is 2^31-1 - add more ifs as needed
-       and adjust this final return as well. */
-    return 10;
+// Return the number of digits an int takes in decimal
+// ** assumes n is not the min or max int possible
+int num_digits(int n) {	
+	int count;
+	for (count = 1; n / (count * 10) != 0; count*= 10) {
+	}
+	
+	return count;	
 }
-
