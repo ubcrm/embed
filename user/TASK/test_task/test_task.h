@@ -13,6 +13,14 @@ typedef struct
 	uint16_t gimbal_tq_current_raw;
 } Gimbal_Motor_t;
 
+
+typedef struct 
+{
+	Gimbal_Motor_t *gimbal_motor;
+	const fp32 *gyro_reading_raw;
+	const fp32 *acce_reading_raw;
+} Gimbal_t;
+
 void testTask(void *pvParameters);
 	
 #endif
