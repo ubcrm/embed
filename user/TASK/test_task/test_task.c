@@ -12,6 +12,10 @@
 #include "USART_comms.h"
 #include <stdio.h>
 
+#include "pid.h"
+
+PidTypeDef pid;
+
 Gimbal_Motor_t gimbal_yaw_motor;
 
 
@@ -20,10 +24,15 @@ void testTask(void *pvParameters)
 	  gimbal_yaw_motor.gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
     char str[20];//uart data buffer
 	
+	  const fp32 PID[3] = {10.0, 0.0, 0.0};
+		PID_Init(&pid, 0, PID, 100, 100);
+	
     while(1) {
 			  led_green_toggle();
 			  //Make the motor turn
-			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
+				int angle = PID_Calc(&pid, 0.0, 90.0);
+
+			  CAN_CMD_GIMBAL(0, angle, 0, 0);
 			
 			  //Get CAN received data
 			  gimbal_yaw_motor.gimbal_pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
