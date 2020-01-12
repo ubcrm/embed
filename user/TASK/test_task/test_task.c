@@ -12,17 +12,28 @@
 #include "USART_comms.h"
 #include "stdio.h"
 
+Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_yaw_motor;
 
 
 void testTask(void *pvParameters)
 {
 	  gimbal_yaw_motor.gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
     char str[20];//uart data buffer
 	
     while(1) {
 			
-			
+			  //Sending data via UART
+			  
+			  sprintf(str, "gyro[0]: %f\n\r", gimbal.gyro_reading_raw[0]);
+				Serial_sendString(str);		 
+				sprintf(str, "gyro[1]: %f\n\r", gimbal.gyro_reading_raw[1]);
+				Serial_sendString(str);	
+			  sprintf(str, "gyro[2]: %f\n\r", gimbal.gyro_reading_raw[2]);
+				Serial_sendString(str);	
+			  delay_ms(200);
+				
 			  
 			
 			  //Make the motor turn

@@ -79,7 +79,9 @@ extern void INSTask(void *pvParameters);
 extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);
 extern const fp32 *get_INS_angle_point(void);
+//Gets gyro data
 extern const fp32 *get_MPU6500_Gyro_Data_Point(void);
+//Gets accelerometer data
 extern const fp32 *get_MPU6500_Accel_Data_Point(void);
 
 #endif
