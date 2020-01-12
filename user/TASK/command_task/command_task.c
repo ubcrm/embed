@@ -43,15 +43,11 @@ command find_command(uint16_t command[COMMAND_LENGTH]){
 }
 
 int command_exists(uint16_t command[COMMAND_LENGTH]){
-	//Serial_sendString("check exist\n\r");
 	for(int i = 0; i < MAX_NUM_COMMANDS; i++){
-		//Serial_sendString("Checking cmd\n\r");
 		if(string_equals(commands[i].name, command) == 1){
-			//Serial_sendString("Exists!!!!!!!!!!!!!\n\r");
 			return 1;
 		}
 	}
-	//Serial_sendString("Does not exist");
 	//Command does not exist
 	return 0;
 }
@@ -59,15 +55,17 @@ int command_exists(uint16_t command[COMMAND_LENGTH]){
 int cmdin = 0;
 
 void callback(uint16_t rest[10]){
-	Serial_sendString("CALLBACK!!!\n\r");
+	Serial_sendString("Hello World\n\r");
 }
+
+uint16_t test[5] = {116, 101, 115, 116, 115};
 
 void createCommand(){
 	command cmd;
 	cmd_entry ce;
 	for(int i = 0; i < 5; i++){
-		cmd.name[i] = 98;
-		ce.name[i] = 98;
+		cmd.name[i] = test[i];
+		ce.name[i] = test[i];
 	}
 	cmd.num_args = 0;
 	cmd.callback = &callback;
@@ -78,6 +76,7 @@ void createCommand(){
 }
 
 void try_execute_command(){
+	//Demo command creation done here because Keil
 	if(cmdin == 0){
 		createCommand();
 	}
@@ -91,13 +90,10 @@ void try_execute_command(){
 			rest[i - COMMAND_LENGTH] = buffer[i];
 		}
 	}
-	//Serial_sendString("Got past array stuff");
 	
-	//command tgt = find_command(cmd); //Retrieves command
 	if(command_exists(cmd) == 1){
 		//Then do callback
 		command tgt = find_command(cmd);
-		//Serial_sendString("Attempting to use a callback");
 		tgt.callback(rest);
 	}else{
 		//Invalid Command
@@ -108,13 +104,12 @@ void try_execute_command(){
 char ret[1];
 
 void USART6_IRQHandler(void){
-	//Serial_sendString("Hello World\n\r");
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){
 		uint16_t bt = USART_ReceiveData(USART6);
-		sprintf(ret, "entered: %d buffer at %d \n\r", bt, buffer_pos);
+		sprintf(ret, "%d", bt);
 		Serial_sendString(ret);
 		if((bt == 13 && buffer_pos != 0) || buffer_pos >= MAX_COMMAND_LINE){
-			//Serial_sendString("Sending command\n\r");
+			Serial_sendString("\n\r");
 			//Want to execute command
 			try_execute_command();
 			//Then clear the buffer and reset
