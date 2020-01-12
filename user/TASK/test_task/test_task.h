@@ -16,7 +16,8 @@ typedef struct
 
 typedef struct 
 {
-	Gimbal_Motor_t *gimbal_motor;
+	Gimbal_Motor_t *gimbal_yaw_motor;
+	Gimbal_Motor_t *gimbal_pitch_motor;
 	const fp32 *gyro_reading_raw;
 	const fp32 *acce_reading_raw;
 } Gimbal_t;

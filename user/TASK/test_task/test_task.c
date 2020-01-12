@@ -13,12 +13,12 @@
 #include "stdio.h"
 
 Gimbal_t gimbal;
-Gimbal_Motor_t gimbal_yaw_motor;
 
 
 void testTask(void *pvParameters)
 {
-	  gimbal_yaw_motor.gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+	  //Link pointers
+	  gimbal.gimbal_yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
 	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
 		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
     char str[20];//uart data buffer

@@ -6,14 +6,19 @@
 
 #include "test_task.h"
 #include "revolver_task.h"
+#include "INS_task.h"
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE 512
 static TaskHandle_t StartTask_Handler;
 
-#define TEST_TASK_PRIO 2
+#define TEST_TASK_PRIO 4
 #define TEST_STK_SIZE 256
 static TaskHandle_t TestTask_Handler;
+
+#define INS_TASK_PRIO 2
+#define INS_STK_SIZE 256
+static TaskHandle_t INSTask_Handler;
 
 #define REV_TASK_PRIO 10
 #define REV_STK_SIZE 256
@@ -29,6 +34,13 @@ void start_task(void *pvParameters)
                 (void *)NULL,
                 (UBaseType_t)TEST_TASK_PRIO,
                 (TaskHandle_t *)&TestTask_Handler);
+								
+		xTaskCreate((TaskFunction_t) INSTask,
+								(const char *)"INS_task",
+								(uint16_t) INS_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)INS_TASK_PRIO,
+                (TaskHandle_t *)&INSTask_Handler);
 				
 /*								
 		xTaskCreate((TaskFunction_t) revolverTask,
