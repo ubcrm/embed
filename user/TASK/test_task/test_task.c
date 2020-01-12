@@ -20,6 +20,7 @@ void testTask(void *pvParameters)
 {
 	  gimbal_yaw_motor.gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
 	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
+		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
     char str[20];//uart data buffer
 	
     while(1) {
@@ -31,6 +32,14 @@ void testTask(void *pvParameters)
 				sprintf(str, "gyro[1]: %f\n\r", gimbal.gyro_reading_raw[1]);
 				Serial_sendString(str);	
 			  sprintf(str, "gyro[2]: %f\n\r", gimbal.gyro_reading_raw[2]);
+				Serial_sendString(str);	
+			
+			
+				sprintf(str, "accel x : %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
+				Serial_sendString(str);		 
+				sprintf(str, "accel y: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
+				Serial_sendString(str);	
+			  sprintf(str, "accel z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
 				Serial_sendString(str);	
 			  delay_ms(200);
 				
