@@ -54,8 +54,9 @@ void serial_send_int(int num)
 // Return the number of digits an int takes in decimal
 // ** assumes n is not the min or max int possible
 int num_digits(int n) {	
-	int count;
-	for (count = 1; n / (count * 10) != 0; count*= 10) {
+	int count = 1;
+	for (int i = 1; n / (i * 10) != 0; i*= 10) {
+		count++;
 	}
 	
 	return count;	
