@@ -48,6 +48,7 @@ int main(void)
     delay_ms(100);
     startTask();
     vTaskStartScheduler();
+	
     while (1)
     {
         ;
