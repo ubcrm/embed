@@ -12,13 +12,14 @@
 #include "USART_comms.h"
 #include "stm32f4xx.h"
 
+#include <stdio.h>
+
 
 void testTask(void *pvParameters)
 {
     while(1) {
 			led_green_toggle();
-			int test = num_digits(2);
-			serial_send_int(1);
+			serial_send_int(1);			
 			delay_ms(100);
     }
     

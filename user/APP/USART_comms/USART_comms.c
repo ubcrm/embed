@@ -26,28 +26,13 @@ void serial_send_int_array(volatile int *arr, int length)
 	}
 }
 
-// THIS DOES NOT WORK - to send ints do the following
-/*
-char str[number of digits your number is + 1];
-sprintf(str, "%d", number);
-serial_send_string(str);
-*/
 // Send an integer over serial as its ASCII value
 void serial_send_int(int num)
 {
-	serial_send_string("in send int");
-	// Make a string with room for num and EOL characters
-	const int digits = num_digits(num) + 3; //4;
-	char str[digits];
-	serial_send_string("down here");
-	
-	// Turn num into a string with the format "%d\n\r"
-	// and store the result in str
+  // This is hardcoded because dynamic memory allocation
+	// is harder than solving the Collatz conjecture.
+	char str[32] = {0};
 	sprintf(str, "%d\n\r", num);
-	
-	// Make volatile to avoid potential issues if not volatile
-	// volatile char* num_as_string = str;
-	// serial_send_string(num_as_string);
 	serial_send_string(str);
 }
 
