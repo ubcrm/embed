@@ -11,7 +11,7 @@ void RC_Init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
         RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, DISABLE);
 
         GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1); //PB7  usart1 rx
-                                                                  /* -------------- Configure GPIO ---------------------------------------*/
+        /* -------------- Configure GPIO ---------------------------------------*/
         {
                 GPIO_InitTypeDef GPIO_InitStructure;
                 USART_InitTypeDef USART_InitStructure;

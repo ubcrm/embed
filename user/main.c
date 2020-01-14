@@ -40,6 +40,8 @@
 
 #include "start_task.h"
 
+#include "remote_control.h"
+
 void BSP_init(void);
 
 int main(void)
@@ -87,6 +89,7 @@ void BSP_init(void)
     CAN2_mode_init(CAN_SJW_1tq, CAN_BS2_2tq, CAN_BS1_6tq, 5, CAN_Mode_Normal);
 		
 		USART_6_INIT();
+		remote_control_init();
 
     //24v power output on
     for (uint8_t i = POWER1_CTRL_SWITCH; i < POWER4_CTRL_SWITCH + 1; i++)
