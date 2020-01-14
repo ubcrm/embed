@@ -5,6 +5,7 @@
 #include "task.h"
 
 #include "test_task.h"
+#include "revolver_task.h"
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE 512
@@ -13,6 +14,10 @@ static TaskHandle_t StartTask_Handler;
 #define TEST_TASK_PRIO 2
 #define TEST_STK_SIZE 256
 static TaskHandle_t TestTask_Handler;
+
+#define REV_TASK_PRIO 10
+#define REV_STK_SIZE 256
+static TaskHandle_t RevolverTask_Handler;
 
 void start_task(void *pvParameters)
 {
@@ -24,6 +29,15 @@ void start_task(void *pvParameters)
                 (void *)NULL,
                 (UBaseType_t)TEST_TASK_PRIO,
                 (TaskHandle_t *)&TestTask_Handler);
+				
+/*								
+		xTaskCreate((TaskFunction_t) revolverTask,
+								(const char *)"revolver_task",
+								(uint16_t) REV_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)REV_TASK_PRIO,
+                (TaskHandle_t *)&RevolverTask_Handler);
+								*/
 
     vTaskDelete(StartTask_Handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical

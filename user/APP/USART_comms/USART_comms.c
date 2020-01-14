@@ -34,6 +34,7 @@ void serial_send_int(int num)
 	char str[32] = {0};
 	sprintf(str, "%d\n\r", num);
 	serial_send_string(str);
+
 }
 
 // Return the number of digits an int takes in decimal
