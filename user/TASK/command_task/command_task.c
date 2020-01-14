@@ -20,11 +20,11 @@ void clear_buf(){
 char str[10];
 
 int string_equals(uint16_t arr1[COMMAND_LENGTH], uint16_t arr2[COMMAND_LENGTH]){
-	//Serial_sendString("Check String equals");
+	//serial_send_string("Check String equals");
 	for(int i = 0; i < COMMAND_LENGTH; i++){
-		//Serial_sendString("Checking letters");
+		//serial_send_string("Checking letters");
 		//sprintf(str, "Check letter %d %d", arr1[i], arr2[i]);
-		Serial_sendString(str);
+		serial_send_string(str);
 		if(arr1[i] != arr2[i]){
 			return 0;
 		}
@@ -55,7 +55,7 @@ int command_exists(uint16_t command[COMMAND_LENGTH]){
 int cmdin = 0;
 
 void callback(uint16_t rest[10]){
-	Serial_sendString("Hello World\n\r");
+	serial_send_string("Hello World\n\r");
 }
 
 uint16_t test[5] = {116, 101, 115, 116, 115};
@@ -97,19 +97,20 @@ void try_execute_command(){
 		tgt.callback(rest);
 	}else{
 		//Invalid Command
-		Serial_sendString("Command does not exist\n\r");
+		serial_send_string("Command does not exist\n\r");
 	}
 }
 
-char ret[1];
+//char ret[1];
 
 void USART6_IRQHandler(void){
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){
 		uint16_t bt = USART_ReceiveData(USART6);
-		sprintf(ret, "%d", bt);
-		Serial_sendString(ret);
+		//sprintf(ret, "%d", bt);
+		//serial_send_string(ret);
+		serial_send_int(bt);
 		if((bt == 13 && buffer_pos != 0) || buffer_pos >= MAX_COMMAND_LINE){
-			Serial_sendString("\n\r");
+			serial_send_string("\n\r");
 			//Want to execute command
 			try_execute_command();
 			//Then clear the buffer and reset
