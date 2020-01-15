@@ -10,8 +10,15 @@
 #include "delay.h"
 #include "INS_task.h"
 #include "USART_comms.h"
+<<<<<<< HEAD
 #include "stdio.h"
 #include "mpu6500driver.h"
+=======
+
+#include "stm32f4xx.h"
+
+#include <stdio.h>
+>>>>>>> dbb93161ede86a5450a792483bb01801c67ecd08
 
 Gimbal_t gimbal;
 
@@ -60,11 +67,11 @@ void testTask(void *pvParameters)
 			  //Sending data via UART
 			  /*
 			  sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
-				Serial_sendString(str);		 
+				serial_send_string(str);		 
 				sprintf(str, "speed: %d\n\r", gimbal_yaw_motor.gimbal_speed_raw);
-				Serial_sendString(str);				
+				serial_send_string(str);				
 			  sprintf(str, "current: %d\n\r", gimbal_yaw_motor.gimbal_tq_current_raw);
-				Serial_sendString(str);	
+				serial_send_string(str);	
 			  delay_ms(100);
 				*/
     }
