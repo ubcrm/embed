@@ -10,6 +10,9 @@
 #include "CAN_Receive.h"
 #include "delay.h"
 #include "USART_comms.h"
+
+#include "stm32f4xx.h"
+
 #include <stdio.h>
 
 Gimbal_Motor_t gimbal_yaw_motor;
@@ -21,7 +24,10 @@ void testTask(void *pvParameters)
     char str[20];//uart data buffer
 	
     while(1) {
-			  led_green_toggle();
+      led_green_toggle();
+			serial_send_int(1);			
+			delay_ms(100);
+
 			  //Make the motor turn
 			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
 			
@@ -35,7 +41,7 @@ void testTask(void *pvParameters)
 			  /*sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
 				Serial_sendString(str);		 
 				sprintf(str, "speed: %d\n\r", gimbal_yaw_motor.gimbal_speed_raw);
-				Serial_sendString(str);				
+				serial_send_string(str);				
 			  sprintf(str, "current: %d\n\r", gimbal_yaw_motor.gimbal_tq_current_raw);
 				Serial_sendString(str);	
 			  delay_ms(100);*/
