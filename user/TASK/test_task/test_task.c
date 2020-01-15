@@ -39,11 +39,11 @@ void testTask(void *pvParameters)
 			
 			  //Sending data via UART
 			  sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
-				Serial_sendString(str);		 
+				serial_send_string(str);		 
 				sprintf(str, "speed: %d\n\r", gimbal_yaw_motor.gimbal_speed_raw);
-				Serial_sendString(str);				
+				serial_send_string(str);				
 			  sprintf(str, "current: %d\n\r", gimbal_yaw_motor.gimbal_tq_current_raw);
-				Serial_sendString(str);	
+				serial_send_string(str);	
 			  delay_ms(100);
     }
     
