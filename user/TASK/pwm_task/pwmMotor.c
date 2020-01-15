@@ -59,7 +59,7 @@ void USART6_IRQHandler(void)
 
  void USART6_IRQHandler(void){
 	 if (USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){		 
-			buffer[buffer_position++] = USART_ReceiveData(USART6);
+			buffer[buffer_position++] = USART_ReceiveData(USART6);	
 		  if(buffer_position > 0){
 				
 				/* 13 is the enter key on Windows*/ 
@@ -72,7 +72,4 @@ void USART6_IRQHandler(void)
 				}
 			}
 	}
-
-	
-	
 }
