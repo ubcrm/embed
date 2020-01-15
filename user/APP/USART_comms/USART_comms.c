@@ -26,6 +26,15 @@ void serial_send_int_array(volatile int *arr, int length)
 	}
 }
 
+// Sends a string plus a number, followed by next line
+// Used for debug prints
+void serial_send_string_int(volatile char *str, int num)
+{
+	serial_send_string(str);
+	serial_send_int(num);
+	serial_send_string("\n\r");
+}
+
 // Send an integer over serial as its ASCII value
 void serial_send_int(int num)
 {

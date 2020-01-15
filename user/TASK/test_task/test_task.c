@@ -19,6 +19,7 @@
 
 
 Gimbal_t gimbal;
+char str[32] = {0};
 
 
 void testTask(void *pvParameters)
@@ -31,13 +32,21 @@ void testTask(void *pvParameters)
     while(1) {
 			
 			  //Sending data via UART
-				serial_send_int(gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);	 
-				serial_send_int(gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
-			  serial_send_int(gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
+
+				sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Gyro Z: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
+				serial_send_string(str);
 			
-			  serial_send_int(gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
-				serial_send_int(gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
-				serial_send_int(gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
+				sprintf(str, "Acce X: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Acce Y: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Acce Z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
+				serial_send_string(str);
+
 			  delay_ms(200);
 				
 			  
