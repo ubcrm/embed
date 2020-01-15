@@ -38,6 +38,7 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "mpu6500driver.h"
 
 #include "start_task.h"
 
@@ -85,6 +86,8 @@ void BSP_init(void)
     //CAN peripherals init
     CAN1_mode_init(CAN_SJW_1tq, CAN_BS2_2tq, CAN_BS1_6tq, 5, CAN_Mode_Normal);
     CAN2_mode_init(CAN_SJW_1tq, CAN_BS2_2tq, CAN_BS1_6tq, 5, CAN_Mode_Normal);
+		//IMU init
+		mpu6500_init();
 		
 		USART_6_INIT();
 

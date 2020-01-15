@@ -11,6 +11,7 @@
 #include "INS_task.h"
 #include "USART_comms.h"
 #include "stdio.h"
+#include "mpu6500driver.h"
 
 Gimbal_t gimbal;
 
@@ -27,11 +28,11 @@ void testTask(void *pvParameters)
 			
 			  //Sending data via UART
 			  
-			  sprintf(str, "gyro[0]: %f\n\r", gimbal.gyro_reading_raw[0]);
+			  sprintf(str, "gyro x: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
 				Serial_sendString(str);		 
-				sprintf(str, "gyro[1]: %f\n\r", gimbal.gyro_reading_raw[1]);
+				sprintf(str, "gyro y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
 				Serial_sendString(str);	
-			  sprintf(str, "gyro[2]: %f\n\r", gimbal.gyro_reading_raw[2]);
+			  sprintf(str, "gyro z: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
 				Serial_sendString(str);	
 			
 			

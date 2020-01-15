@@ -223,7 +223,7 @@ void INSTask(void *pvParameters)
             if (updata_count == 0)
             {
                 MPU6500_TEMPERATURE_PWM_INIT();
-               // PID_Init(&imuTempPid, PID_DELTA, imuTempPID, MPU6500_TEMPERATURE_PID_MAX_OUT, MPU6500_TEMPERATURE_PID_MAX_IOUT);
+               //PID_Init(&imuTempPid, PID_DELTA, imuTempPID, MPU6500_TEMPERATURE_PID_MAX_OUT, MPU6500_TEMPERATURE_PID_MAX_IOUT);
 
                 //初始化四元数
                 AHRS_init(INS_quat, INS_accel, INS_mag);

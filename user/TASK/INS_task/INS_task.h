@@ -66,10 +66,12 @@
 #define INS_PITCH_ADDRESS_OFFSET 1
 #define INS_ROLL_ADDRESS_OFFSET 2
 
+//Data index offset for gyro pointer
 #define INS_GYRO_X_ADDRESS_OFFSET 0
 #define INS_GYRO_Y_ADDRESS_OFFSET 1
 #define INS_GYRO_Z_ADDRESS_OFFSET 2
 
+//Data index offset for accelerometer pointer
 #define INS_ACCEL_X_ADDRESS_OFFSET 0
 #define INS_ACCEL_Y_ADDRESS_OFFSET 1
 #define INS_ACCEL_Z_ADDRESS_OFFSET 2
