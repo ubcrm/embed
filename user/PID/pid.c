@@ -1,11 +1,11 @@
 /**
   ****************************(C) COPYRIGHT 2016 DJI****************************
   * @file       pid.c/h
-  * @brief      pid??????????????'????PID????????
+  * @brief      PID motor control library
   * @note       
   * @history
   *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. ???
+  *  V1.0.0     Dec-26-2018     RM              1. UBC Robomaster
   *
   @verbatim
   ==============================================================================
