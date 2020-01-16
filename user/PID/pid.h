@@ -30,7 +30,7 @@ typedef struct
 {
     uint8_t mode;
 
-		fp32 Kp;
+    fp32 Kp;
     fp32 Ki;
     fp32 Kd;
 

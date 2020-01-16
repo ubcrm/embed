@@ -7,10 +7,10 @@
 
 typedef struct 
 {
-		const motor_measure_t *gimbal_motor_raw;
-		uint16_t gimbal_pos_raw;
-		uint16_t gimbal_speed_raw;
-		uint16_t gimbal_tq_current_raw;
+    const motor_measure_t *gimbal_motor_raw;
+    uint16_t gimbal_pos_raw;
+    uint16_t gimbal_speed_raw;
+    uint16_t gimbal_tq_current_raw;
 	
 } Gimbal_Motor_t;
 
