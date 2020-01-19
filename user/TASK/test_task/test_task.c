@@ -4,10 +4,6 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "led.h"
-#include "CAN_Receive.h"
-#include "delay.h"
-#include "USART_comms.h"
 #include <stdio.h>
 
 // TODO: determine pid constants
