@@ -4,4 +4,7 @@
 */
 
 /* Converts between motor position and degrees */
-#define POSITION_TO_DEGREE 500 //Change
+#define Motor_Ecd_to_Rad 0.000766990394f
+#define PI cos(-1)
+#define FALSE 0
+#define TRUE 1
