@@ -133,11 +133,6 @@ static uint8_t first_temperate = 0;
 
 
 
-Gimbal_t gimbal;
-char str[32] = {0};
-
-
-
 void INSTask(void *pvParameters)
 {
     vTaskDelay(INS_TASK_INIT_TIME);
@@ -176,13 +171,15 @@ void INSTask(void *pvParameters)
     MPU6500_SPI_DMA_Init(mpu6500_spi_DMA_txbuf, mpu6500_spi_rxbuf);
 
 #endif
-
+/*
     gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
 	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
 		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
+		*/
     while (1)
     {
-				serial_send_string("\n\r");
+				//serial_send_string("hello\n\r");
+			/*
 				sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
 				serial_send_string(str);
 				sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
@@ -195,6 +192,7 @@ void INSTask(void *pvParameters)
 				serial_send_string(str);
 				sprintf(str, "Acce Z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
 				serial_send_string(str);
+			  vTaskDelay(200);*/
 			
 #if defined(MPU6500_USE_DATA_READY_EXIT)
         //等待外部中断中断唤醒任务
