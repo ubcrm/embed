@@ -8,12 +8,13 @@
  #include "task.h"
  #include <math.h>
  #include "stm32f4xx.h"
+ #include "USART_comms.h"
  
  /*
   * The delay time for the control loop in ms. 
 	* Can be modified to 1 ms to better refect DJI
 	*/
- #define PWM_CONTROL_TIME 10
+ #define PWM_CONTROL_TIME 1
  #define BUFFER_LENGTH 10
  
  uint16_t pwm_setting = 0;
@@ -27,6 +28,7 @@
 	*/
  void PWMMotorTask(void *pvparameters){
 	 fric_off();
+     
 	 vTaskDelay(PWM_CONTROL_TIME);
 	 /*
 	 From DJI Code: The friction wheels need to be turned on one by one, 
@@ -34,8 +36,8 @@
 	 otherwise the motor may not turn
 	 */
 	 while(1){
-		 fric1_on(pwm_setting);
-		 vTaskDelay(PWM_CONTROL_TIME);
+		 vTaskDelay(PWM_CONTROL_TIME*10);
+         
 	 }
  }
  
@@ -66,9 +68,26 @@ void USART6_IRQHandler(void)
 				if(buffer[buffer_position-1] == 13){
 					pwm_setting = 0;
 					int power = buffer_position - 2;
-					for(int index = 0; index < BUFFER_LENGTH; index++){
-						pwm_setting += pow(buffer[index], power - index);
+					for(int index = 0; index < buffer_position - 1; index++){
+                        serial_send_string("index: ");
+                        serial_send_int(index);
+                        serial_send_string("power (ptot - i): ");
+                        serial_send_int(power - index);
+                        serial_send_string("buffer value:");
+                        serial_send_int(buffer[index] - ASCII_ZERO);
+                        serial_send_string("pwm setting (interm): ");
+                        
+						pwm_setting += (buffer[index] - ASCII_ZERO) * pow(10 , power - index);
+                        serial_send_int(pwm_setting);
+                        buffer[index] = 0;
+                        fric1_on(pwm_setting);
+                        fric2_on(pwm_setting);
 					}
+                    serial_send_string("\n ------ \n");
+                    serial_send_string("pwm setting: ");
+                    serial_send_int(pwm_setting);
+                    serial_send_string("\n ------ \n");
+                    buffer_position = 0;
 				}
 			}
 	}
