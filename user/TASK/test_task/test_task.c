@@ -25,7 +25,7 @@ char str[32] = {0};
 void testTask(void *pvParameters)
 {
 	  //Link pointers
-	  gimbal.gimbal_yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+	  gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
 	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
 		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
 	
@@ -48,28 +48,26 @@ void testTask(void *pvParameters)
 				serial_send_string(str);
 
 			  delay_ms(200);
-				
 			  
-			  /*
 			  //Make the motor turn
-			  //CAN_CMD_GIMBAL(2000, 0, 0, 0);
+			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
 			
 			  //Get CAN received data
 			  
-			  gimbal_yaw_motor.gimbal_pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
-			  gimbal_yaw_motor.gimbal_speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
-			  gimbal_yaw_motor.gimbal_tq_current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
+			  gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
+			  gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
+			  gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
 			
 			
 			  //Sending data via UART
 				serial_send_string("position: %d\n\r");
-				serial_send_int(gimbal.gimbal_yaw_motor->gimbal_pos_raw);
+				serial_send_int(gimbal.yaw_motor->pos_raw);
 				serial_send_string("speed: %d\n\r");
-				serial_send_int(gimbal.gimbal_yaw_motor->gimbal_speed_raw);
+				serial_send_int(gimbal.yaw_motor->speed_raw);
 				serial_send_string("current: %d\n\r");
-				serial_send_int(gimbal.gimbal_yaw_motor->gimbal_tq_current_raw);	
-			  delay_ms(100);
-				*/
+				serial_send_int(gimbal.yaw_motor->current_raw);	
+			  vTaskDelay(200);
+				
 				
     }
     

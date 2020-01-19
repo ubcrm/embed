@@ -144,10 +144,10 @@ void CAN_CMD_CHASSIS_RESET_ID(void)
 
 
 /**
-* @brief  Writes a CAN message to chassis motors
-* @param  Input speed values for the four motors (M3508) range untested
-* @retval None
-*/
+ * @brief  Writes a CAN message to chassis motors
+ * @param  Input speed values for the four motors (M3508) range untested
+ * @retval None
+ */
 void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
 {
     CanTxMsg TxMessage;

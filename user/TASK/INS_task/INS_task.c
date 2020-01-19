@@ -39,6 +39,9 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "USART_comms.h"
+#include <stdio.h>
+#include "test_task.h"
 
 #define IMUWarnBuzzerOn() buzzer_on(95, 10000) //开机陀螺仪校准蜂鸣器
 
@@ -128,14 +131,20 @@ static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f}; //四元数
 
 static uint8_t first_temperate = 0;
 
+
+
+Gimbal_t gimbal;
+char str[32] = {0};
+
+
+
 void INSTask(void *pvParameters)
 {
-
     vTaskDelay(INS_TASK_INIT_TIME);
+	
     //初始化mpu6500，失败进入死循环
     while (mpu6500_init() != MPU6500_NO_ERROR)
     {
-        ;
     }
 
 //初始化ist8310，失败进入死循环
@@ -168,9 +177,25 @@ void INSTask(void *pvParameters)
 
 #endif
 
+    gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
+		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
     while (1)
     {
-
+				serial_send_string("\n\r");
+				sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Gyro Z: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
+				serial_send_string(str);
+			  sprintf(str, "Acce X: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Acce Y: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
+				serial_send_string(str);
+				sprintf(str, "Acce Z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
+				serial_send_string(str);
+			
 #if defined(MPU6500_USE_DATA_READY_EXIT)
         //等待外部中断中断唤醒任务
         while (ulTaskNotifyTake(pdTRUE, portMAX_DELAY) != pdPASS)

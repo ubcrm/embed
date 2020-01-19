@@ -17,7 +17,7 @@ static TaskHandle_t StartTask_Handler;
 static TaskHandle_t TestTask_Handler;
 
 #define INS_TASK_PRIO 2
-#define INS_STK_SIZE 256
+#define INS_STK_SIZE 512
 static TaskHandle_t INSTask_Handler;
 
 #define REV_TASK_PRIO 10
@@ -34,6 +34,7 @@ void start_task(void *pvParameters)
                 (void *)NULL,
                 (UBaseType_t)TEST_TASK_PRIO,
                 (TaskHandle_t *)&TestTask_Handler);
+	
 								
 		xTaskCreate((TaskFunction_t) INSTask,
 								(const char *)"INS_task",
