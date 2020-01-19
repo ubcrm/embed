@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // Sends one string over USART
-// Example usage: Serial_sendString("Nando eats Nando's at Nando's");
+// Example usage: serial_send_string("Nando eats Nando's at Nando's");
 void serial_send_string(volatile char *str)
 {
 	while (*str) {

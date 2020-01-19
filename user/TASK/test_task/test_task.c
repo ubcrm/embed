@@ -26,10 +26,10 @@ void testTask(void *pvParameters)
     while(1) {
       led_green_toggle();
 			serial_send_int(1);			
-			delay_ms(100);
+			//delay_ms(100);
 
 			  //Make the motor turn
-			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
+			  CAN_CMD_GIMBAL(2000, 2000, 0, 0);
 			
 			  //Get CAN received data
 			  gimbal_yaw_motor.gimbal_pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
