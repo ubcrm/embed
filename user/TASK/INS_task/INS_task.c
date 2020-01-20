@@ -133,7 +133,7 @@ static uint8_t first_temperate = 0;
 
 
 
-void INSTask(void *pvParameters)
+void INS_task(void *pvParameters)
 {
     vTaskDelay(INS_TASK_INIT_TIME);
 	

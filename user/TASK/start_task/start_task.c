@@ -7,41 +7,53 @@
 #include "test_task.h"
 #include "revolver_task.h"
 #include "INS_task.h"
+#include "chassis_task.h"
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE 512
-static TaskHandle_t StartTask_Handler;
+static TaskHandle_t start_task_handler;
 
 #define TEST_TASK_PRIO 4
 #define TEST_STK_SIZE 256
-static TaskHandle_t TestTask_Handler;
+static TaskHandle_t test_task_handler;
 
 #define INS_TASK_PRIO 2
 #define INS_STK_SIZE 512
-static TaskHandle_t INSTask_Handler;
+static TaskHandle_t chassis_task_handler;
+
+#define CHASSIS_TASK_PRIO 2
+#define CHASSIS_STK_SIZE 512
+static TaskHandle_t INS_task_handler;
 
 #define REV_TASK_PRIO 10
 #define REV_STK_SIZE 256
-static TaskHandle_t RevolverTask_Handler;
+static TaskHandle_t revolver_task_Handler;
 
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();
 
-		xTaskCreate((TaskFunction_t) testTask,
+		xTaskCreate((TaskFunction_t) test_task,
 								(const char *)"test_task",
 								(uint16_t) TEST_STK_SIZE,
                 (void *)NULL,
                 (UBaseType_t)TEST_TASK_PRIO,
-                (TaskHandle_t *)&TestTask_Handler);
+                (TaskHandle_t *)&test_task_handler);
 	
 								
-		xTaskCreate((TaskFunction_t) INSTask,
+		xTaskCreate((TaskFunction_t) INS_task,
 								(const char *)"INS_task",
 								(uint16_t) INS_STK_SIZE,
                 (void *)NULL,
                 (UBaseType_t)INS_TASK_PRIO,
-                (TaskHandle_t *)&INSTask_Handler);
+                (TaskHandle_t *)&INS_task_handler);
+								
+		xTaskCreate((TaskFunction_t) chassis_task,
+								(const char *)"INS_task",
+								(uint16_t) CHASSIS_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)CHASSIS_TASK_PRIO,
+                (TaskHandle_t *)&chassis_task_handler);
 				
 /*								
 		xTaskCreate((TaskFunction_t) revolverTask,
@@ -52,7 +64,7 @@ void start_task(void *pvParameters)
                 (TaskHandle_t *)&RevolverTask_Handler);
 								*/
 
-    vTaskDelete(StartTask_Handler); //Delete start task
+    vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical
 }
 
@@ -63,5 +75,5 @@ void startTask(void)
                 (uint16_t)START_STK_SIZE,            //Task stack size
                 (void *)NULL,                        //Inputs to task functions
                 (UBaseType_t)START_TASK_PRIO,        //Task priority
-                (TaskHandle_t *)&StartTask_Handler); //Task handler
+                (TaskHandle_t *)&start_task_handler); //Task handler
 }

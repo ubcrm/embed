@@ -76,7 +76,7 @@
 #define INS_ACCEL_Y_ADDRESS_OFFSET 1
 #define INS_ACCEL_Z_ADDRESS_OFFSET 2
 
-extern void INSTask(void *pvParameters);
+extern void INS_task(void *pvParameters);
 
 extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);

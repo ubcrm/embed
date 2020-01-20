@@ -13,8 +13,6 @@
 #include "delay.h"
 #include "INS_task.h"
 #include "USART_comms.h"
-
-#include "stdio.h"
 #include "mpu6500driver.h"
 
 
@@ -22,7 +20,7 @@ Gimbal_t gimbal;
 char str[32] = {0};
 
 
-void testTask(void *pvParameters)
+void test_task(void *pvParameters)
 {
 	  //Link pointers
 	  gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();

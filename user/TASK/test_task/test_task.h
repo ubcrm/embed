@@ -22,6 +22,6 @@ typedef struct
 	const fp32 *acce_reading_raw;
 } Gimbal_t;
 
-void testTask(void *pvParameters);
+void test_task(void *pvParameters);
 	
 #endif
