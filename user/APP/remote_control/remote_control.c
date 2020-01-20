@@ -46,7 +46,7 @@ void remote_control_init(void)
     RC_Init(SBUS_rx_buf[0], SBUS_rx_buf[1], SBUS_RX_BUF_NUM);
 }
 // get a pointer to the rc struct
-const RC_ctrl_t *get_remote_control_point(void)
+const RC_ctrl_t* get_remote_control_point(void)
 {
     return &rc_ctrl;
 }
