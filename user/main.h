@@ -51,6 +51,11 @@ typedef double fp64;
 #define NULL 0
 #endif
 
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #ifndef PI
 #define PI 3.14159265358979f
 #endif
