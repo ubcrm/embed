@@ -97,6 +97,8 @@ void USART6_IRQHandler(void)
                         
 						pwm_setting += (buffer[index] - ASCII_ZERO) * pow(10 , power - index);
                         serial_send_int(pwm_setting);
+						fric2_on(pwm_setting);
+						fric1_on(pwm_setting);
                         buffer[index] = 0;
                       
 					}
