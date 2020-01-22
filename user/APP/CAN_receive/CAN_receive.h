@@ -37,7 +37,7 @@ typedef enum
     CAN_YAW_MOTOR_ID = 0x205,
     CAN_PIT_MOTOR_ID = 0x206,
     CAN_SHOOT_MOTOR_ID = 0x207,
-	  CAN_REVOLVER_MOTOR_ID = 0x208,
+	CAN_REVOLVER_MOTOR_ID = 0x208,
     CAN_GIMBAL_ALL_ID = 0x1FF,
 
 } can_msg_id_e;

@@ -63,7 +63,7 @@ void start_task(void *pvParameters)
             (void *)NULL,
             (UBaseType_t)REV_TASK_PRIO,
             (TaskHandle_t *)&RevolverTask_Handler);
-                            */
+*/
 
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical

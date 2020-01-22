@@ -7,13 +7,13 @@
 	* @attention The initialization of CAN channels must be done by calling funtions
 	*          in hardware/CAN.c. Additionally, the motor layout are as following:
 	*          CAN 1: chassis  M3508  
-	*									motor ID 1 2 3 4
-	*									write ID 0x200 (for all of them)
+	*				  motor ID 1 2 3 4
+	*  				  write ID 0x200 (for all of them)
 	*                 read ID 0x201 0x202 0x203 0x204 
-	*					 CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
+	*		   CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
 	*                 motor ID 5 6 7 8
-	*									write ID 0x1FF (for all of them)
-	*									read ID 0x205 0x206 0x207 0x208
+	*				  write ID 0x1FF (for all of them)
+	*				  read ID 0x205 0x206 0x207 0x208
   ******************************************************************************
 **/
 
