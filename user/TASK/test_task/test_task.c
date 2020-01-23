@@ -6,6 +6,9 @@
 #include "task.h"
 #include <stdio.h>
 
+#include "led.h"
+#include "USART_comms.h"
+
 #define pid_kp 4
 #define pid_ki 0.01
 #define pid_kd 0.5
