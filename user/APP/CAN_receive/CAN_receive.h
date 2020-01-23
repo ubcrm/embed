@@ -1,19 +1,20 @@
 /**
   ******************************************************************************
-  * @file    APP/CAN_receive
-  * @date    15-January-2020
-  * @brief   This file contains functions to write to chassis and gimbal motors 
-	*          and read their information using CAN interrupt. 
-	* @attention The initialization of CAN channels must be done by calling funtions
+    * @file    APP/CAN_receive
+    * @date    15-January-2020
+    * @brief   This file contains functions to write to chassis and gimbal motors 
+    *          and read their information using CAN interrupt. 
+    * @attention The initialization of CAN channels must be done by calling funtions
 	*          in hardware/CAN.c. Additionally, the motor layout are as following:
 	*          CAN 1: chassis  M3508  
-	*									motor ID 1 2 3 4
-	*									write ID 0x200 (for all of them)
-	*                 read ID 0x201 0x202 0x203 0x204 
-	*					 CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
-	*                 motor ID 5 6 7 8
-	*									write ID 0x1FF (for all of them)
-	*									read ID 0x205 0x206 0x207 0x208
+	*				  motor ID     1     2     3     4
+	*				  write ID 0x200 0x200 0x200 0x200
+	*                 read ID  0x201 0x202 0x203 0x204 
+	*		   CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
+	*                 motor ID     1     2     3     4
+    *                 motor bits 001   010   N/A   N/A
+	*				  write ID 0x1FF 0x1FF 0x1FF 0x1FF
+	*				  read ID  0x205 0x206 0x207 0x208
   ******************************************************************************
 **/
 
