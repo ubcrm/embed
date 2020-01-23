@@ -16,10 +16,22 @@
 #include "gimbal_task.h"
 #include "stm32f4xx.h"
 
+#define RC_MIN -1.0;
+#define RC_MAX 1.0;
+
+#define ENCODER_MIN 0;
+#define ENCODER_MAX 8191;
+#define YAW_MIN 0;
+#define YAW_MAX 8191;
+#define PITCH_MIN 0;
+#define PITCH_MAX 8191;
+
 // These will later be produced from RC
 /* angle in radians*/
-float theta;
-float phi;
+float theta_setpoint;
+float phi_setpoint;
+float rc_channel_1;
+float rc_channel_2;
 
 /*
 * Returns an angle between -pi and pi
@@ -34,6 +46,11 @@ float get_domain_angle(float alpha);
 * returns: angle in radians with magnitude < 2*pi
 */
 float get_relative_angle(float alpha, float beta);
+
+/**
+ * Maps float in a specified range to an int in a new range as a linear mapping function
+ */
+int linear_map_float_to_int(float val, float val_max, float val_min, int out_min, int out_max);
 
 /**
   * @brief      Handles cases when RC joystick is not quite centered
@@ -55,11 +72,21 @@ void gimbalTask(void* parameters){
 
 	
 	while(1){	
+        /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
+        
+        
 		// Gets update on position from encoders and gyro
 		// Comparison to setpoint
 		// run PID
 	}
 }
+
+int linear_map_float_to_int(float val, float val_max, float val_min, int out_min, int out_max){
+    float percentage = val / (val_max - val_min);
+    
+    return (int) (percentage * (out_max - out_min)); 
+}
+
 
 float get_domain_angle(float alpha){
 	int done = 0;
