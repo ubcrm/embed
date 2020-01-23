@@ -19,6 +19,8 @@ void testTask(void *pvParameters)
     gimbal_pitch_motor.gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
     
     fp32 pitch_signal;
+    
+    int vision_signal;
 
     PidTypeDef pid;
     fp32 pid_constants[3] = {pid_kp, pid_ki, pid_kd};
@@ -33,14 +35,8 @@ void testTask(void *pvParameters)
         gimbal_pitch_motor.gimbal_speed_raw = gimbal_pitch_motor.gimbal_motor_raw->speed_rpm;
         gimbal_pitch_motor.gimbal_tq_current_raw = gimbal_pitch_motor.gimbal_motor_raw->given_current;
 
-        int vision_signal = -1000;  // TODO: Get real values from vision
+        vision_signal = get_vision_signal();
         
-        while (vision_signal > 8191) {
-            vision_signal -= 8191;
-        }
-        while (vision_signal < 0) {
-            vision_signal += 8192;
-        }
         pitch_signal = PID_Calc(&pid, gimbal_pitch_motor.gimbal_pos_raw, vision_signal);
 
         // Turn gimbal motor
@@ -50,6 +46,19 @@ void testTask(void *pvParameters)
         send_to_uart(gimbal_pitch_motor, pid, pitch_signal);			
         
     }
+}
+
+int get_vision_signal() {
+    int vision_signal = -1000;  // TODO: Get real values from vision
+        
+    while (vision_signal > 8191) {
+        vision_signal -= 8191;
+    }
+    while (vision_signal < 0) {
+        vision_signal += 8192;
+    }
+    
+    return vision_signal;
 }
 
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
