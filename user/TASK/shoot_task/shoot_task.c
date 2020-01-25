@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+    * @file    TASK/shoot_task
+    * @date    24-January/2020
+    * @brief   Shooting controls
+    * @attention Shoot motors are plugged into pins A8 and E14, order unknown (update this if you find out)
+  ******************************************************************************
+**/
+
 #include "shoot_task.h"
 #include "main.h"
 #include "stm32f4xx.h"
