@@ -62,7 +62,7 @@ void start_task(void *pvParameters)
             (uint16_t) REV_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)REV_TASK_PRIO,
-            (TaskHandle_t *)&RevolverTask_Handler);
+            (TaskHandle_t *)&revolver_task_handler);
 */
 
     vTaskDelete(start_task_handler); //Delete start task
