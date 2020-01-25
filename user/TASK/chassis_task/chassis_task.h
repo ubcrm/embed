@@ -19,7 +19,7 @@ typedef struct
     
     //Final output speed
     uint16_t speed_out;
-} Chassis_Motor_t;
+} chassis_Motor_t;
 
 
 typedef struct 
@@ -39,7 +39,7 @@ typedef struct
     uint16_t x_speed_set;
     uint16_t y_speed_set;
     uint16_t z_speed_set;
-} Chassis_t;
+} chassis_t;
 
 
 typedef enum{

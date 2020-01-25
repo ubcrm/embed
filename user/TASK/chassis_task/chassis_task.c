@@ -1,12 +1,12 @@
 #include "chassis_task.h"
 #include "main.h"
 #include "stm32f4xx.h"
-#include <stdio.h>
 
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include <stdio.h>
 #include "led.h"
 #include "CAN_Receive.h"
 #include "delay.h"
@@ -14,14 +14,14 @@
 #include "INS_task.h"
 
 
-static uint8_t chassis_init(Chassis_t *chassis_move_init);
+static uint8_t chassis_init(chassis_t *chassis_move_init);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
 static void chassis_set_mode(void);
 static void chassis_motor_calc(void);
 static void chassis_PID(void);
 
-static Chassis_t chassis;
+static chassis_t chassis;
     
 
 
@@ -48,7 +48,7 @@ void chassis_task(void *pvParameters){
  * @retval TRUE if init is completed
  */
 
-uint8_t chassis_init(Chassis_t *chassis_init){
+uint8_t chassis_init(chassis_t *chassis_init){
     //Forces motors to reset ID
     CAN_CMD_CHASSIS_RESET_ID();
     
