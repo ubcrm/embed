@@ -17,5 +17,16 @@ typedef struct
 void testTask(void *pvParameters);
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pi, fp32 pitch_signal);
 int get_vision_signal();
+
+typedef struct 
+{
+	Gimbal_Motor_t *yaw_motor;
+	Gimbal_Motor_t *pitch_motor;
+	const fp32 *gyro_reading_raw;
+	const fp32 *acce_reading_raw;
+} Gimbal_t;
+
+void test_task(void *pvParameters);
+
 	
 #endif

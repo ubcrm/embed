@@ -26,6 +26,7 @@
 #include "flash.h"
 #include "fric.h"
 #include "laser.h"
+
 #include "led.h"
 #include "power_ctrl.h"
 #include "rc.h"
@@ -37,9 +38,9 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "mpu6500driver.h"
 
 #include "start_task.h"
-
 #include "remote_control.h"
 
 void BSP_init(void);

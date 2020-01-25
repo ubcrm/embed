@@ -1,13 +1,18 @@
 #include "test_task.h"
 #include "main.h"
-#include "pid.h"
+
+#include "stm32f4xx.h"
+#include <stdio.h>
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include <stdio.h>
 
 #include "led.h"
+#include "CAN_Receive.h"
+#include "delay.h"
+#include "INS_task.h"
 #include "USART_comms.h"
+#include "pid.h"
 
 #define pid_kp 4
 #define pid_ki 0.01
@@ -15,9 +20,12 @@
 #define max_out 15000
 #define max_iout 0
 
+Gimbal_t gimbal;
+char str[32] = {0};
+
 Gimbal_Motor_t gimbal_pitch_motor;
 
-void testTask(void *pvParameters)
+void test_task(void *pvParameters)
 {
     gimbal_pitch_motor.gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
     
