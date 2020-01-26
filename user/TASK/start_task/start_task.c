@@ -14,7 +14,7 @@
 static TaskHandle_t start_task_handler;
 
 #define TEST_TASK_PRIO 4
-#define TEST_STK_SIZE 256
+#define TEST_STK_SIZE 512
 static TaskHandle_t test_task_handler;
 
 #define INS_TASK_PRIO 2

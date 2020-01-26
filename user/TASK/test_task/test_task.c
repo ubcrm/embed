@@ -67,11 +67,7 @@ void test_task(void *pvParameters)
 {
     vTaskDelay(200);
     while(1) {
-        led_green_toggle();
-        serial_send_string("in test task");
-        vTaskDelay(200);
-        
-			  //test_CAN_Motor();
+			  test_CAN_Motor();
     }  
 }
 
@@ -133,17 +129,15 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
  * @retval None
  * @attention The motor needs to be set to ID 1
  */
-static void test_CAN_Motor(){
-    serial_send_string("Here");
+void test_CAN_Motor(){
     //Link pointer (only needs to be done once)
     gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
     vTaskDelay(10);
     
     while(1){
         //Make the motor turn
-        serial_send_string("Here");
 
-        CAN_CMD_GIMBAL(0, 0, 0, 0);
+        //CAN_CMD_GIMBAL(0, 0, 0, 0);
 
         //Get CAN received data
         gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
@@ -158,7 +152,7 @@ static void test_CAN_Motor(){
         serial_send_string(str);
         sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
         serial_send_string(str);	
-        vTaskDelay(1);
+        vTaskDelay(200);
     }
 }
 
