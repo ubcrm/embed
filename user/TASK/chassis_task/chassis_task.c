@@ -27,7 +27,6 @@ static Chassis_t chassis;
 
 
 void chassis_task(void *pvParameters){
-
     //Initializes chassis
     while(!chassis_init(&chassis)){
     }
@@ -128,4 +127,7 @@ void chassis_PID(void){
     //Don't worry about this for now
 	//translation
     //rotation
+	  while(1) {
+        // todo
+      }
 }

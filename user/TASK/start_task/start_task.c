@@ -44,14 +44,13 @@ void start_task(void *pvParameters)
             (UBaseType_t)TEST_TASK_PRIO,
             (TaskHandle_t *)&test_task_handler);
 
-                            
     xTaskCreate((TaskFunction_t) INS_task,
             (const char *)"INS_task",
             (uint16_t) INS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)INS_TASK_PRIO,
             (TaskHandle_t *)&INS_task_handler);
-                            
+			
     xTaskCreate((TaskFunction_t) chassis_task,
             (const char *)"chassis_task",
             (uint16_t) CHASSIS_STK_SIZE,
@@ -61,6 +60,7 @@ void start_task(void *pvParameters)
             
 /*								
     xTaskCreate((TaskFunction_t) revolverTask,
+
             (const char *)"revolver_task",
             (uint16_t) REV_STK_SIZE,
             (void *)NULL,
