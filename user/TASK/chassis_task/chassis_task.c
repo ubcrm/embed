@@ -15,6 +15,7 @@
 
 void chassis_task(void *pvParameters){
 	  while(1) {
+          vTaskDelay(200);
         // todo
       }
 }

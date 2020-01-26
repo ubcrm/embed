@@ -45,6 +45,8 @@ char str[32] = {0};
 static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce);
 //Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
 static void test_GM6020(void);
+//Enables Debug of P19 (chassis) motor
+static void test_P19(int id);
 
 
 
@@ -123,6 +125,16 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
     }
 }
 
+
+/** 
+ * @brief  Turns P19 (Chassis Motor) and returns encoder position
+ * @param  int id
+ * @retval None
+ * @attention The motor needs to be set to ID 1
+ */
+static void test_P19(int id){
+    //
+}
 
 /** 
  * @brief  Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
