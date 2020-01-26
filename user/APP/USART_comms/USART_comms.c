@@ -26,6 +26,7 @@ void serial_send_int_array(volatile int *arr, int length)
 	}
 }
 
+
 // Send an integer over serial as its ASCII value
 void serial_send_int(int num)
 {

@@ -1,19 +1,22 @@
 /**
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  * @file       can_receive.c/h
-  * @brief      完成can设备数据收发函数，该文件是通过can中断完成接收
-  * @note       该文件不是freeRTOS任务
-  * @history
-  *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. 完成
-  *
-  @verbatim
-  ==============================================================================
-
-  ==============================================================================
-  @endverbatim
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  */
+  ******************************************************************************
+    * @file    APP/CAN_receive
+    * @date    15-January-2020
+    * @brief   This file contains functions to write to chassis and gimbal motors 
+    *          and read their information using CAN interrupt. 
+    * @attention The initialization of CAN channels must be done by calling funtions
+    *          in hardware/CAN.c. Additionally, the motor layout are as following:
+    *          CAN 1: chassis  M3508  
+    *                 motor ID     1     2     3     4
+    *                 write ID 0x200 0x200 0x200 0x200
+    *                 read ID  0x201 0x202 0x203 0x204 
+    *          CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
+    *                 motor ID     1     2     3     4
+    *                 motor bits 001   010   N/A   N/A
+    *                 write ID 0x1FF 0x1FF 0x1FF 0x1FF
+    *                 read ID  0x205 0x206 0x207 0x208
+  ******************************************************************************
+**/
 
 #ifndef CANTASK_H
 #define CANTASK_H
@@ -22,7 +25,8 @@
 #define CHASSIS_CAN CAN2
 #define GIMBAL_CAN CAN1
 
-/* CAN send and receive ID */
+
+// CAN send and receive IDs
 typedef enum
 {
     CAN_CHASSIS_ALL_ID = 0x200,
@@ -33,12 +37,14 @@ typedef enum
 
     CAN_YAW_MOTOR_ID = 0x205,
     CAN_PIT_MOTOR_ID = 0x206,
-    CAN_TRIGGER_MOTOR_ID = 0x207,
+    CAN_SHOOT_MOTOR_ID = 0x207,
+	  CAN_REVOLVER_MOTOR_ID = 0x208,
     CAN_GIMBAL_ALL_ID = 0x1FF,
 
 } can_msg_id_e;
 
-//
+
+//Motor data struct for GM6020 and M3508
 typedef struct
 {
     uint16_t ecd;
@@ -48,9 +54,13 @@ typedef struct
     int16_t last_ecd;
 } motor_measure_t;
 
-extern void CAN_CMD_CHASSIS_RESET_ID(void);
 
-//Send to gimbal, trigger, and revolver
+
+/******************** Main Functions Called From Outside ********************/
+
+//Resets chassis motor CAN ID
+extern void CAN_CMD_CHASSIS_RESET_ID(void);
+//Send to yaw, pitch , trigger, and revolver
 extern void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev);
 //Send to chassis
 extern void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
