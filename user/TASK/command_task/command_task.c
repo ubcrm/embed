@@ -101,13 +101,14 @@ void try_execute_command(){
 	}
 }
 
-//char ret[1];
+char ret[1];
 
 void USART6_IRQHandler(void){
+	serial_send_string("Recieved UART");
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){
 		uint16_t bt = USART_ReceiveData(USART6);
-		//sprintf(ret, "%d", bt);
-		//serial_send_string(ret);
+		sprintf(ret, "%d", bt);
+		serial_send_string(ret);
 		serial_send_int(bt);
 		if((bt == 13 && buffer_pos != 0) || buffer_pos >= MAX_COMMAND_LINE){
 			serial_send_string("\n\r");

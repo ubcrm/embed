@@ -175,8 +175,9 @@ void SysTick_Handler(void)
 
 // Interrupt handler for USART 6. This is called on the reception of every
 // byte on USART6
-void USART6_IRQHandler(void)
+/*void USART6_IRQHandler(void)
 {
+	serial_send_string("WTF");
 	// make sure USART6 was intended to be called for this interrupt
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
 		uint16_t USART_Data = USART_ReceiveData(USART6);
@@ -201,9 +202,8 @@ void USART6_IRQHandler(void)
 				buffer_rx[i] = 0;
 			}
 		}
-		
 	}
-}
+}*/
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

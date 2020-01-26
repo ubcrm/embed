@@ -25,20 +25,21 @@ void testTask(void *pvParameters)
 	
     while(1) {
       led_green_toggle();
-			serial_send_int(1);			
+			//serial_send_int(1);
+			//serial_send_string("String");
 			delay_ms(100);
 
-			  //Make the motor turn
-			  CAN_CMD_GIMBAL(2000, 0, 0, 0);
+			//Make the motor turn
+			CAN_CMD_GIMBAL(2000, 0, 0, 0);
 			
-			  //Get CAN received data
-			  gimbal_yaw_motor.gimbal_pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
-			  gimbal_yaw_motor.gimbal_speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
-			  gimbal_yaw_motor.gimbal_tq_current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
+		  //Get CAN received data
+			gimbal_yaw_motor.gimbal_pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
+			gimbal_yaw_motor.gimbal_speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
+			gimbal_yaw_motor.gimbal_tq_current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
 			
 			
-			  //Sending data via UART
-			  //sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
+			//Sending data via UART
+			//sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
 				/*Serial_sendString(str);
 				sprintf(str, "speed: %d\n\r", gimbal_yaw_motor.gimbal_speed_raw);
 				Serial_sendString(str);				

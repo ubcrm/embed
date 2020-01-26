@@ -22,5 +22,6 @@ typedef struct {
 } cmd_entry;
 
 extern cmd_entry commands[MAX_NUM_COMMANDS];
+//void USART6_IRQHandler(void);
 
 #endif
