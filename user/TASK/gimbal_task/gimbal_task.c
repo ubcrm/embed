@@ -16,15 +16,22 @@
 #include "gimbal_task.h"
 #include "stm32f4xx.h"
 
-#define RC_MIN -1.0;
-#define RC_MAX 1.0;
+#include "FreeRTOSConfig.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
-#define ENCODER_MIN 0;
-#define ENCODER_MAX 8191;
-#define YAW_MIN 0;
-#define YAW_MAX 8191;
-#define PITCH_MIN 0;
-#define PITCH_MAX 8191;
+#define GIMBAL_TASK_INIT_TIME 201
+#define CONTROL_TIME 1
+
+#define RC_MIN -1.0
+#define RC_MAX 1.0
+
+#define ENCODER_MIN 0
+#define ENCODER_MAX 8191
+#define YAW_MIN 0
+#define YAW_MAX 8191
+#define PITCH_MIN 0
+#define PITCH_MAX 8191
 
 // These will later be produced from RC
 /* angle in radians*/
@@ -50,7 +57,7 @@ float get_relative_angle(float alpha, float beta);
 /**
  * Maps float in a specified range to an int in a new range as a linear mapping function
  */
-int linear_map_float_to_int(float val, float val_max, float val_min, int out_min, int out_max);
+int linear_map_float_to_int(float val, float val_min, float val_max, int out_min, int out_max);
 
 /**
   * @brief      Handles cases when RC joystick is not quite centered
@@ -70,14 +77,19 @@ int linear_map_float_to_int(float val, float val_max, float val_min, int out_min
 
 void gimbalTask(void* parameters){
 
+    vTaskDelay(GIMBAL_TASK_INIT_TIME);
 	
 	while(1){	
         /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
+        /* For now using strictly encoder feedback for position */
+        theta_setpoint = linear_map_float_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
+        phi_setpoint = linear_map_float_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
         
         
 		// Gets update on position from encoders and gyro
 		// Comparison to setpoint
 		// run PID
+        vTaskDelay(CONTROL_TIME);
 	}
 }
 
