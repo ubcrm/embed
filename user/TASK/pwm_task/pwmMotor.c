@@ -40,45 +40,23 @@
          
 	 }
  }
- 
- /* From Jaden */ /*
-extern void USART_puts(USART_TypeDef *USARTx, volatile char *str);
-extern volatile uint8_t USART_Data;
-extern volatile int Data_received;
 
-// interrupt request handler for all USART6 interrupts
-// is called every time 1 byte is received
-void USART6_IRQHandler(void)
-{
-	// make sure USART6 was intended to be called for this interrupt
-	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
-		USART_Data = USART_ReceiveData(USART6);
-		Data_received = 1;
-
-	}
-}*/
- 
-
- void USART6_IRQHandler(void){
-	 if (USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){		 
-			buffer[buffer_position++] = USART_ReceiveData(USART6);	
-		  if(buffer_position > 0){
-				
-				/* 13 is the enter key on Windows*/ 
-				if(buffer[buffer_position-1] == 13){
-					pwm_setting = 0;
-					int power = buffer_position - 2;
-					for(int index = 0; index < buffer_position - 1; index++){
-                        serial_send_string("index: ");
-                        serial_send_int(index);
-                        serial_send_string("power (ptot - i): ");
-                        serial_send_int(power - index);
-                        serial_send_string("buffer value:");
-                        serial_send_int(buffer[index] - ASCII_ZERO);
-                        serial_send_string("pwm setting (interm): ");
-                        
+/*
+ * A debug handler used can be used to get a PWM signal directly.
+ * Configured to interface with Putty on a windows system. 
+ * Enter a number, x (0-1999), and press enter. 
+ * This will output a PWM signal with duty cycle x/2000  
+ */
+void USART6_IRQHandler(void){
+	if (USART_GetITStatus(USART6, USART_IT_RXNE) != RESET){		 
+        buffer[buffer_position++] = USART_ReceiveData(USART6);	
+            if(buffer_position > 0){
+                /* 13 is the enter key on Windows*/ 
+                if(buffer[buffer_position-1] == 13){
+                    pwm_setting = 0;
+                    int power = buffer_position - 2;
+                    for(int index = 0; index < buffer_position - 1; index++){
 						pwm_setting += (buffer[index] - ASCII_ZERO) * pow(10 , power - index);
-                        serial_send_int(pwm_setting);
                         buffer[index] = 0;
                         fric1_on(pwm_setting);
                         fric2_on(pwm_setting);
