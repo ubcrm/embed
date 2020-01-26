@@ -37,14 +37,15 @@ void testTask(void *pvParameters)
 			gimbal_yaw_motor.gimbal_speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
 			gimbal_yaw_motor.gimbal_tq_current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
 			
-			
 			//Sending data via UART
 			//sprintf(str, "position: %d\n\r", gimbal_yaw_motor.gimbal_pos_raw);
+
 				/*Serial_sendString(str);
 				sprintf(str, "speed: %d\n\r", gimbal_yaw_motor.gimbal_speed_raw);
-				Serial_sendString(str);				
+				serial_send_string(str);				
 			  sprintf(str, "current: %d\n\r", gimbal_yaw_motor.gimbal_tq_current_raw);
 				Serial_sendString(str);	*/
+
 			  delay_ms(100);
     }
     
