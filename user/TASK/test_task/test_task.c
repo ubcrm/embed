@@ -28,6 +28,11 @@
 
 
 /******************** Private User Declarations ********************/
+#define pid_kp 4
+#define pid_ki 0.01
+#define pid_kd 0.5
+#define max_out 15000
+#define max_iout 0
 
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
