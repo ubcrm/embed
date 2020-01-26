@@ -26,7 +26,7 @@
 #include "mpu6500driver.h"
 #include "pid.h"
 #include "remote_control.h"
-
+#include "chassis_task.h"
 
 /******************** Private User Declarations ********************/
 #define pid_kp 4
@@ -61,9 +61,13 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
  */
 void test_task(void *pvParameters)
 {
+    
+    //Chassis_t* chassis = get_chassis_point();
+    
     while(1) {
-			  
-        vTaskDelay(200);
+        
+        
+        vTaskDelay(2000);
 
     }  
 }

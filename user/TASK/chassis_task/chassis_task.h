@@ -9,10 +9,16 @@
 //Chassis motor CAN ID offset
 //Update after testing
 //usage: (Chassis_t)chassis->motor[FRONT_LEFT] 
-#define FRONT_LEFT 0
-#define BACK_LEFT 1
-#define FRONT_RIGHT 2
-#define BACK_RIGHT 3
+#define FRONT_LEFT 2
+#define BACK_LEFT 3
+#define FRONT_RIGHT 1
+#define BACK_RIGHT 4
+
+// RC channels
+#define RC_X 2
+#define RC_Y 1
+#define RC_Z 0
+
 
 typedef struct 
 {
@@ -64,6 +70,8 @@ typedef enum{
 
 
 extern void chassis_task(void *pvParameters);
+extern uint8_t chassis_init(Chassis_t *chassis_init);
+extern Chassis_t* get_chassis_point(void);
 
 #endif
 	

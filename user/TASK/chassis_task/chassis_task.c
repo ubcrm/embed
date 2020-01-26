@@ -15,7 +15,7 @@
 #include "remote_control.h"
 
 
-static uint8_t chassis_init(Chassis_t *chassis_move_init);
+//static uint8_t chassis_init(Chassis_t *chassis_move_init);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
 static void chassis_set_mode(void);
@@ -25,6 +25,9 @@ static void chassis_PID(void);
 static Chassis_t chassis;
     
 
+Chassis_t* get_chassis_point() {
+    return &chassis;
+}
 
 void chassis_task(void *pvParameters){
     //Initializes chassis
@@ -41,7 +44,7 @@ void chassis_task(void *pvParameters){
         //PID calculations, process 
         chassis_PID();
         //output, change to actual output
-        CAN_CMD_CHASSIS(0, 0, 0, 0);
+        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_set * 4, chassis.motor[FRONT_LEFT].speed_set * 4, chassis.motor[BACK_LEFT].speed_set * 4, chassis.motor[BACK_RIGHT].speed_set * 4);
         vTaskDelay(50);
     }        
 }
@@ -101,6 +104,15 @@ void chassis_remote_calc(chassis_user_mode_e mode){
     //process based on mode (which is currently none) and put into x_speed_set
     //Debug print out current 
     
+    // get rc data and put into chassis struct
+    chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
+    chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
+    chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
+    
+    // process raw sppeds based on modes (for now they are just the same)
+    chassis.x_speed_set = chassis.x_speed_raw;
+    chassis.y_speed_set = chassis.y_speed_raw;
+    chassis.z_speed_set = chassis.z_speed_raw;
     
 }
 
@@ -115,6 +127,12 @@ void chassis_motor_calc(void){
 	//Take x_speed_set etc
     //Handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
+    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
+    chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set + chassis.z_speed_set;
+    chassis.motor[FRONT_RIGHT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set - chassis.z_speed_set;
+    chassis.motor[BACK_RIGHT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set - chassis.z_speed_set;
+    
+    //chassis.motor[].speed_set = 
 }
 
 /**
