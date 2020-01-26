@@ -25,6 +25,7 @@
 #include "USART_comms.h"
 #include "mpu6500driver.h"
 #include "pid.h"
+#include "remote_control.h"
 
 
 /******************** Private User Declarations ********************/

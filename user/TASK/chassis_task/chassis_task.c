@@ -14,5 +14,7 @@
 
 
 void chassis_task(void *pvParameters){
-	  
+	  while(1) {
+        // todo
+      }
 }
