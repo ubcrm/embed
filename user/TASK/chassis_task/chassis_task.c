@@ -12,6 +12,7 @@
 #include "delay.h"
 #include "USART_comms.h"
 #include "INS_task.h"
+#include "remote_control.h"
 
 
 static uint8_t chassis_init(Chassis_t *chassis_move_init);
@@ -27,15 +28,20 @@ static Chassis_t chassis;
 
 void chassis_task(void *pvParameters){
 
+    //Initializes chassis
     while(!chassis_init(&chassis)){
     }
     
 	while(1) {
         //set mode
         chassis_set_mode();
-        //process data/motor vector decomposition 
-        //PID
-        //output
+        //process RC data into xyz speed
+        chassis_remote_calc(CHASSIS_VECTOR_RAW);
+        //process xyz speed into vector decomposition 
+        chassis_motor_calc();
+        //PID calculations, process 
+        chassis_PID();
+        //output, change to actual output
         CAN_CMD_CHASSIS(0, 0, 0, 0);
         vTaskDelay(50);
     }        
@@ -65,31 +71,36 @@ uint8_t chassis_init(Chassis_t *chassis_init){
     chassis_init->yaw_pos_raw = chassis_init->vec_raw + INS_YAW_ADDRESS_OFFSET;
     
     //Init PID constants
+    
+    
     //Pointer remote
+    chassis_init->rc_raw = get_remote_control_point();
+    
     return TRUE;
 }
 
 
 /**
  * @brief Based on the mode of operation, remote control data is processed
- * @param A value from the enum chassis_user_mode_e
+ * @param 
  * @retval 
  */
 
 void chassis_set_mode(void){
-	
+	//Don't do anything
 }
 
 
 /**
  * @brief Takes the remote control data and converts as specified by user
- * @param
+ * @param  A value from the enum chassis_user_mode_e
  * @retval 
  */
 
 void chassis_remote_calc(chassis_user_mode_e mode){
-    //Get remote control data
-    //Debug print out current motor data
+    //Get remote control data and put into x_speed_raw etc
+    //process based on mode (which is currently none) and put into x_speed_set
+    //Debug print out current 
     
     
 }
@@ -102,7 +113,9 @@ void chassis_remote_calc(chassis_user_mode_e mode){
  */
 
 void chassis_motor_calc(void){
-	
+	//Take x_speed_set etc
+    //Handle mechanum wheels
+    //Put results into Chassis_Motor_t speed_set (and/or pos_set)
 }
 
 /**
@@ -112,6 +125,7 @@ void chassis_motor_calc(void){
  */
 
 void chassis_PID(void){
+    //Don't worry about this for now
 	//translation
     //rotation
 }

@@ -3,6 +3,16 @@
 
 #include "CAN_receive.h"
 #include "main.h"
+#include "remote_control.h"
+
+
+//Chassis motor CAN ID offset
+//Update after testing
+//usage: (Chassis_t)chassis->motor[FRONT_LEFT] 
+#define FRONT_LEFT 0
+#define BACK_LEFT 1
+#define FRONT_RIGHT 2
+#define BACK_RIGHT 3
 
 typedef struct 
 {
@@ -25,6 +35,9 @@ typedef struct
 typedef struct 
 {
     Chassis_Motor_t motor[4];
+    
+    //Raw remote control data
+    const RC_ctrl_t *rc_raw;
     
     //Current front vector
     const fp32 *vec_raw;

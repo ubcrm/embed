@@ -1,4 +1,7 @@
-#include "Start_Task.h"
+#include "start_task.h"
+#include "main.h"
+#include "stm32f4xx.h"
+#include <stdio.h>
 
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -50,7 +53,7 @@ void start_task(void *pvParameters)
             (TaskHandle_t *)&INS_task_handler);
                             
     xTaskCreate((TaskFunction_t) chassis_task,
-            (const char *)"INS_task",
+            (const char *)"chassis_task",
             (uint16_t) CHASSIS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)CHASSIS_TASK_PRIO,
