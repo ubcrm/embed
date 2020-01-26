@@ -44,7 +44,7 @@ char str[32] = {0};
 //Reading angle, gyro, and accelerometer data and printing to serial
 static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce);
 //Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
-static void test_GM6020(void);
+static void test_CAN_Motor(void);
 
 
 
@@ -66,9 +66,11 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
 void test_task(void *pvParameters)
 {
     while(1) {
-			  
-        vTaskDelay(200);
-
+        led_green_toggle();
+        serial_send_string("in test task");
+        vTaskDelay(2);
+        
+			  //test_CAN_Motor();
     }  
 }
 
@@ -130,26 +132,33 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
  * @retval None
  * @attention The motor needs to be set to ID 1
  */
-static void test_GM6020(void){
+static void test_CAN_Motor(){
+    serial_send_string("Here");
     //Link pointer (only needs to be done once)
     gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+    vTaskDelay(10);
     
-    //Make the motor turn
-    CAN_CMD_GIMBAL(2000, 0, 0, 0);
+    while(1){
+        //Make the motor turn
+        serial_send_string("Here");
 
-    //Get CAN received data
-    gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
-    gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
-    gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
+        CAN_CMD_GIMBAL(0, 0, 0, 0);
+
+        //Get CAN received data
+        gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
+        gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
+        gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
 
 
-    //Sending data via UART
-    sprintf(str, "position: %d\n\r", gimbal.yaw_motor->pos_raw);
-    serial_send_string(str);
-    sprintf(str, "speed: %d\n\r", gimbal.yaw_motor->speed_raw);
-    serial_send_string(str);
-    sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
-    serial_send_string(str);	
+        //Sending data via UART
+        sprintf(str, "position: %d\n\r", gimbal.yaw_motor->pos_raw);
+        serial_send_string(str);
+        sprintf(str, "speed: %d\n\r", gimbal.yaw_motor->speed_raw);
+        serial_send_string(str);
+        sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
+        serial_send_string(str);	
+        vTaskDelay(1);
+    }
 }
 
 
