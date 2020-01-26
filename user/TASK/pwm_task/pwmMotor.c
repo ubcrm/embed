@@ -16,8 +16,9 @@
 	*/
  #define PWM_CONTROL_TIME 1
  #define BUFFER_LENGTH 10
- 
- uint16_t pwm_setting = 0;
+ #define DELAY_TIME 1
+ uint16_t pwm_setting = 150;
+ uint16_t pwm_output = 1000;
  uint16_t buffer[BUFFER_LENGTH];
  uint16_t buffer_position = 0;
  
@@ -35,10 +36,25 @@
 	 and cannot be turned on at the same time, 
 	 otherwise the motor may not turn
 	 */
+	 
+	 
+	 
 	 while(1){
-		 vTaskDelay(PWM_CONTROL_TIME*10);
-         
+	 	if(pwm_output < pwm_setting){
+	 		pwm_output = pwm_output + 1;
+	 	}
+	 	if(pwm_output > pwm_setting){
+	 		pwm_output = pwm_output - 1;
+	 	}
+	 	serial_send_string("\n ------ \n");
+        serial_send_string("pwm setting: ");
+	 	  fric1_on(pwm_output);
+          fric2_on(pwm_output);
+	 	vTaskDelay(DELAY_TIME); 
 	 }
+	 
+	 
+	 
  }
 
 /*
@@ -58,11 +74,9 @@ void USART6_IRQHandler(void){
                     for(int index = 0; index < buffer_position - 1; index++){
 						pwm_setting += (buffer[index] - ASCII_ZERO) * pow(10 , power - index);
                         buffer[index] = 0;
-                        fric1_on(pwm_setting);
-                        fric2_on(pwm_setting);
+                      
 					}
-                    serial_send_string("\n ------ \n");
-                    serial_send_string("pwm setting: ");
+					serial_send_string("\n ------ \n");
                     serial_send_int(pwm_setting);
                     serial_send_string("\n ------ \n");
                     buffer_position = 0;
