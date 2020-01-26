@@ -65,10 +65,11 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
  */
 void test_task(void *pvParameters)
 {
+    vTaskDelay(200);
     while(1) {
         led_green_toggle();
         serial_send_string("in test task");
-        vTaskDelay(2);
+        vTaskDelay(200);
         
 			  //test_CAN_Motor();
     }  

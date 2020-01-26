@@ -21,7 +21,7 @@ static TaskHandle_t test_task_handler;
 #define INS_STK_SIZE 512
 static TaskHandle_t chassis_task_handler;
 
-#define CHASSIS_TASK_PRIO 2
+#define CHASSIS_TASK_PRIO 5
 #define CHASSIS_STK_SIZE 512
 static TaskHandle_t INS_task_handler;
 
