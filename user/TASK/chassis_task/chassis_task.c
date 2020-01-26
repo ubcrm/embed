@@ -44,7 +44,8 @@ void chassis_task(void *pvParameters){
         //PID calculations, process 
         chassis_PID();
         //output, change to actual output
-        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_set * 4, chassis.motor[FRONT_LEFT].speed_set * 4, chassis.motor[BACK_LEFT].speed_set * 4, chassis.motor[BACK_RIGHT].speed_set * 4);
+        
+        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT - 1].speed_set * 4, chassis.motor[FRONT_LEFT - 1].speed_set * 4, chassis.motor[BACK_LEFT - 1].speed_set * 4, chassis.motor[BACK_RIGHT - 1].speed_set * 4);
         vTaskDelay(50);
     }        
 }
@@ -127,10 +128,31 @@ void chassis_motor_calc(void){
 	//Take x_speed_set etc
     //Handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
-    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
-    chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set + chassis.z_speed_set;
-    chassis.motor[FRONT_RIGHT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set - chassis.z_speed_set;
-    chassis.motor[BACK_RIGHT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set - chassis.z_speed_set;
+    
+    //chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
+    //chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set + chassis.z_speed_set;
+    //chassis.motor[FRONT_RIGHT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set - chassis.z_speed_set;
+    //chassis.motor[BACK_RIGHT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set - chassis.z_speed_set;
+    //chassis.motor[1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
+    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.z_speed_set;
+    chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set + chassis.z_speed_set;
+    chassis.motor[FRONT_RIGHT - 1].speed_set = -chassis.x_speed_set + chassis.z_speed_set;
+    chassis.motor[BACK_RIGHT - 1].speed_set = -chassis.x_speed_set + chassis.z_speed_set;
+    
+    volatile char str[32];
+    
+    sprintf((char*) str, "x: %d\n\r", chassis.x_speed_set);
+    serial_send_string(str);
+    sprintf((char*) str, "y: %d\n\r", chassis.y_speed_set);
+    serial_send_string(str);
+    sprintf((char*) str, "z: %d\n\r", chassis.z_speed_set);
+    serial_send_string(str);
+    sprintf((char*) str, "sum: %d\n\r", (chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set));
+    serial_send_string(str);
+    
+    //chassis.motor[1].speed_set = 0;
+    //chassis.motor[2].speed_set = 0;
+    //chassis.motor[3].speed_set = 0;
     
     //chassis.motor[].speed_set = 
 }
@@ -145,7 +167,9 @@ void chassis_PID(void){
     //Don't worry about this for now
 	//translation
     //rotation
+    /*
 	  while(1) {
         // todo
       }
+    */
 }
