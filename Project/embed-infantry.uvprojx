@@ -849,6 +849,16 @@
               <FileType>5</FileType>
               <FilePath>..\user\APP\remote_control\remote_control.h</FilePath>
             </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\APP\PID\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\APP\PID\pid.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -875,14 +885,14 @@
               <FilePath>..\user\TASK\test_task\test_task.c</FilePath>
             </File>
             <File>
-              <FileName>test_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
-            </File>
-            <File>
               <FileName>start_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\TASK\start_task\start_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
             </File>
             <File>
               <FileName>start_task.h</FileName>
@@ -908,16 +918,6 @@
               <FileName>INS_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\INS_task\INS_task.h</FilePath>
-            </File>
-            <File>
-              <FileName>chassis_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\chassis_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>chassis_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\chassis_task.h</FilePath>
             </File>
           </Files>
         </Group>

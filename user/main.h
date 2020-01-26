@@ -47,6 +47,9 @@ typedef double fp64;
 
 #define Latitude_At_ShenZhen 22.57025f
 
+#define TRUE 1
+#define FALSE 0
+
 #ifndef NULL
 #define NULL 0
 #endif
