@@ -62,13 +62,9 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
 void test_task(void *pvParameters)
 {
     
-    //Chassis_t* chassis = get_chassis_point();
-    
     while(1) {
         
-        
         vTaskDelay(2000);
-
     }  
 }
 

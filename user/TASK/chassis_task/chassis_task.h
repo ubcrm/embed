@@ -7,11 +7,10 @@
 
 
 //Chassis motor CAN ID offset
-//Update after testing
 //usage: (Chassis_t)chassis->motor[FRONT_LEFT] 
+#define FRONT_RIGHT 1
 #define FRONT_LEFT 2
 #define BACK_LEFT 3
-#define FRONT_RIGHT 1
 #define BACK_RIGHT 4
 
 // RC channels

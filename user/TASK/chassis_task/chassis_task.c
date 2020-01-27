@@ -129,11 +129,6 @@ void chassis_motor_calc(void){
     //Handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
     
-    //chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
-    //chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set + chassis.z_speed_set;
-    //chassis.motor[FRONT_RIGHT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set - chassis.z_speed_set;
-    //chassis.motor[BACK_RIGHT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set - chassis.z_speed_set;
-    //chassis.motor[1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
     chassis.motor[FRONT_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
     chassis.motor[BACK_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
     chassis.motor[FRONT_RIGHT - 1].speed_set = -chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
@@ -149,12 +144,6 @@ void chassis_motor_calc(void){
     serial_send_string(str);
     sprintf((char*) str, "sum: %d\n\r", (chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set));
     serial_send_string(str);
-    
-    //chassis.motor[1].speed_set = 0;
-    //chassis.motor[2].speed_set = 0;
-    //chassis.motor[3].speed_set = 0;
-    
-    //chassis.motor[].speed_set = 
 }
 
 /**
