@@ -134,10 +134,10 @@ void chassis_motor_calc(void){
     //chassis.motor[FRONT_RIGHT - 1].speed_set = chassis.x_speed_set - chassis.y_speed_set - chassis.z_speed_set;
     //chassis.motor[BACK_RIGHT - 1].speed_set = chassis.x_speed_set + chassis.y_speed_set - chassis.z_speed_set;
     //chassis.motor[1].speed_set = chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set;
-    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.x_speed_set + chassis.z_speed_set;
-    chassis.motor[BACK_LEFT - 1].speed_set = chassis.x_speed_set + chassis.z_speed_set;
-    chassis.motor[FRONT_RIGHT - 1].speed_set = -chassis.x_speed_set + chassis.z_speed_set;
-    chassis.motor[BACK_RIGHT - 1].speed_set = -chassis.x_speed_set + chassis.z_speed_set;
+    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
+    chassis.motor[BACK_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
+    chassis.motor[FRONT_RIGHT - 1].speed_set = -chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
+    chassis.motor[BACK_RIGHT - 1].speed_set = -chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
     
     volatile char str[32];
     
