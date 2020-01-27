@@ -19,7 +19,7 @@ typedef struct
     
     //Final output speed
     uint16_t speed_out;
-} chassis_Motor_t;
+} Chassis_Motor_t;
 
 
 typedef struct 

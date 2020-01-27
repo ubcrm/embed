@@ -59,6 +59,24 @@ static uint16_t shoot_init(void) {
 
 static void shoot_control_loop(void) {
     //Add remote control stuff later
+    
+    if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
+        // ramp up wheels to speed
+        
+        if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
+            // no shoot
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
+            // single shot
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
+            // rapid fire
+        } else {
+            // throw some kind of error?
+        }
+        
+    } else if (shoot.rc->rc.s[POWER_SWITCH] == OFF/* or other switch setting*/) {
+        // turn off wheels down
+    }
+    
     //Currently running SHOOT_ON fully
     shoot.fric1_pwm = Fric_OFF;
     shoot.fric2_pwm = Fric_OFF;

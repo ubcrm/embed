@@ -21,6 +21,13 @@
 //Used for pwm ramp initialization
 #define SHOOT_FRIC_PWM_ADD_VALUE    100.0f
 
+// User defines
+#define POWER_SWITCH 1
+#define SHOOT_SWITCH 0
+
+#define ON 1
+#define OFF 0
+
 typedef struct 
 {
     ramp_function_source_t ramp1;
