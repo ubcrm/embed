@@ -15,7 +15,7 @@
 #include "remote_control.h"
 
 
-//static uint8_t chassis_init(Chassis_t *chassis_move_init);
+static uint8_t chassis_init(Chassis_t *chassis_init);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
 static void chassis_set_mode(void);
@@ -43,9 +43,10 @@ void chassis_task(void *pvParameters){
         chassis_motor_calc();
         //PID calculations, process 
         chassis_PID();
-        //output, change to actual output
+        //output
+        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_set * 4, chassis.motor[FRONT_LEFT].speed_set * 4, 
+            chassis.motor[BACK_LEFT].speed_set * 4, chassis.motor[BACK_RIGHT].speed_set * 4);
         
-        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT - 1].speed_set * 4, chassis.motor[FRONT_LEFT - 1].speed_set * 4, chassis.motor[BACK_LEFT - 1].speed_set * 4, chassis.motor[BACK_RIGHT - 1].speed_set * 4);
         vTaskDelay(50);
     }        
 }
@@ -57,7 +58,7 @@ void chassis_task(void *pvParameters){
  * @retval TRUE if init is completed
  */
 
-uint8_t chassis_init(Chassis_t *chassis_init){
+static uint8_t chassis_init(Chassis_t *chassis_init){
     //Forces motors to reset ID
     CAN_CMD_CHASSIS_RESET_ID();
     
@@ -89,7 +90,7 @@ uint8_t chassis_init(Chassis_t *chassis_init){
  * @retval 
  */
 
-void chassis_set_mode(void){
+static void chassis_set_mode(void){
 	//Don't do anything
 }
 
@@ -100,7 +101,7 @@ void chassis_set_mode(void){
  * @retval 
  */
 
-void chassis_remote_calc(chassis_user_mode_e mode){
+static void chassis_remote_calc(chassis_user_mode_e mode){
     //Get remote control data and put into x_speed_raw etc
     //process based on mode (which is currently none) and put into x_speed_set
     //Debug print out current 
@@ -124,18 +125,15 @@ void chassis_remote_calc(chassis_user_mode_e mode){
  * @retval 
  */
 
-void chassis_motor_calc(void){
-	//Take x_speed_set etc
-    //Handle mechanum wheels
+static void chassis_motor_calc(void){
+	//Take x_speed_set etc and handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
-    
-    chassis.motor[FRONT_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
-    chassis.motor[BACK_LEFT - 1].speed_set = chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
-    chassis.motor[FRONT_RIGHT - 1].speed_set = -chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
-    chassis.motor[BACK_RIGHT - 1].speed_set = -chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
+    chassis.motor[FRONT_LEFT].speed_set = chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
+    chassis.motor[BACK_LEFT].speed_set = chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
+    chassis.motor[FRONT_RIGHT].speed_set = -chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
+    chassis.motor[BACK_RIGHT].speed_set = -chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
     
     volatile char str[32];
-    
     sprintf((char*) str, "x: %d\n\r", chassis.x_speed_set);
     serial_send_string(str);
     sprintf((char*) str, "y: %d\n\r", chassis.y_speed_set);
@@ -152,7 +150,7 @@ void chassis_motor_calc(void){
  * @retval 
  */
 
-void chassis_PID(void){
+static void chassis_PID(void){
     //Don't worry about this for now
 	//translation
     //rotation

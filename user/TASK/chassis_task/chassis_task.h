@@ -6,12 +6,11 @@
 #include "remote_control.h"
 
 
-//Chassis motor CAN ID offset
-//usage: (Chassis_t)chassis->motor[FRONT_LEFT] 
-#define FRONT_RIGHT 1
-#define FRONT_LEFT 2
-#define BACK_LEFT 3
-#define BACK_RIGHT 4
+//Chassis motor CAN ID offset 
+#define FRONT_RIGHT 0
+#define FRONT_LEFT 1
+#define BACK_LEFT 2
+#define BACK_RIGHT 3
 
 // RC channels
 #define RC_X 2
