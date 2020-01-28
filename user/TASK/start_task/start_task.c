@@ -8,6 +8,8 @@
 #include "revolver_task.h"
 #include "INS_task.h"
 #include "chassis_task.h"
+#include "vision_task.h"
+
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE 512
@@ -24,6 +26,10 @@ static TaskHandle_t chassis_task_handler;
 #define CHASSIS_TASK_PRIO 2
 #define CHASSIS_STK_SIZE 512
 static TaskHandle_t INS_task_handler;
+
+#define VISION_TASK_PRIO 5
+#define VISION_STK_SIZE 512
+static TaskHandle_t vision_task_handler;
 
 #define REV_TASK_PRIO 10
 #define REV_STK_SIZE 256
@@ -54,6 +60,13 @@ void start_task(void *pvParameters)
             (void *)NULL,
             (UBaseType_t)CHASSIS_TASK_PRIO,
             (TaskHandle_t *)&chassis_task_handler);
+            
+    xTaskCreate((TaskFunction_t) vision_task,
+            (const char *)"vision_task",
+            (uint16_t) VISION_STK_SIZE,
+            (void *)NULL,
+            (UBaseType_t)VISION_TASK_PRIO,
+            (TaskHandle_t *)&vision_task_handler);
                             
 						
     xTaskCreate((TaskFunction_t) revolver_task,
