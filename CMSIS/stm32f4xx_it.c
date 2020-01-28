@@ -173,6 +173,7 @@ void SysTick_Handler(void)
   */ 
 	
 
+
 // Interrupt handler for USART 6. This is called on the reception of every
 // byte on USART6
 void USART6_IRQHandler(void)

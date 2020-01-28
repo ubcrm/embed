@@ -4,12 +4,13 @@
 #include "CAN_receive.h"
 #include "main.h"
 
-typedef struct 
+typedef struct
 {
-		const motor_measure_t *gimbal_motor_raw;
-		uint16_t pos_raw;
-		uint16_t speed_raw;
-		uint16_t current_raw;
+  const motor_measure_t *chassis_motor_measure;
+  fp32 accel;
+  fp32 speed;
+  fp32 speed_set;
+  int16_t give_current;
 } Chassis_Motor_t;
 
 extern void chassis_task(void *pvParameters);

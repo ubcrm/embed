@@ -22,7 +22,7 @@
 #define CANTASK_H
 #include "main.h"
 
-#define CHASSIS_CAN CAN2
+#define CHASSIS_CAN CAN1
 #define GIMBAL_CAN CAN1
 
 

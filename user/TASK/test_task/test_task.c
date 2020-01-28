@@ -38,6 +38,10 @@
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
 
+Chassis_Motor_t chassis_IDx_motor;
+
+
+
 //UART mailbox
 char str[32] = {0};
 
@@ -47,6 +51,8 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce);
 static void test_GM6020(void);
 //Enables Debug of P19 (chassis) motor
 static void test_P19(int id);
+// extend arm boolean for P19 debugging
+int extend_arm = 0;
 
 
 
@@ -69,7 +75,7 @@ void test_task(void *pvParameters)
 {
     vTaskDelay(200);
     while(1) {
-			  test_CAN_Motor();
+        test_GM6020();
     }  
 }
 
@@ -132,6 +138,38 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
  * @attention The motor needs to be set to ID 1
  */
 static void test_P19(int id){
+    vTaskDelay(50);
+    int16_t chassis_rate = 600;
+    
+    /* positive chassis command increases the motor ECD position */
+    chassis_IDx_motor.chassis_motor_measure = get_Chassis_Motor_Measure_Point(id);
+    while(1){
+        if(extend_arm){
+            CAN_CMD_CHASSIS(chassis_rate,chassis_rate,chassis_rate,chassis_rate);
+        }
+        else{
+            CAN_CMD_CHASSIS(0,0,0,0);
+        }
+        
+        
+        vTaskDelay(5);
+        sprintf(str, "ecd: %d\n\r", chassis_IDx_motor.chassis_motor_measure->ecd);
+        serial_send_string(str);
+       /* 
+        sprintf(str, "speed_rpm: %d\n\r", chassis_IDx_motor.chassis_motor_measure->last_ecd);
+        serial_send_string(str);
+        
+        sprintf(str, "given_current: %d\n\r", chassis_IDx_motor.chassis_motor_measure->given_current);
+        serial_send_string(str);
+        
+        sprintf(str, "temperature: %d\n\r", chassis_IDx_motor.chassis_motor_measure->temperate);
+        serial_send_string(str);
+        
+        sprintf(str, "last_ecd: %d\n\r", chassis_IDx_motor.chassis_motor_measure->last_ecd);
+        serial_send_string(str);
+        */
+    vTaskDelay(5);
+    }
     //
 }
 
@@ -141,9 +179,10 @@ static void test_P19(int id){
  * @retval None
  * @attention The motor needs to be set to ID 1
  */
-void test_CAN_Motor(){
+void test_GM6020(){
     //Link pointer (only needs to be done once)
     gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+    gimbal.pitch_motor->gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
     vTaskDelay(10);
     
     while(1){
@@ -156,15 +195,21 @@ void test_CAN_Motor(){
         gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
         gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
 
+        gimbal.pitch_motor->pos_raw = gimbal.pitch_motor->gimbal_motor_raw->ecd;
 
         //Sending data via UART
-        sprintf(str, "position: %d\n\r", gimbal.yaw_motor->pos_raw);
+        sprintf(str, "yaw position: %d\n\r", gimbal.yaw_motor->pos_raw);
         serial_send_string(str);
+        sprintf(str, "pitch position: %d\n\r", gimbal.pitch_motor->pos_raw);
+        serial_send_string(str);
+        
+        /*
         sprintf(str, "speed: %d\n\r", gimbal.yaw_motor->speed_raw);
         serial_send_string(str);
         sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
         serial_send_string(str);	
-        vTaskDelay(200);
+        */
+        vTaskDelay(10);
     }
 }
 
@@ -253,3 +298,7 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
     sprintf(str, "pitch signal: %f\n\r", pitch_signal);
     serial_send_string(str);
 }
+
+
+
+/********** Handlers (optional) **********/
