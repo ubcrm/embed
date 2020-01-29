@@ -201,6 +201,7 @@ static void testVision(void) {
         if (count < 10) {
             gimbal_pitch_motor_arr[count] = gimbal_pitch_motor;
             pitch_signal_arr[count] = pitch_signal;
+            count++;
         }
         else {
             vTaskDelay(2000);
