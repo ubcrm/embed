@@ -35,7 +35,7 @@
 #define max_out 15000
 #define max_iout 0
 
-Gimbal_t gimbal;
+/*Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
 
 //UART mailbox
@@ -48,7 +48,7 @@ static void test_P19(int id);
 
 /******************** Private User Declarations (VISION TO BE MIGRATED) ********************/
 
-static void testVision(void);
+/*static void testVision(void);
 int get_vision_signal(void); 
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal);
 
@@ -77,7 +77,7 @@ void test_task(void *pvParameters)
  * @param  acce: displays accelerometer data if TRUE
  * @retval None
  */
-static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
+/*static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
     //Link pointers
     gimbal.angle_reading_raw = get_INS_angle_point();
     gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
@@ -124,7 +124,7 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
  * @retval None
  * @attention The motor needs to be set to ID 1
  */
-static void test_P19(int id){
+/*static void test_P19(int id){
     //
 }
 
@@ -134,7 +134,7 @@ static void test_P19(int id){
  * @retval None
  * @attention The motor needs to be set to ID 1
  */
-static void test_GM6020(void){
+/*static void test_GM6020(void){
     //Link pointer (only needs to be done once)
     gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
     
@@ -161,7 +161,7 @@ static void test_GM6020(void){
  * @param  None
  * @retval Vision signal in range of 0 and 8191
  */
-static void testVision(void) {
+/*static void testVision(void) {
 
     gimbal_pitch_motor.gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
     
@@ -190,41 +190,12 @@ static void testVision(void) {
     }
 }
 
-
-/** 
- * @brief  Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
- * @param  None
- * @retval None
- * @attention The motor needs to be set to ID 1
- */
-static void test_GM6020(void){
-    //Link pointer
-    gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
-    
-    //Make the motor turn
-    CAN_CMD_GIMBAL(2000, 0, 0, 0);
-
-    //Get CAN received data
-    gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
-    gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
-    gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
-
-
-    //Sending data via UART
-    sprintf(str, "position: %d\n\r", gimbal.yaw_motor->pos_raw);
-    serial_send_string(str);
-    sprintf(str, "speed: %d\n\r", gimbal.yaw_motor->speed_raw);
-    serial_send_string(str);
-    sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
-    serial_send_string(str);
-}
-
 /** 
  * @brief  Reads vision instruction from UART and cap to certin values
  * @param  None
  * @retval Vision signal in range of 0 and 8191
  */
-int get_vision_signal(void) {
+/*int get_vision_signal(void) {
     int vision_signal = -1000;  // TODO: Get real values from vision
         
     while (vision_signal > 8191) {
@@ -243,7 +214,7 @@ int get_vision_signal(void) {
  * @param  
  * @retval None
  */
-void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
+/*void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
 {
     char str[20]; //uart data buffer
 
@@ -267,4 +238,4 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
     
     sprintf(str, "pitch signal: %f\n\r", pitch_signal);
     serial_send_string(str);
-}
+}*/

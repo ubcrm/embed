@@ -4,6 +4,7 @@
 #include "CAN_receive.h"
 #include "main.h"
 #include "remote_control.h"
+#include "pid.h"
 
 
 //Chassis motor CAN ID offset 
@@ -23,16 +24,19 @@ typedef struct
     const motor_measure_t *motor_raw;
     
     //Current speed read from motors
-    uint16_t pos_raw;
-    uint16_t speed_raw;
-    uint16_t current_raw;
+    int16_t pos_raw;
+    int16_t speed_raw;
+    int16_t current_raw;
     
     //Target speed set by user/remote control
-    uint16_t pos_set;
-    uint16_t speed_set;
+    int16_t pos_set;
+    int16_t speed_set;
     
     //Final output speed
-    uint16_t speed_out;
+    int16_t speed_out;
+	
+		//Control
+		PidTypeDef pid_control;
 } Chassis_Motor_t;
 
 
@@ -48,14 +52,14 @@ typedef struct
     const fp32 *yaw_pos_raw;
     
     //Current speed, vector combination of the speed read from motors
-    uint16_t x_speed_raw;
-    uint16_t y_speed_raw;
-    uint16_t z_speed_raw;
+    int16_t x_speed_raw;
+    int16_t y_speed_raw;
+    int16_t z_speed_raw;
     
     //Speed set by user/remote control
-    uint16_t x_speed_set;
-    uint16_t y_speed_set;
-    uint16_t z_speed_set;
+    int16_t x_speed_set;
+    int16_t y_speed_set;
+    int16_t z_speed_set;
 } Chassis_t;
 
 
@@ -72,4 +76,3 @@ extern uint8_t chassis_init(Chassis_t *chassis_init);
 extern Chassis_t* get_chassis_point(void);
 
 #endif
-	
