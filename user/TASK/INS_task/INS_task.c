@@ -1,22 +1,12 @@
 /**
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  * @file       INSTask.c/h
-  * @brief      主要利用陀螺仪mpu6500，磁力计ist8310，完成姿态解算，得出欧拉角，
-  *             提供通过mpu6500的data ready 中断完成外部触发，减少数据等待延迟
-  *             通过DMA的SPI传输节约CPU时间，提供注释对应的宏定义，关闭DMA，
-  *             DR的外部中断的方式.
-  * @note       SPI 在陀螺仪初始化的时候需要低于2MHz，之后读取数据需低于20MHz
-  * @history
-  *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. 完成
-  *
-  @verbatim
-  ==============================================================================
-
-  ==============================================================================
-  @endverbatim
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  */
+  ******************************************************************************
+    * @file    TASK/INS_task
+    * @brief   This file contains functions to update and access data from the IMU.
+    *          Currently using MPU 6500, which allows access to gyro and accelerometer data
+    *          A vector of current yaw/pitch direction is also calculated
+    *          DMA is used for data access unless otherwise specified
+  ******************************************************************************
+**/
 
 #include "INS_Task.h"
 
@@ -133,16 +123,95 @@ static uint8_t first_temperate = 0;
 
 
 
-void INSTask(void *pvParameters)
+/******************** Accessor Functions Called from Outside ********************/
+
+/**
+  * @brief          Gyro calibration
+  * @param[in]      Gyro calibration scaling, 1 is default ie no scaling(x, y, z)
+  * @param[in]      Gyro origin offset(x, y, z)
+  * @param[in]      Time of gyro, increments by 1 every time gyro_offset is called
+  * @retval         None
+  */
+void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
+{
+    if (first_temperate)
+    {
+        if( *time_count == 0)
+        {
+            Gyro_Offset[0] = gyro_cali_offset[0];
+            Gyro_Offset[1] = gyro_cali_offset[1];
+            Gyro_Offset[2] = gyro_cali_offset[2];
+        }
+        gyro_offset(Gyro_Offset, INS_gyro, mpu6500_real_data.status, time_count);
+
+        cali_offset[0] = Gyro_Offset[0];
+        cali_offset[1] = Gyro_Offset[1];
+        cali_offset[2] = Gyro_Offset[2];
+    }
+}
+
+
+/**
+  * @brief          Set gyro calibration constants
+  * @param[in]      Gyro calibration scaling, 1 is default ie no scaling(x, y, z)
+  * @param[in]      Gyro origin offset(x, y, z)
+  * @retval         None
+  */
+void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
+{
+    gyro_cali_offset[0] = cali_offset[0];
+    gyro_cali_offset[1] = cali_offset[1];
+    gyro_cali_offset[2] = cali_offset[2];
+}
+
+/**
+ * @brief  Returns a pointer to a vector defining the current robot position
+ * @param  None
+ * @retval Returns a pointer to a vector defining the current robot position
+ */
+const fp32 *get_INS_angle_point(void)
+{
+    return INS_Angle;
+}
+
+
+/**
+ * @brief  Returns a pointer to a vector of current gyro reading
+ * @param  None
+ * @retval A pointer to gyro reading, contains three indices with angular acceleration about x,y,z axis
+ */
+const fp32 *get_MPU6500_Gyro_Data_Point(void)
+{
+    return INS_gyro;
+}
+
+
+/**
+ * @brief  Returns a pointer to a vector of current accelerometer reading
+ * @param  None
+ * @retval A pointer to accelerometer reading, contains three indices with acceleration about x,y,z axis
+ */
+const fp32 *get_MPU6500_Accel_Data_Point(void)
+{
+    return INS_accel;
+}
+
+
+/**
+  * @brief          Main task handling the IMU
+  *                 Initializes IMU and updates the gyro and accelerometer reading in the background
+  * @param[in]      None
+  * @retval         None
+  */
+void INS_task(void *pvParameters)
 {
     vTaskDelay(INS_TASK_INIT_TIME);
 	
-    //初始化mpu6500，失败进入死循环
+    //Initializes MPU6500, stays in the loop if not initialized
     while (mpu6500_init() != MPU6500_NO_ERROR)
     {
     }
 
-//初始化ist8310，失败进入死循环
 #if defined(USE_IST8310)
     while (ist8310_init() != IST8310_NO_ERROR)
     {
@@ -171,28 +240,9 @@ void INSTask(void *pvParameters)
     MPU6500_SPI_DMA_Init(mpu6500_spi_DMA_txbuf, mpu6500_spi_rxbuf);
 
 #endif
-/*
-    gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
-	  gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
-		gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
-		*/
+
     while (1)
     {
-				//serial_send_string("hello\n\r");
-			/*
-				sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
-				serial_send_string(str);
-				sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
-				serial_send_string(str);
-				sprintf(str, "Gyro Z: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
-				serial_send_string(str);
-			  sprintf(str, "Acce X: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
-				serial_send_string(str);
-				sprintf(str, "Acce Y: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
-				serial_send_string(str);
-				sprintf(str, "Acce Z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
-				serial_send_string(str);
-			  vTaskDelay(200);*/
 			
 #if defined(MPU6500_USE_DATA_READY_EXIT)
         //等待外部中断中断唤醒任务
@@ -316,64 +366,13 @@ void INSTask(void *pvParameters)
         INSTaskStack = uxTaskGetStackHighWaterMark(NULL);
 #endif
 
-        //while(1) end
-    }
-    //task function end
-}
-
-/**
-  * @brief          校准陀螺仪
-  * @author         RM
-  * @param[in]      陀螺仪的比例因子，1.0f为默认值，不修改
-  * @param[in]      陀螺仪的零漂，采集陀螺仪的静止的输出作为offset
-  * @param[in]      陀螺仪的时刻，每次在gyro_offset调用会加1,
-  * @retval         返回空
-  */
-void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
-{
-    if (first_temperate)
-    {
-        if( *time_count == 0)
-        {
-            Gyro_Offset[0] = gyro_cali_offset[0];
-            Gyro_Offset[1] = gyro_cali_offset[1];
-            Gyro_Offset[2] = gyro_cali_offset[2];
-        }
-        gyro_offset(Gyro_Offset, INS_gyro, mpu6500_real_data.status, time_count);
-
-        cali_offset[0] = Gyro_Offset[0];
-        cali_offset[1] = Gyro_Offset[1];
-        cali_offset[2] = Gyro_Offset[2];
     }
 }
 
-/**
-  * @brief          校准陀螺仪设置，将从flash或者其他地方传入校准值
-  * @author         RM
-  * @param[in]      陀螺仪的比例因子，1.0f为默认值，不修改
-  * @param[in]      陀螺仪的零漂
-  * @retval         返回空
-  */
-void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
-{
-    gyro_cali_offset[0] = cali_offset[0];
-    gyro_cali_offset[1] = cali_offset[1];
-    gyro_cali_offset[2] = cali_offset[2];
-}
 
-const fp32 *get_INS_angle_point(void)
-{
-    return INS_Angle;
-}
-const fp32 *get_MPU6500_Gyro_Data_Point(void)
-{
-    return INS_gyro;
-}
 
-const fp32 *get_MPU6500_Accel_Data_Point(void)
-{
-    return INS_accel;
-}
+
+/******************** Other Implementations, DO NOT TOUCH ********************/
 
 static void IMU_Cali_Slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], mpu6500_real_data_t *mpu6500, ist8310_real_data_t *ist8310)
 {
@@ -466,3 +465,7 @@ void MPU6500_DMA_IRQHandler(void)
 }
 
 #endif
+
+
+
+

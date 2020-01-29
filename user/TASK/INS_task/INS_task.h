@@ -1,22 +1,13 @@
 /**
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  * @file       INSTask.c/h
-  * @brief      主要利用陀螺仪mpu6500，磁力计ist8310，完成姿态解算，得出欧拉角，
-  *             提供通过mpu6500的data ready 中断完成外部触发，减少数据等待延迟
-  *             通过DMA的SPI传输节约CPU时间，提供注释对应的宏定义，关闭DMA，
-  *             DR的外部中断的方式.
-  * @note       SPI 在陀螺仪初始化的时候需要低于2MHz，之后读取数据需低于20MHz
-  * @history
-  *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. 完成
-  *
-  @verbatim
-  ==============================================================================
+  ******************************************************************************
+    * @file    TASK/INS_task
+    * @brief   This file contains functions to update and access data from the IMU.
+    *          Currently using MPU 6500, which allows access to gyro and accelerometer data
+    *          A vector of current yaw/pitch direction is also calculated
+    *          DMA is used for data access unless otherwise specified
+  ******************************************************************************
+**/
 
-  ==============================================================================
-  @endverbatim
-  ****************************(C) COPYRIGHT 2016 DJI****************************
-  */
 #ifndef INS_Task_H
 #define INS_Task_H
 #include "main.h"
@@ -76,14 +67,21 @@
 #define INS_ACCEL_Y_ADDRESS_OFFSET 1
 #define INS_ACCEL_Z_ADDRESS_OFFSET 2
 
-extern void INSTask(void *pvParameters);
 
+
+/******************** Accessor Functions Called from Outside ********************/
+
+//Main IMU handler task
+extern void INS_task(void *pvParameters);
+//Gyro calibration
 extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
+//Set gyro calibration constants
 extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);
+//Returns a pointer to a vector defining the current robot position
 extern const fp32 *get_INS_angle_point(void);
-//Gets gyro data
+//Returns a pointer to a vector of current gyro reading
 extern const fp32 *get_MPU6500_Gyro_Data_Point(void);
-//Gets accelerometer data
+//Returns a pointer to a vector of current accelerometer reading
 extern const fp32 *get_MPU6500_Accel_Data_Point(void);
 
 #endif

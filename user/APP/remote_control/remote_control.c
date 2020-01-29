@@ -24,6 +24,7 @@
 #include "rc.h"
 
 #include "USART_comms.h"
+#include <stdio.h>
 
 // #include "Detect_Task.h" 		// see todo l.134
 //遥控器出错数据上限
@@ -32,6 +33,7 @@
 // Function prototypes
 static int16_t RC_abs(int16_t value);
 static void SBUS_TO_RC(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl);
+void test_rc(RC_ctrl_t *rc_ctrl);
 
 // Variable definitions
 
@@ -201,4 +203,36 @@ static void SBUS_TO_RC(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
     rc_ctrl->rc.ch[2] -= RC_CH_VALUE_OFFSET;
     rc_ctrl->rc.ch[3] -= RC_CH_VALUE_OFFSET;
     rc_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+}
+
+void test_rc(RC_ctrl_t *rc_ctrl) {
+    volatile char str[32];
+    
+    // channels 0 - 4
+    for (int c = 0; c < 5; ++c) {
+        sprintf((char*) str, "channel %d: %i\n\r", c, rc_ctrl->rc.ch[c]);
+        serial_send_string(str);
+    }
+    
+    // switches 1, 2
+    for (int s = 0; s < 2; ++s) {
+        sprintf((char*) str, "switch %d: %i\n\r", s, rc_ctrl->rc.s[s]);
+        serial_send_string(str);
+    }
+    
+    // mouse
+    sprintf((char*) str, "mouse x: %d\n\r", rc_ctrl->mouse.x);
+    serial_send_string(str);
+
+    sprintf((char*) str, "mouse y: %d\n\r", rc_ctrl->mouse.y);
+    serial_send_string(str);
+    
+    sprintf((char*) str, "mouse z: %d\n\r", rc_ctrl->mouse.z);
+    serial_send_string(str);
+
+    sprintf((char*) str, "mouse l: %u\n\r", rc_ctrl->mouse.press_l);
+    serial_send_string(str);
+    
+    sprintf((char*) str, "mouse r: %u\n\r", rc_ctrl->mouse.press_r);
+    serial_send_string(str);
 }
