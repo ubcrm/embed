@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F427_437xx,USE_STDPERIPH_DRIVER,__FPU_USED,__FPU_PRESENT,ARM_MATH_CM4,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CMSIS;..\FWLIB\inc;..\User;..\User\AHRS;..\User\DSP\Include;..\User\FreeRTOS\include;..\User\FreeRTOS\portable;..\User\FreeRTOS\portable\RVDS\ARM_CM4F;..\user\user_lib;..\User\hardware\ADC;..\User\hardware\BUZZER;..\User\hardware\delay;..\User\hardware\EXIT_Init;..\User\hardware\CAN;..\User\hardware\LED;..\User\hardware\FLASH;..\User\hardware\FRIC;..\User\hardware\LASER;..\User\hardware\POWER_CTRL;..\User\hardware\RC;..\User\hardware\RNG;..\User\hardware\SPI;..\User\hardware\SYS;..\user\hardware\timer;..\User\APP\Calibrate_Task;..\User\APP\CAN_Receive;..\User\APP\Chassis_Task;..\User\APP\Detect_Task;..\User\APP\FreeRTOS_Middleware;..\User\APP\Gimbal_Task;..\User\APP\pid;..\User\APP\Remote_Control;..\User\TASK\start_task;..\User\TASK\test_task;..\User\APP\USART_comms;..\User\hardware\usart;..\User\TASK\revolver_task</IncludePath>
+              <IncludePath>..\CMSIS;..\FWLIB\inc;..\User;..\User\AHRS;..\User\DSP\Include;..\User\FreeRTOS\include;..\User\FreeRTOS\portable;..\User\FreeRTOS\portable\RVDS\ARM_CM4F;..\user\user_lib;..\User\hardware\ADC;..\User\hardware\BUZZER;..\User\hardware\delay;..\User\hardware\EXIT_Init;..\User\hardware\CAN;..\User\hardware\LED;..\User\hardware\FLASH;..\User\hardware\FRIC;..\User\hardware\LASER;..\User\hardware\POWER_CTRL;..\User\hardware\RC;..\User\hardware\RNG;..\User\hardware\SPI;..\User\hardware\SYS;..\user\hardware\timer;..\User\APP\CAN_Receive;..\User\APP\FreeRTOS_Middleware;..\User\APP\pid;..\User\APP\Remote_Control;..\User\TASK\start_task;..\User\TASK\test_task;..\User\APP\USART_comms;..\User\hardware\usart;..\User\TASK\revolver_task;..\User\TASK\INS_task;..\User\TASK\chassis_task</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -852,6 +852,16 @@
               <FileType>5</FileType>
               <FilePath>..\user\APP\remote_control\remote_control.h</FilePath>
             </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\APP\PID\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\APP\PID\pid.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -878,14 +888,14 @@
               <FilePath>..\user\TASK\test_task\test_task.c</FilePath>
             </File>
             <File>
-              <FileName>test_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
-            </File>
-            <File>
               <FileName>start_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\TASK\start_task\start_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
             </File>
             <File>
               <FileName>start_task.h</FileName>
@@ -903,14 +913,24 @@
               <FilePath>..\user\TASK\revolver_task\revolver_task.h</FilePath>
             </File>
             <File>
-              <FileName>pwmMotor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\pwm_task\pwmMotor.h</FilePath>
+              <FileName>INS_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\TASK\INS_task\INS_task.c</FilePath>
             </File>
             <File>
-              <FileName>pwmMotor.c</FileName>
+              <FileName>INS_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\TASK\INS_task\INS_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>chassis_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\TASK\pwm_task\pwmMotor.c</FilePath>
+              <FilePath>..\user\TASK\chassis_task\chassis_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>chassis_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\TASK\chassis_task\chassis_task.h</FilePath>
             </File>
           </Files>
         </Group>
