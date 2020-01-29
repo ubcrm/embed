@@ -32,7 +32,7 @@ static void shoot_control_loop(void);
 
 void shoot_task(void *pvParameters){
     while(!shoot_init()) {
-
+        
     }
 
     while(1) {
@@ -64,38 +64,47 @@ static void shoot_control_loop(void) {
         // ramp up wheels to speed
         
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
+
+            //Currently running SHOOT_ON fully
+            shoot.fric1_pwm = Fric_OFF;
+            shoot.fric2_pwm = Fric_OFF;
+
+            //Turning the motors on one by one
+            ramp_calc(&shoot.ramp1, SHOOT_FRIC_PWM_ADD_VALUE);
+            if(shoot.ramp1.out == SHOOT_FRIC_PWM_ADD_VALUE) {
+                ramp_calc(&shoot.ramp2, SHOOT_FRIC_PWM_ADD_VALUE);
+                
+                if(shoot.ramp2.out != SHOOT_FRIC_PWM_ADD_VALUE) {
+                    // error, shoot.ramp1 value not set
+                }
+            } else {
+                // error, shoot.ramp1 value not set
+            }
+
+            //Sets the ramp maximum, ramp will update to reach this value
+            shoot.ramp1.max_value = Fric_DOWN;
+            shoot.ramp2.max_value = Fric_DOWN;
+
+            //Sets pwm output to be the ramp value
+            shoot.fric1_pwm = (uint16_t)(shoot.ramp1.out);
+            shoot.fric2_pwm = (uint16_t)(shoot.ramp2.out);
+
+            //Turn flywheel on
+            fric1_on(shoot.fric1_pwm);
+            fric2_on(shoot.fric2_pwm);
+
             // no shoot
-        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
-            // single shot
-        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
-            // rapid fire
+        // } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
+        //     // single shot
+        // } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
+        //     // rapid fire
         } else {
             // throw some kind of error?
         }
         
     } else if (shoot.rc->rc.s[POWER_SWITCH] == OFF/* or other switch setting*/) {
         // turn off wheels down
+        
     }
     
-    //Currently running SHOOT_ON fully
-    shoot.fric1_pwm = Fric_OFF;
-    shoot.fric2_pwm = Fric_OFF;
-
-    //Turning the motors on one by one
-    ramp_calc(&shoot.ramp1, SHOOT_FRIC_PWM_ADD_VALUE);
-    if(shoot.ramp1.out == SHOOT_FRIC_PWM_ADD_VALUE) {
-        ramp_calc(&shoot.ramp2, SHOOT_FRIC_PWM_ADD_VALUE);
-    }
-
-    //Sets the ramp maximum, ramp will update to reach this value
-    shoot.ramp1.max_value = Fric_DOWN;
-    shoot.ramp2.max_value = Fric_DOWN;
-
-    //Sets pwm output to be the ramp value
-    shoot.fric1_pwm = (uint16_t)(shoot.ramp1.out);
-    shoot.fric2_pwm = (uint16_t)(shoot.ramp2.out);
-
-    //Turn flywheel on
-    fric1_on(shoot.fric1_pwm);
-    fric2_on(shoot.fric2_pwm);
 }
