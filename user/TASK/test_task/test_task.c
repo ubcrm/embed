@@ -51,17 +51,20 @@ void testTask(void *pvParameters)
     }
 }
 
+int truncate_pid_signal(int signal) {
+     while (signal > 8191) {
+        signal -= 8191;
+    }
+    while (signal < 0) {
+        signal+= 8192;
+    }
+    return signal;
+}
+
 int get_vision_signal() {
-    int vision_signal = -1000;  // TODO: Get real values from vision
-        
-    while (vision_signal > 8191) {
-        vision_signal -= 8191;
-    }
-    while (vision_signal < 0) {
-        vision_signal += 8192;
-    }
-    
-    return vision_signal;
+    int vision_signal = 3000;  // TODO: Get real values from vision
+    int output_signal = truncate_pid_signal(vision_signal);
+    return output_signal;
 }
 
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
