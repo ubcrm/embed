@@ -31,12 +31,19 @@ static void shoot_control_loop(void);
 /******************** Task/Functions Called from Outside ********************/
 
 void shoot_task(void *pvParameters){
+		//fric_off();
+		fric1_on(0);
+		fric2_on(0);
     while(!shoot_init()) {
         
     }
-
+		fric1_on(0);
+		fric2_on(0);
     while(1) {
-        shoot_control_loop();
+				fric_off();
+			
+				vTaskDelay(3);
+        //shoot_control_loop();
     }
     
 }
@@ -52,6 +59,8 @@ static uint16_t shoot_init(void) {
     //Set pwm motor to zero
     shoot.fric1_pwm = Fric_OFF;
     shoot.fric2_pwm = Fric_OFF;
+	
+		fric_off();
 
     return TRUE;
 }

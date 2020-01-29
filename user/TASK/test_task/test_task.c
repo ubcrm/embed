@@ -42,7 +42,7 @@ static void test_GM6020(void);
  * @param: None
  * @retval: None
  */
-static void test_task(void *pvParameters)
+void test_task(void *pvParameters)
 {
     while(1) {
 			  
