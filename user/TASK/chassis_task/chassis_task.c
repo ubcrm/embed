@@ -26,7 +26,6 @@ static chassis_t chassis;
 
 
 void chassis_task(void *pvParameters){
-
     while(!chassis_init(&chassis)){
     }
     

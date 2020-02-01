@@ -41,27 +41,33 @@ void start_task(void *pvParameters)
             (UBaseType_t)TEST_TASK_PRIO,
             (TaskHandle_t *)&test_task_handler);
 
-                            
     xTaskCreate((TaskFunction_t) INS_task,
             (const char *)"INS_task",
             (uint16_t) INS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)INS_TASK_PRIO,
             (TaskHandle_t *)&INS_task_handler);
-                            
+
     xTaskCreate((TaskFunction_t) chassis_task,
-            (const char *)"INS_task",
+            (const char *)"chassis_task",
             (uint16_t) CHASSIS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)CHASSIS_TASK_PRIO,
             (TaskHandle_t *)&chassis_task_handler);
-            								
+
     xTaskCreate((TaskFunction_t) shoot_task,
             (const char *)"shoot_task",
             (uint16_t) SHOOT_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)SHOOT_TASK_PRIO,
             (TaskHandle_t *)&shoot_task_handler);
+
+    xTaskCreate((TaskFunction_t) revolver_task,
+            (const char *)"revolver_task",
+            (uint16_t) REV_STK_SIZE,
+            (void *)NULL,
+            (UBaseType_t)REV_TASK_PRIO,
+            (TaskHandle_t *)&revolver_task_Handler);
 
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical

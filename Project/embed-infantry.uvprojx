@@ -10,7 +10,7 @@
       <TargetName>embed-infantry</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -852,6 +852,16 @@
               <FileType>5</FileType>
               <FilePath>..\user\APP\remote_control\remote_control.h</FilePath>
             </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\APP\PID\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\APP\PID\pid.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -878,14 +888,14 @@
               <FilePath>..\user\TASK\test_task\test_task.c</FilePath>
             </File>
             <File>
-              <FileName>test_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
-            </File>
-            <File>
               <FileName>start_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\TASK\start_task\start_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
             </File>
             <File>
               <FileName>start_task.h</FileName>
@@ -911,6 +921,7 @@
               <FileName>chassis_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\chassis_task\chassis_task.h</FilePath>
+<<<<<<< HEAD
             </File>
             <File>
               <FileName>shoot_task.c</FileName>
@@ -921,6 +932,8 @@
               <FileName>shoot_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\shoot_task\shoot_task.h</FilePath>
+=======
+>>>>>>> master
             </File>
           </Files>
         </Group>
