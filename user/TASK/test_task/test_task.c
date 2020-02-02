@@ -26,6 +26,7 @@
 #include "mpu6500driver.h"
 #include "pid.h"
 #include "remote_control.h"
+#include "string.h"
 
 
 /******************** Private User Declarations ********************/
@@ -68,9 +69,8 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
 void test_task(void *pvParameters)
 {
     while(1) {
-			  
-        vTaskDelay(200);
-
+        //vTaskDelay(200);
+        testVision();
     }  
 }
 
@@ -180,7 +180,11 @@ static void testVision(void) {
     PidTypeDef pid;
     fp32 pid_constants[3] = {pid_kp, pid_ki, pid_kd};
     PID_Init(&pid, PID_POSITION, pid_constants, max_out, max_iout);
-
+    
+    Gimbal_Motor_t gimbal_pitch_motor_arr[10];
+    int pitch_signal_arr[10];
+    int count = 0;
+    
     while (1) {     
         // Get CAN received data
         gimbal_pitch_motor.pos_raw = gimbal_pitch_motor.gimbal_motor_raw->ecd;
@@ -194,8 +198,19 @@ static void testVision(void) {
         // Turn gimbal motor
         CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
 
-        //Sending data via UART
-        send_to_uart(gimbal_pitch_motor, pid, pitch_signal);
+        if (count < 10) {
+            gimbal_pitch_motor_arr[count] = gimbal_pitch_motor;
+            pitch_signal_arr[count] = pitch_signal;
+            count++;
+        }
+        else {
+            vTaskDelay(2000);
+            count = 0;
+            
+            for (int i=0; i < 10; i++) {
+                send_to_uart(gimbal_pitch_motor_arr[i], pid, pitch_signal_arr[i]);  //Sending data via UART
+            }
+        }
     }
 }
 

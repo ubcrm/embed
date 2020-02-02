@@ -17,10 +17,10 @@
 
 /******************** PID Constants (May need to rename...) ********************/
 
-#define pid_kp 4
-#define pid_ki 0.01
-#define pid_kd 0.5
-#define max_out 15000
+#define pid_kp 20.0f
+#define pid_ki 0.0f
+#define pid_kd 0.0f
+#define max_out 5000.0f
 #define max_iout 0
 
 
