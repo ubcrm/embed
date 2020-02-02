@@ -29,13 +29,6 @@
 #include "string.h"
 
 
-/******************** Private User Declarations ********************/
-#define pid_kp 4
-#define pid_ki 0.01
-#define pid_kd 0.5
-#define max_out 15000
-#define max_iout 0
-
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
 
@@ -197,7 +190,7 @@ static void testVision(void) {
 
         // Turn gimbal motor
         CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
-
+        /*
         if (count < 10) {
             gimbal_pitch_motor_arr[count] = gimbal_pitch_motor;
             pitch_signal_arr[count] = pitch_signal;
@@ -211,6 +204,7 @@ static void testVision(void) {
                 send_to_uart(gimbal_pitch_motor_arr[i], pid, pitch_signal_arr[i]);  //Sending data via UART
             }
         }
+        */
     }
 }
 
@@ -221,21 +215,15 @@ static void testVision(void) {
  * @retval Vision signal in range of 0 and 8191
  */
 int get_vision_signal(void) {
-    int vision_signal = -1000;  // TODO: Get real values from vision
+    int vision_signal = 5900;  // TODO: Get real values from vision
         
     while (vision_signal > 8191) {
         vision_signal -= 8191;
     }
-    while (signal < 0) {
-        signal+= 8192;
+    while (vision_signal < 0) {
+        vision_signal+= 8192;
     }
-    return signal;
-}
-
-int get_vision_signal() {
-    int vision_signal = 3000;  // TODO: Get real values from vision
-    int output_signal = truncate_pid_signal(vision_signal);
-    return output_signal;
+    return vision_signal;
 }
 
 
