@@ -34,7 +34,6 @@ typedef struct
 	uint16_t current_raw;
 } Gimbal_Motor_t;
 
-
 typedef struct 
 {
 	Gimbal_Motor_t *yaw_motor;

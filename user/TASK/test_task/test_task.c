@@ -211,11 +211,16 @@ int get_vision_signal(void) {
     while (vision_signal > 8191) {
         vision_signal -= 8191;
     }
-    while (vision_signal < 0) {
-        vision_signal += 8192;
+    while (signal < 0) {
+        signal+= 8192;
     }
-    
-    return vision_signal;
+    return signal;
+}
+
+int get_vision_signal() {
+    int vision_signal = 3000;  // TODO: Get real values from vision
+    int output_signal = truncate_pid_signal(vision_signal);
+    return output_signal;
 }
 
 
