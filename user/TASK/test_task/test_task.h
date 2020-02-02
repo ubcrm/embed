@@ -7,8 +7,8 @@
   ******************************************************************************
 **/
 
-#ifndef USER_TASK_H
-#define USER_TASK_H
+#ifndef TEST_TASK_H
+#define TEST_TASK_H
 
 #include "CAN_receive.h"
 #include "main.h"
@@ -23,8 +23,6 @@
 #define max_out 15000
 #define max_iout 0
 
-
-/******************** Public Definitions & Structs ********************/
 
 /******************** Public Definitions & Structs ********************/
 

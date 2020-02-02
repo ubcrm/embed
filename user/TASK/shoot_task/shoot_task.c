@@ -55,8 +55,15 @@ static uint16_t shoot_init(void) {
     ramp_init(&shoot.ramp2, RAMP_PRD, Fric_UP, Fric_OFF);
 
     //Set pwm motor to zero
+<<<<<<< HEAD
     shoot.fric1_pwm = /*Fric_OFF*/ 50;
     shoot.fric2_pwm = /*Fric_OFF*/ 50;
+=======
+    shoot.fric1_pwm = Fric_OFF;
+    shoot.fric2_pwm = Fric_OFF;
+	
+	fric_off();
+>>>>>>> 3a0ad908b97bc6f9e637dcc67c9721c1f62dbb56
 
     return TRUE;
 }
@@ -66,13 +73,59 @@ static void shoot_control_loop(void) {
     if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
         pwm_target = Fric_DOWN;
         
+        // Hopper:spin constantly
+        
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
+<<<<<<< HEAD
             // no shoot
             pwm_target = Fric_OFF;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
             // single shot
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
             // rapid fire
+=======
+
+            //Currently running SHOOT_ON fully
+            shoot.fric1_pwm = Fric_OFF;
+            shoot.fric2_pwm = Fric_OFF;
+
+            //Turning the motors on one by one
+            ramp_calc(&shoot.ramp1, SHOOT_FRIC_PWM_ADD_VALUE);
+            if(shoot.ramp1.out == SHOOT_FRIC_PWM_ADD_VALUE) {
+                ramp_calc(&shoot.ramp2, SHOOT_FRIC_PWM_ADD_VALUE);
+                
+                if(shoot.ramp2.out != SHOOT_FRIC_PWM_ADD_VALUE) {
+                    // error, shoot.ramp1 value not set
+                }
+            } else {
+                // error, shoot.ramp1 value not set
+            }
+
+            //Sets the ramp maximum, ramp will update to reach this value
+            shoot.ramp1.max_value = Fric_DOWN;
+            shoot.ramp2.max_value = Fric_DOWN;
+
+            //Sets pwm output to be the ramp value
+            shoot.fric1_pwm = (uint16_t)(shoot.ramp1.out);
+            shoot.fric2_pwm = (uint16_t)(shoot.ramp2.out);
+
+            //Turn flywheel on
+            fric1_on(shoot.fric1_pwm);
+            fric2_on(shoot.fric2_pwm);
+
+
+            // Trigger: stop
+            
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
+            // single shot
+            
+            // Trigger: turn 90 degrees
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
+            // rapid fire
+            
+            // Trigger: turn 90 degrees
+            
+>>>>>>> 3a0ad908b97bc6f9e637dcc67c9721c1f62dbb56
         } else {
             // throw some kind of error?
         }
