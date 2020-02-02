@@ -12,7 +12,7 @@
 #include "delay.h"
 #include "USART_comms.h"
 #include "INS_task.h"
-
+#include "test_task.h"
 
 static uint8_t chassis_init(chassis_t *chassis_move_init);
 static void chassis_set_mode(void);
@@ -36,7 +36,7 @@ void chassis_task(void *pvParameters){
         //PID
         //output
         CAN_CMD_CHASSIS(0, 0, 0, 0);
-        vTaskDelay(50);
+        vTaskDelay(CHASSIS_TASK_DELAY);
     }        
 }
 

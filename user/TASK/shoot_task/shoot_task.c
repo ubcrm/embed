@@ -23,6 +23,7 @@
 #include "user_lib.h"
 #include "fric.h"
 #include "USART_comms.h"
+#include "test_task.h"
 
 shoot_t shoot;
 
@@ -35,16 +36,14 @@ static uint16_t pwm_output = Fric_OFF;
 
 /******************** Task/Functions Called from Outside ********************/
 
-void shoot_task(void *pvParameters){
-    
+void shoot_task(void *pvParameters) {
     while(!shoot_init()) {
     }
     vTaskDelay(2000);
     while(1) {
         shoot_control_loop();
-		vTaskDelay(5);
+	vTaskDelay(5);
     }
-    
 }
 
 static uint16_t shoot_init(void) {
@@ -56,7 +55,6 @@ static uint16_t shoot_init(void) {
     shoot.fric2_pwm = Fric_INIT;
     
     fric1_on(shoot.fric1_pwm);
-    fric2_on(shoot.fric2_pwm);
 
     return TRUE;
 }
@@ -75,7 +73,7 @@ static void shoot_control_loop(void) {
             pwm_target = Fric_UP;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
             // rapid fire
-
+            // Trigger: turn 90 degrees
         } else {
             // throw some kind of error?
             pwm_target = Fric_OFF;
