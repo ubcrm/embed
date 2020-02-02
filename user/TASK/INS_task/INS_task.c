@@ -370,9 +370,9 @@ void INS_task(void *pvParameters)
 }
 
 
-//Used for test_imu_readings
-Gimbal_t gimbal;
-char str[32] = {0};
+extern Gimbal_t gimbal;
+extern Gimbal_Motor_t gimbal_pitch_motor;
+extern char str[];
 
 /**
  * @brief  Reading angle, gyro, and accelerometer data and printing to serial

@@ -23,8 +23,6 @@
 #define max_out 15000
 #define max_iout 0
 
-
-
 /******************** Public Definitions & Structs ********************/
 
 typedef struct 
