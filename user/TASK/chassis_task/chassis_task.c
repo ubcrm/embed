@@ -20,7 +20,7 @@ static uint8_t chassis_init(Chassis_t *chassis_init);
 static void chassis_update_data(Chassis_t *chassis_update);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
-//static void chassis_set_mode(void);
+static void chassis_set_mode(void);
 static void chassis_motor_calc(void);
 static void chassis_PID(void);
 
@@ -42,7 +42,7 @@ void chassis_task(void *pvParameters){
 		    //update info
 				chassis_update_data(&chassis);
         //set mode
-        //chassis_set_mode();
+        chassis_set_mode();
         //process RC data into xyz speed
         chassis_remote_calc(CHASSIS_VECTOR_RAW);
         //process xyz speed into vector decomposition 
@@ -101,9 +101,9 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
  * @retval 
  */
 
-/*static void chassis_set_mode(void){
+static void chassis_set_mode(void){
 	//Don't do anything
-}*/
+}
 
 
 /**
@@ -126,7 +126,6 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
     chassis.x_speed_set = chassis.x_speed_raw;
     chassis.y_speed_set = chassis.y_speed_raw;
     chassis.z_speed_set = chassis.z_speed_raw;
-    
 }
 
 
