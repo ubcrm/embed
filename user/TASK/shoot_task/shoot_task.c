@@ -60,7 +60,7 @@ static uint16_t shoot_init(void) {
     shoot.fric1_pwm = Fric_OFF;
     shoot.fric2_pwm = Fric_OFF;
 	
-		fric_off();
+	fric_off();
 
     return TRUE;
 }
@@ -71,6 +71,8 @@ static void shoot_control_loop(void) {
     
     if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
         // ramp up wheels to speed
+        
+        // Hopper:spin constantly
         
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
 
@@ -102,11 +104,18 @@ static void shoot_control_loop(void) {
             fric1_on(shoot.fric1_pwm);
             fric2_on(shoot.fric2_pwm);
 
-            // no shoot
-        // } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
-        //     // single shot
-        // } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
-        //     // rapid fire
+
+            // Trigger: stop
+            
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
+            // single shot
+            
+            // Trigger: turn 90 degrees
+        } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
+            // rapid fire
+            
+            // Trigger: turn 90 degrees
+            
         } else {
             // throw some kind of error?
         }
