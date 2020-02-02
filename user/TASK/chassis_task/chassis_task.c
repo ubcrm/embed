@@ -39,8 +39,8 @@ void chassis_task(void *pvParameters){
     }
     
 	while(1) {
-		    //update info
-				chassis_update_data(&chassis);
+        //update info
+        chassis_update_data(&chassis);
         //set mode
         chassis_set_mode();
         //process RC data into xyz speed
@@ -58,11 +58,11 @@ void chassis_task(void *pvParameters){
 }
 
 static void chassis_update_data(Chassis_t *chassis_update){
-		for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
         chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
         chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
         chassis_update->motor[i].current_raw = chassis_update->motor[i].motor_raw->given_current;
-		}
+	}
 }
 
 /**
@@ -81,7 +81,7 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
         chassis_init->motor[i].pos_raw = chassis_init->motor[i].motor_raw->ecd;
         chassis_init->motor[i].current_raw = chassis_init->motor[i].motor_raw->given_current;
 			
-				PID_Init(&chassis_init->motor[i].pid_control, PID_DELTA, def_pid_constants, 1000.0, 50.0);
+		PID_Init(&chassis_init->motor[i].pid_control, PID_DELTA, def_pid_constants, 1000.0, 50.0);
     }
     
     //Init yaw and front vector

@@ -516,6 +516,3 @@ void MPU6500_DMA_IRQHandler(void)
 
 #endif
 
-
-
-

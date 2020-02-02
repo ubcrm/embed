@@ -24,7 +24,6 @@
 #define max_iout 0
 
 
-/******************** Public Definitions & Structs ********************/
 
 /******************** Public Definitions & Structs ********************/
 
@@ -41,7 +40,7 @@ typedef struct
 {
 	Gimbal_Motor_t *yaw_motor;
 	Gimbal_Motor_t *pitch_motor;
-  const fp32 *angle_reading_raw;
+    const fp32 *angle_reading_raw;
 	const fp32 *gyro_reading_raw;
 	const fp32 *acce_reading_raw;
 } Gimbal_t;
