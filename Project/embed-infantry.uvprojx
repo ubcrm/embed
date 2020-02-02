@@ -921,7 +921,6 @@
               <FileName>chassis_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\chassis_task\chassis_task.h</FilePath>
-<<<<<<< HEAD
             </File>
             <File>
               <FileName>shoot_task.c</FileName>
@@ -932,8 +931,6 @@
               <FileName>shoot_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\shoot_task\shoot_task.h</FilePath>
-=======
->>>>>>> master
             </File>
           </Files>
         </Group>
