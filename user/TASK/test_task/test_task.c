@@ -190,7 +190,7 @@ static void testVision(void) {
 
         // Turn gimbal motor
         CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
-        /*
+        
         if (count < 10) {
             gimbal_pitch_motor_arr[count] = gimbal_pitch_motor;
             pitch_signal_arr[count] = pitch_signal;
@@ -204,7 +204,6 @@ static void testVision(void) {
                 send_to_uart(gimbal_pitch_motor_arr[i], pid, pitch_signal_arr[i]);  //Sending data via UART
             }
         }
-        */
     }
 }
 
