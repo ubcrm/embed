@@ -20,14 +20,14 @@ static uint8_t chassis_init(Chassis_t *chassis_init);
 static void chassis_update_data(Chassis_t *chassis_update);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
-static void chassis_set_mode(void);
+//static void chassis_set_mode(void);
 static void chassis_motor_calc(void);
 static void chassis_PID(void);
 
 
 static Chassis_t chassis;
     
-fp32 def_pid_constants[3] = {1.0, 0.0, 0.0};
+fp32 def_pid_constants[3] = {0.02, 0.0, 0.1};
 
 Chassis_t* get_chassis_point() {
     return &chassis;
@@ -42,7 +42,7 @@ void chassis_task(void *pvParameters){
 		    //update info
 				chassis_update_data(&chassis);
         //set mode
-        chassis_set_mode();
+        //chassis_set_mode();
         //process RC data into xyz speed
         chassis_remote_calc(CHASSIS_VECTOR_RAW);
         //process xyz speed into vector decomposition 
@@ -53,8 +53,8 @@ void chassis_task(void *pvParameters){
         CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
             chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
         
-        vTaskDelay(50);
-    }        
+        vTaskDelay(1);
+    }
 }
 
 static void chassis_update_data(Chassis_t *chassis_update){
@@ -70,7 +70,6 @@ static void chassis_update_data(Chassis_t *chassis_update){
  * @param
  * @retval TRUE if init is completed
  */
-
 static uint8_t chassis_init(Chassis_t *chassis_init){
     //Forces motors to reset ID
     CAN_CMD_CHASSIS_RESET_ID();
@@ -102,9 +101,9 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
  * @retval 
  */
 
-static void chassis_set_mode(void){
+/*static void chassis_set_mode(void){
 	//Don't do anything
-}
+}*/
 
 
 /**
@@ -136,14 +135,13 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
  * @param 
  * @retval 
  */
-
 static void chassis_motor_calc(void){
 	//Take x_speed_set etc and handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
-    chassis.motor[FRONT_LEFT].speed_set = chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
-    chassis.motor[BACK_LEFT].speed_set = chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
-    chassis.motor[FRONT_RIGHT].speed_set = -chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set;
-    chassis.motor[BACK_RIGHT].speed_set = -chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set;
+    chassis.motor[FRONT_LEFT].speed_set = MULTIPLIER * (chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set);
+    chassis.motor[BACK_LEFT].speed_set = MULTIPLIER * (chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set);
+    chassis.motor[FRONT_RIGHT].speed_set = MULTIPLIER * (-chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set);
+    chassis.motor[BACK_RIGHT].speed_set = MULTIPLIER * (-chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set);
     
     /*volatile char str[32];
     sprintf((char*) str, "x: %d\n\r", chassis.x_speed_set);
@@ -178,45 +176,45 @@ static void chassis_PID(void){
 	front_right = PID_Calc(&chassis.motor[FRONT_RIGHT].pid_control, 
 	chassis.motor[FRONT_RIGHT].speed_raw,
 	chassis.motor[FRONT_RIGHT].speed_set);
-	chassis.motor[FRONT_RIGHT].speed_out = front_right;
+	chassis.motor[FRONT_RIGHT].speed_out += front_right;
 	
 	back_right = PID_Calc(&chassis.motor[BACK_RIGHT].pid_control, 
 	chassis.motor[BACK_RIGHT].speed_raw, 
 	chassis.motor[BACK_RIGHT].speed_set);
-	chassis.motor[BACK_RIGHT].speed_out = back_right;
+	chassis.motor[BACK_RIGHT].speed_out += back_right;
 	
 	front_left = PID_Calc(&chassis.motor[FRONT_LEFT].pid_control, 
 	chassis.motor[FRONT_LEFT].speed_raw, 
 	chassis.motor[FRONT_LEFT].speed_set);
-	chassis.motor[FRONT_LEFT].speed_out = front_left;
+	chassis.motor[FRONT_LEFT].speed_out += front_left;
 	
 	back_left = PID_Calc(&chassis.motor[BACK_LEFT].pid_control, 
 	chassis.motor[BACK_LEFT].speed_raw, 
 	chassis.motor[BACK_LEFT].speed_set);
-	chassis.motor[BACK_LEFT].speed_out = back_left;
+	chassis.motor[BACK_LEFT].speed_out += back_left;
 	
-	sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %f \n\r", 
+	sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
 	chassis.motor[FRONT_RIGHT].speed_set, 
 	chassis.motor[FRONT_RIGHT].speed_raw, 
-	front_right);
+	chassis.motor[FRONT_RIGHT].speed_out);
 	serial_send_string(pid_out);
 	
-	sprintf(pid_out, "Back Right - target: %d, sensor: %d, output: %f \n\r", 
+	sprintf(pid_out, "Back Right - target: %d, sensor: %d, output: %d \n\r", 
 	chassis.motor[BACK_RIGHT].speed_set, 
 	chassis.motor[BACK_RIGHT].speed_raw, 
-	back_right);
+	chassis.motor[BACK_RIGHT].speed_out);
 	serial_send_string(pid_out);
 	
-	sprintf(pid_out, "Front Left - target: %d, sensor: %d, output: %f \n\r", 
+	sprintf(pid_out, "Front Left - target: %d, sensor: %d, output: %d \n\r", 
 	chassis.motor[FRONT_LEFT].speed_set, 
 	chassis.motor[FRONT_LEFT].speed_raw, 
-	front_left);
+	chassis.motor[FRONT_LEFT].speed_out);
 	serial_send_string(pid_out);
 	
-	sprintf(pid_out, "Back Left - target: %d, sensor: %d, output: %f \n\r", 
+	sprintf(pid_out, "Back Left - target: %d, sensor: %d, output: %d \n\r", 
 	chassis.motor[BACK_LEFT].speed_set, 
 	chassis.motor[BACK_LEFT].speed_raw, 
-	back_left);
+	chassis.motor[BACK_LEFT].speed_out);
 	serial_send_string(pid_out);
 	
 }

@@ -13,6 +13,8 @@
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
 
+#define MULTIPLIER 3
+
 // RC channels
 #define RC_X 2
 #define RC_Y 1
