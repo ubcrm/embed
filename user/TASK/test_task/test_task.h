@@ -23,6 +23,10 @@
 #define max_out 15000
 #define max_iout 0
 
+#define TEST_TASK_DELAY 200
+#define INS_TASK_DELAY 7
+#define CHASSIS_TASK_DELAY 50
+#define SHOOT_TASK_DELAY 1
 
 /******************** Public Definitions & Structs ********************/
 

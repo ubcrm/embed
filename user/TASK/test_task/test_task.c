@@ -71,7 +71,7 @@ void test_task(void *pvParameters)
 {
     while(1) {
 			  
-        vTaskDelay(200);
+        vTaskDelay(TEST_TASK_DELAY);
 
     }  
 }

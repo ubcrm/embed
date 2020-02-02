@@ -22,6 +22,7 @@
 #include "CAN_Receive.h"
 #include "user_lib.h"
 #include "fric.h"
+#include "test_task.h"
 
 shoot_t shoot;
 
@@ -42,7 +43,7 @@ void shoot_task(void *pvParameters){
     while(1) {
 				fric_off();
 			
-				vTaskDelay(3);
+				vTaskDelay(SHOOT_TASK_DELAY);
         //shoot_control_loop();
     }
     
