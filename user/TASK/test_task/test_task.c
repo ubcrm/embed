@@ -7,7 +7,6 @@
   ******************************************************************************
 **/
 
->>>>>>> master
 #include "test_task.h"
 #include "main.h"
 #include "stm32f4xx.h"
@@ -46,7 +45,6 @@ char str[32] = {0};
 static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce);
 //Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
 static void test_GM6020(void);
-<<<<<<< HEAD
 
 
 /******************** Task/Functions Called Outside ********************/

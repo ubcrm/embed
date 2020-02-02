@@ -44,7 +44,6 @@ typedef struct
     const fp32 *angle_reading_raw;
 	const fp32 *gyro_reading_raw;
 	const fp32 *acce_reading_raw;
-    const fp32 *angle_reading_raw;
 } Gimbal_t;
 
 

@@ -61,14 +61,14 @@ void start_task(void *pvParameters)
             (void *)NULL,
             (UBaseType_t)SHOOT_TASK_PRIO,
             (TaskHandle_t *)&shoot_task_handler);
-
+/*
     xTaskCreate((TaskFunction_t) revolver_task,
             (const char *)"revolver_task",
             (uint16_t) REV_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)REV_TASK_PRIO,
             (TaskHandle_t *)&revolver_task_Handler);
-
+*/
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical
 }
