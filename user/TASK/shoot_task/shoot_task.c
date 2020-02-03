@@ -42,7 +42,7 @@ void shoot_task(void *pvParameters) {
     vTaskDelay(2000);
     while(1) {
         shoot_control_loop();
-	vTaskDelay(5);
+        vTaskDelay(1);
     }
 }
 
