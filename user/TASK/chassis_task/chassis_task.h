@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+    * @file    TASK/chassis_task
+    * @date    03-February/2020
+    * @brief   This file contains tasks and functions to control the chassis.
+    *          Raw control mode maps the motor output to wheel speed, no interaction with gimbal.
+    * @attention PID tuning required.
+  ******************************************************************************
+**/
+
 #ifndef CHASSIS_TASK_H
 #define CHASSIS_TASK_H
 
@@ -6,6 +16,7 @@
 #include "remote_control.h"
 #include "pid.h"
 
+/******************** User Definitions ********************/
 
 //Chassis motor CAN ID offset 
 #define FRONT_RIGHT 0
@@ -20,6 +31,13 @@
 #define RC_Y 1
 #define RC_Z 0
 
+//M3508 motors max and min CAN output
+#define M3508_MAX_OUT 1000
+#define M3508_MIN_OUT 50.0
+//M3508 speed PID constants
+#define M3508_KP 0.02
+#define M3508_KI 0.00
+#define M3508_KD 0.1
 
 typedef struct 
 {
@@ -37,8 +55,8 @@ typedef struct
     //Final output speed
     int16_t speed_out;
 	
-		//Control
-		PidTypeDef pid_control;
+    //Control
+    PidTypeDef pid_control;
 } Chassis_Motor_t;
 
 
@@ -72,6 +90,8 @@ typedef enum{
 } chassis_user_mode_e;
 
 
+
+/******************** Main Task/Functions Called from Outside ********************/
 
 extern void chassis_task(void *pvParameters);
 extern uint8_t chassis_init(Chassis_t *chassis_init);

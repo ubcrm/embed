@@ -58,8 +58,6 @@ void test_task(void *pvParameters)
 
 /******************** Private Functions ********************/
 
-
-
 /** 
  * @brief  Turns P19 (Chassis Motor) and returns encoder position
  * @param  int id

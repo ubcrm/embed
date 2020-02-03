@@ -1,21 +1,31 @@
+/**
+  ******************************************************************************
+    * @file    TASK/chassis_task
+    * @date    03-February/2020
+    * @brief   This file contains tasks and functions to control the chassis.
+    *          Raw control mode maps the motor output to wheel speed, no interaction with gimbal.
+    * @attention PID tuning required.
+  ******************************************************************************
+**/
+
 #include "chassis_task.h"
 #include "main.h"
 #include "stm32f4xx.h"
 #include <stdio.h>
-
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "led.h"
+
+/******************** User Includes ********************/
 #include "CAN_Receive.h"
-#include "delay.h"
 #include "USART_comms.h"
-#include "INS_task.h"
 #include "remote_control.h"
+#include "INS_task.h"
 #include "pid.h"
 
 
+/******************** Private User Declarations ********************/
 static uint8_t chassis_init(Chassis_t *chassis_init);
 static void chassis_update_data(Chassis_t *chassis_update);
 static void chassis_set_mode(void);
@@ -27,12 +37,15 @@ static void chassis_PID(void);
 
 static Chassis_t chassis;
     
-fp32 def_pid_constants[3] = {0.02, 0.0, 0.1};
 
-Chassis_t* get_chassis_point() {
-    return &chassis;
-}
 
+/******************** Main Task/Functions Called from Outside ********************/
+
+/**
+ * @brief Starts chassis motors and peripherals, initializes a front vector
+ * @param
+ * @retval TRUE if init is completed
+ */
 void chassis_task(void *pvParameters){
     //Initializes chassis
     while(!chassis_init(&chassis)){
@@ -57,22 +70,32 @@ void chassis_task(void *pvParameters){
     }
 }
 
-static void chassis_update_data(Chassis_t *chassis_update){
-	for (int i = 0; i < 4; i++) {
-        chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
-        chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
-        chassis_update->motor[i].current_raw = chassis_update->motor[i].motor_raw->given_current;
-	}
-}
 
 /**
- * @brief Starts chassis motors and peripherals, initializes a front vector
+ * @brief Util, returns a pointer to the main chassis struct
+ * @param
+ * @retval A pointer to the main chassis struct
+ */
+Chassis_t* get_chassis_point(void) {
+    return &chassis;
+}
+
+
+
+
+/******************** Private User Functions ********************/
+
+/**
+ * @brief Starts chassis motors and peripherals, initializes a front vector, a PID struct, and links motor data pointers.
  * @param
  * @retval TRUE if init is completed
  */
 static uint8_t chassis_init(Chassis_t *chassis_init){
     //Forces motors to reset ID
     CAN_CMD_CHASSIS_RESET_ID();
+    
+    //Init PID constants
+    fp32 def_pid_constants[3]  = {M3508_KP, M3508_KI, M3508_KD};
     
     //Link pointers with CAN motors
     for (int i = 0; i < 4; i++) {
@@ -81,7 +104,7 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
         chassis_init->motor[i].pos_raw = chassis_init->motor[i].motor_raw->ecd;
         chassis_init->motor[i].current_raw = chassis_init->motor[i].motor_raw->given_current;
 			
-		PID_Init(&chassis_init->motor[i].pid_control, PID_DELTA, def_pid_constants, 1000.0, 50.0);
+		PID_Init(&chassis_init->motor[i].pid_control, PID_DELTA, def_pid_constants, M3508_MAX_OUT, M3508_MIN_OUT);
     }
     
     //Init yaw and front vector
@@ -96,7 +119,22 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
 
 
 /**
- * @brief Based on the mode of operation, remote control data is processed
+ * @brief Updates speed, position, and current data from all motors. Runs at the start of every loop.
+ * @param None
+ * @retval None
+ */
+static void chassis_update_data(Chassis_t *chassis_update){
+	for (int i = 0; i < 4; i++) {
+        chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
+        chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
+        chassis_update->motor[i].current_raw = chassis_update->motor[i].motor_raw->given_current;
+	}
+}
+
+
+/**
+ * @brief Based on the mode of operation, remote control data is processed. 
+ *      Currently blank as raw control is implemented
  * @param 
  * @retval 
  */
@@ -104,6 +142,7 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
 static void chassis_set_mode(void){
 	//Don't do anything
 }
+
 
 
 /**
@@ -130,7 +169,7 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
 
 
 /**
- * @brief Handles the data from remote controller
+ * @brief Handles the data from remote controller. Converts xyz axis into mecanum wheel current values.
  * @param 
  * @retval 
  */
@@ -141,37 +180,26 @@ static void chassis_motor_calc(void){
     chassis.motor[BACK_LEFT].speed_set = MULTIPLIER * (chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set);
     chassis.motor[FRONT_RIGHT].speed_set = MULTIPLIER * (-chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set);
     chassis.motor[BACK_RIGHT].speed_set = MULTIPLIER * (-chassis.y_speed_set + chassis.z_speed_set - chassis.x_speed_set);
-    
-    /*volatile char str[32];
-    sprintf((char*) str, "x: %d\n\r", chassis.x_speed_set);
-    serial_send_string(str);
-    sprintf((char*) str, "y: %d\n\r", chassis.y_speed_set);
-    serial_send_string(str);
-    sprintf((char*) str, "z: %d\n\r", chassis.z_speed_set);
-    serial_send_string(str);
-    sprintf((char*) str, "sum: %d\n\r", (chassis.x_speed_set + chassis.y_speed_set + chassis.z_speed_set));
-    serial_send_string(str);*/
 }
 
+
+//Buffer used to store data for PID debugging
+char pid_out[64];
+
+
 /**
- * @brief PID calculations for motors, both in translation and rotation 
- * @param 
+ * @brief PID calculations for motors, ensures that the motors run at a given speed
+ * @param None
  * @retval 
  */
-char pid_out[64];
-fp32 front_right;
-fp32 back_right;
-fp32 front_left;
-fp32 back_left;
-
 static void chassis_PID(void){
-	//Don't worry about this for now
 	//translation
-  //rotation
-	//get velocity
-	//pid calc
-	//set speed_out
-	//FRONT RIGHT
+    //rotation
+	fp32 front_right;
+    fp32 back_right;
+    fp32 front_left;
+    fp32 back_left;
+
 	front_right = PID_Calc(&chassis.motor[FRONT_RIGHT].pid_control, 
 	chassis.motor[FRONT_RIGHT].speed_raw,
 	chassis.motor[FRONT_RIGHT].speed_set);
