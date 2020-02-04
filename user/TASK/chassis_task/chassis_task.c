@@ -26,7 +26,7 @@
 
 
 /******************** Private User Declarations ********************/
-static uint8_t chassis_init(Chassis_t *chassis_init);
+static void chassis_init(Chassis_t *chassis_init);
 static void chassis_update_data(Chassis_t *chassis_update);
 static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
@@ -47,9 +47,11 @@ static Chassis_t chassis;
  * @retval TRUE if init is completed
  */
 void chassis_task(void *pvParameters){
+    
+    // Delay to make sure critical has been initialised
+    vTaskDelay(20);
     //Initializes chassis
-    while(!chassis_init(&chassis)){
-    }
+    chassis_init(&chassis);
     
 	while(1) {
         //update info
@@ -90,7 +92,7 @@ Chassis_t* get_chassis_point(void) {
  * @param
  * @retval TRUE if init is completed
  */
-static uint8_t chassis_init(Chassis_t *chassis_init){
+static void chassis_init(Chassis_t *chassis_init){
     //Forces motors to reset ID
     CAN_CMD_CHASSIS_RESET_ID();
     
@@ -113,8 +115,6 @@ static uint8_t chassis_init(Chassis_t *chassis_init){
 		
     //Pointer remote
     chassis_init->rc_raw = get_remote_control_point();
-    
-    return TRUE;
 }
 
 
