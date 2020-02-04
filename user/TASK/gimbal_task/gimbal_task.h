@@ -30,10 +30,10 @@
 #define RC_MAX 1.0
 #define ENCODER_MIN 0
 #define ENCODER_MAX 8191
-#define YAW_MIN 0
-#define YAW_MAX 8191
-#define PITCH_MIN 0
-#define PITCH_MAX 8191
+#define YAW_MIN 2359
+#define YAW_MAX 6576
+#define PITCH_MIN 3545
+#define PITCH_MAX 7642
 
 
 /************************** Gimbal Data Structures ***************************/

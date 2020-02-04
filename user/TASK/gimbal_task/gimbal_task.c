@@ -28,6 +28,7 @@ float rc_channel_1;
 float rc_channel_2;
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
+Gimbal_Motor_t gimbal_yaw_motor;
 
 //UART mailbox
 char str[32] = {0};
@@ -53,39 +54,53 @@ void gimbal_task(void* parameters){
     vTaskDelay(GIMBAL_TASK_INIT_TIME);
 	
     gimbal_pitch_motor.gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
+    gimbal_yaw_motor.gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
     
     fp32 pitch_signal;
+    fp32 yaw_signal;
     int vision_signal;
     
-    PidTypeDef pid;
+    PidTypeDef pid_pitch;
     fp32 pid_constants[3] = {pid_kp, pid_ki, pid_kd};
-    PID_Init(&pid, PID_POSITION, pid_constants, max_out, max_iout);
+    PID_Init(&pid_pitch, PID_POSITION, pid_constants, max_out, max_iout);
+
+    PidTypeDef pid_yaw;
+    PID_Init(&pid_yaw, PID_POSITION, pid_constants, max_out, max_iout);
     
 	while(1){	
         /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
         /* For now using strictly encoder feedback for position */
-        // theta_setpoint = linear_map_float_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
-        // phi_setpoint = linear_map_float_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
+       
 		// Gets update on position from encoders and gyro
 		// Comparison to setpoint
 		// run PID
         //vTaskDelay(CONTROL_TIME);
+
+        // Update RC pointer
+        
         
         // Get CAN received data
         gimbal_pitch_motor.pos_raw = gimbal_pitch_motor.gimbal_motor_raw->ecd;
         gimbal_pitch_motor.speed_raw = gimbal_pitch_motor.gimbal_motor_raw->speed_rpm;
         gimbal_pitch_motor.current_raw = gimbal_pitch_motor.gimbal_motor_raw->given_current;
 
-        vision_signal = get_vision_signal();
+        gimbal_yaw_motor.pos_raw = gimbal_yaw_motor.gimbal_motor_raw->ecd;
+        gimbal_yaw_motor.speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
+        gimbal_yaw_motor.current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
+
+        // Calculate setpoints based on RC signal
+        phi_setpoint = linear_map_float_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
+        theta_setpoint = linear_map_float_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
         
-        pitch_signal = PID_Calc(&pid, gimbal_pitch_motor.pos_raw, vision_signal);
+        pitch_signal = PID_Calc(&pid_pitch, gimbal_pitch_motor.pos_raw, phi_setpoint);
+        yaw_signal = PID_Calc(&pid_yaw, gimbal_yaw_motor.pos_raw, theta_setpoint);
 
         // Turn gimbal motor
         CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
         
         vTaskDelay(1);
         
-        send_to_uart(gimbal_pitch_motor, pid, pitch_signal);  //Sending data via UART
+        send_to_uart(gimbal_pitch_motor, pid_pitch, pitch_signal);  //Sending data via UART
 	}
 }
 
@@ -142,7 +157,7 @@ int get_vision_signal(void) {
  * @param  
  * @retval None
  */
-void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
+void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid_pitch, fp32 pitch_signal) 	
 {
     char str[20]; //uart data buffer
 
@@ -155,13 +170,13 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
     sprintf(str, "current: %d\n\r", gimbal_yaw_motor.current_raw);
     serial_send_string(str);
 
-    sprintf(str, "motor kp: %f\n\r", pid.Kp);
+    sprintf(str, "motor kp: %f\n\r", pid_pitch.Kp);
     serial_send_string(str);
 
-    sprintf(str, "motor kd: %f\n\r", pid.Kd);
+    sprintf(str, "motor kd: %f\n\r", pid_pitch.Kd);
     serial_send_string(str);    
 
-    sprintf(str, "motor ki: %f\n\r", pid.Ki);
+    sprintf(str, "motor ki: %f\n\r", pid_pitch.Ki);
     serial_send_string(str);
     
     sprintf(str, "pitch signal: %f\n\r", pitch_signal);
