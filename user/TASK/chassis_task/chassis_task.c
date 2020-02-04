@@ -32,8 +32,7 @@ static void chassis_set_mode(void);
 static void chassis_remote_calc(chassis_user_mode_e mode);
 static void chassis_set_mode(void);
 static void chassis_motor_calc(void);
-static void chassis_PID(void);
-
+static void chassis_PID(uint8_t debug);
 
 static Chassis_t chassis;
     
@@ -63,7 +62,7 @@ void chassis_task(void *pvParameters){
         //process xyz speed into vector decomposition 
         chassis_motor_calc();
         //PID calculations, process 
-        chassis_PID();
+        chassis_PID(FALSE);
         //output
         CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
             chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
@@ -92,10 +91,7 @@ Chassis_t* get_chassis_point(void) {
  * @param
  * @retval TRUE if init is completed
  */
-static void chassis_init(Chassis_t *chassis_init){
-    //Forces motors to reset ID
-    CAN_CMD_CHASSIS_RESET_ID();
-    
+static void chassis_init(Chassis_t *chassis_init){    
     //Init PID constants
     fp32 def_pid_constants[3]  = {M3508_KP, M3508_KI, M3508_KD};
     
@@ -141,6 +137,7 @@ static void chassis_update_data(Chassis_t *chassis_update){
 
 static void chassis_set_mode(void){
 	//Don't do anything
+    //Implement chassis_follow_gimbal_yaw mode in the future
 }
 
 
@@ -192,7 +189,7 @@ char pid_out[64];
  * @param None
  * @retval 
  */
-static void chassis_PID(void){
+static void chassis_PID(uint8_t debug){
 	//translation
     //rotation
 	fp32 front_right;
@@ -220,28 +217,30 @@ static void chassis_PID(void){
 	chassis.motor[BACK_LEFT].speed_set);
 	chassis.motor[BACK_LEFT].speed_out += back_left;
 	
-	sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
-	chassis.motor[FRONT_RIGHT].speed_set, 
-	chassis.motor[FRONT_RIGHT].speed_raw, 
-	chassis.motor[FRONT_RIGHT].speed_out);
-	serial_send_string(pid_out);
-	
-	sprintf(pid_out, "Back Right - target: %d, sensor: %d, output: %d \n\r", 
-	chassis.motor[BACK_RIGHT].speed_set, 
-	chassis.motor[BACK_RIGHT].speed_raw, 
-	chassis.motor[BACK_RIGHT].speed_out);
-	serial_send_string(pid_out);
-	
-	sprintf(pid_out, "Front Left - target: %d, sensor: %d, output: %d \n\r", 
-	chassis.motor[FRONT_LEFT].speed_set, 
-	chassis.motor[FRONT_LEFT].speed_raw, 
-	chassis.motor[FRONT_LEFT].speed_out);
-	serial_send_string(pid_out);
-	
-	sprintf(pid_out, "Back Left - target: %d, sensor: %d, output: %d \n\r", 
-	chassis.motor[BACK_LEFT].speed_set, 
-	chassis.motor[BACK_LEFT].speed_raw, 
-	chassis.motor[BACK_LEFT].speed_out);
-	serial_send_string(pid_out);
+    if (debug == 1) {
+        sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
+        chassis.motor[FRONT_RIGHT].speed_set, 
+        chassis.motor[FRONT_RIGHT].speed_raw, 
+        chassis.motor[FRONT_RIGHT].speed_out);
+        serial_send_string(pid_out);
+        
+        sprintf(pid_out, "Back Right - target: %d, sensor: %d, output: %d \n\r", 
+        chassis.motor[BACK_RIGHT].speed_set, 
+        chassis.motor[BACK_RIGHT].speed_raw, 
+        chassis.motor[BACK_RIGHT].speed_out);
+        serial_send_string(pid_out);
+        
+        sprintf(pid_out, "Front Left - target: %d, sensor: %d, output: %d \n\r", 
+        chassis.motor[FRONT_LEFT].speed_set, 
+        chassis.motor[FRONT_LEFT].speed_raw, 
+        chassis.motor[FRONT_LEFT].speed_out);
+        serial_send_string(pid_out);
+        
+        sprintf(pid_out, "Back Left - target: %d, sensor: %d, output: %d \n\r", 
+        chassis.motor[BACK_LEFT].speed_set, 
+        chassis.motor[BACK_LEFT].speed_raw, 
+        chassis.motor[BACK_LEFT].speed_out);
+        serial_send_string(pid_out);
+    }
 	
 }

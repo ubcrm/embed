@@ -94,7 +94,6 @@ typedef enum{
 /******************** Main Task/Functions Called from Outside ********************/
 
 extern void chassis_task(void *pvParameters);
-extern uint8_t chassis_init(Chassis_t *chassis_init);
 extern Chassis_t* get_chassis_point(void);
 
 #endif
