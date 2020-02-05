@@ -10,7 +10,7 @@
       <TargetName>embed-infantry</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -893,16 +893,6 @@
               <FilePath>..\user\TASK\start_task\start_task.h</FilePath>
             </File>
             <File>
-              <FileName>revolver_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user\TASK\revolver_task\revolver_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>revolver_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\revolver_task\revolver_task.h</FilePath>
-            </File>
-            <File>
               <FileName>INS_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\TASK\INS_task\INS_task.c</FilePath>
@@ -931,16 +921,6 @@
               <FileName>gimbal_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\gimbal_task\gimbal_task.h</FilePath>
-            </File>
-            <File>
-              <FileName>test_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user\TASK\test_task\test_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>test_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\TASK\test_task\test_task.h</FilePath>
             </File>
           </Files>
         </Group>

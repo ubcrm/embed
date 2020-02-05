@@ -21,12 +21,14 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "CAN_Receive.h"
+#include "remote_control.h"
 
 float theta_setpoint;
 float phi_setpoint;
 float rc_channel_1;
 float rc_channel_2;
-const RC_ctrl_t* rc_ptr
+const RC_ctrl_t* rc_ptr;
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
 Gimbal_Motor_t gimbal_yaw_motor;
