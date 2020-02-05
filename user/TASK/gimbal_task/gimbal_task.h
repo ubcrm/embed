@@ -14,6 +14,8 @@
 #define Motor_Ecd_to_Rad 0.000766990394f
 #define FALSE 0
 #define TRUE 1
+#define average(x,y) ((x + y) / 2.0)
+#define range(x,y) (y - x)
 
 
 /****************************** PID Constants ********************************/
@@ -77,7 +79,7 @@ float get_relative_angle(float alpha, float beta);
 /**
  * Maps float in a specified range to an int in a new range as a linear mapping function
  */
-int linear_map_float_to_int(float val, float val_min, float val_max, int out_min, int out_max);
+int linear_map_int_to_int(int val, int val_min, int val_max, int out_min, int out_max);
 
 
 /******************************* Variable Declarations ***********************/
