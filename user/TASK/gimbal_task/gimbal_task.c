@@ -48,6 +48,8 @@ char str[32] = {0};
     }
 
 
+
+
 /**
  * @brief Initialises PID and fetches Gimbal motor data to ensure 
  *  gimbal points in direction specified. 
@@ -70,8 +72,8 @@ void gimbal_task(void* parameters){
 	while(1){	
         /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
         /* For now using strictly encoder feedback for position */
-        // theta_setpoint = linear_map_float_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
-        // phi_setpoint = linear_map_float_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
+        // theta_setpoint = linear_map_int_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
+        // phi_setpoint = linear_map_int_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
 		// Gets update on position from encoders and gyro
 		// Comparison to setpoint
 		// run PID
@@ -97,16 +99,25 @@ void gimbal_task(void* parameters){
 
 /**
  * @brief maps a value within a specified range to another specified range as a linear mapping 
- * @param
- * @retval 
+ * @param val is the value to be mapped. Must be within val_max and val_min for the output to be within the new bounds.
+ * @param val_min the lower bound on val
+ * @param val_max the upper bound on val
+ * @param out_min the new lower bound on val
+ * @param out_max the new upper bound on val
+ * @retval the new value within the new bounds
  */
-int linear_map_float_to_int(float val, float val_max, float val_min, int out_min, int out_max){
-    float percentage = val / (val_max - val_min);
-    
-    return (int) (percentage * (out_max - out_min)); 
+int linear_map_int_to_int(int val, int val_min , int val_max, int out_min, int out_max){
+    float delta = val - average(val_max, val_min);
+    float expansion_factor = range(out_min, out_max) / (float) range(val_min, val_max);
+
+    return (int) (average(out_min, out_max) + delta * expansion_factor);
 }
 
-
+/**
+ * @brief Returns angle in [-PI, PI]
+ * @param alpha an angle in radians
+ * @retval the angle in range [-PI, PI]
+ */
 float get_domain_angle(float alpha){
 	int done = 0;
 	while(!done){
@@ -120,10 +131,15 @@ float get_domain_angle(float alpha){
 			done = TRUE;
 		}
 	}
-    return 0.0;
+    return alpha;
 }
 
-
+/** 
+ * @brief Returns the smallest relative angle between two angles
+ * @param alpha an angle in radians
+ * @param beta an angle in radians
+ * @retval the smallest relative angle between alpha and beta in radians
+ */
 float get_relative_angle(float alpha, float beta){
 	return get_domain_angle(beta - alpha);
 }
@@ -148,7 +164,8 @@ int get_vision_signal(void) {
 
 
 /** 
- * @brief  
+ * @brief Updates Uart with position information on the yaw motor and the PID settings
+ * This will block for several milliseconds
  * @param  
  * @retval None
  */
