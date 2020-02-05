@@ -33,7 +33,7 @@
 
 
 
-/******************** User Defines for Receiving ********************/
+/******************** Private Defines for Receiving ********************/
 
 #define get_motor_measure(ptr, rx_message)                                                     \
     {                                                                                          \
@@ -49,7 +49,7 @@
 		
 		
 		
-/******************** User Declarations ********************/
+/******************** Private User Declarations ********************/
 		
 //CAN received data handler
 static void CAN_hook(CanRxMsg *rx_message);
@@ -60,7 +60,7 @@ static CanTxMsg GIMBAL_TxMessage;
 		
 
 		
-/******************** CAN Write Functions ********************/
+/******************** Public CAN Write Functions ********************/
 
 /**
 * @brief  Writes a CAN message to 4 gimbal motors
@@ -168,7 +168,7 @@ void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 
 
 
-/******************* CAN Read Functions *******************/
+/******************* Public CAN Read Functions *******************/
 
 //Return a pointer to yaw motor data
 const motor_measure_t *get_Yaw_Gimbal_Motor_Measure_Point(void)
@@ -201,6 +201,8 @@ const motor_measure_t *get_Chassis_Motor_Measure_Point(uint8_t i)
 }
 
 
+/******************** Private Function Implementationss ********************/
+
 /**
 * @brief  CAN1 interrupt handler, used for reading gimbal messages
 * @param  None
@@ -219,6 +221,7 @@ void CAN1_RX0_IRQHandler(void)
     }
 }
 
+
 /**
 * @brief  CAN2 interrupt handler, used for reading chassis messages
 * @param  None
@@ -235,6 +238,7 @@ void CAN2_RX0_IRQHandler(void)
         CAN_hook(&rx2_message); // Call to CAN_hook and allocates the received message to a data struct
     }
 }
+
 
 /**
 * @brief  Handles CAN messages received, takes motor ID and calls handling function of that motor

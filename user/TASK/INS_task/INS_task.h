@@ -52,7 +52,7 @@
 
 #define MPU6500_TEMP_PWM_MAX 5000 //mpu6500控制温度的设置TIM的重载值，即给PWM最大为 MPU6500_TEMP_PWM_MAX - 1
 
-//获取姿态角指针地址后，对应姿态角的地址偏移量 fp32类型
+//Data index offset for angle vector
 #define INS_YAW_ADDRESS_OFFSET 0
 #define INS_PITCH_ADDRESS_OFFSET 1
 #define INS_ROLL_ADDRESS_OFFSET 2
@@ -83,5 +83,7 @@ extern const fp32 *get_INS_angle_point(void);
 extern const fp32 *get_MPU6500_Gyro_Data_Point(void);
 //Returns a pointer to a vector of current accelerometer reading
 extern const fp32 *get_MPU6500_Accel_Data_Point(void);
+//Reading angle, gyro, and accelerometer data and printing to serial
+extern void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce); 	
 
 #endif
