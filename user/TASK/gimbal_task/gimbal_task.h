@@ -28,8 +28,8 @@
 /***************************** Gimbal Constants *****************************/
 #define GIMBAL_TASK_INIT_TIME 201
 #define CONTROL_TIME 1
-#define RC_MIN -1.0
-#define RC_MAX 1.0
+#define RC_MIN -660
+#define RC_MAX 660
 #define ENCODER_MIN 0
 #define ENCODER_MAX 8191
 #define YAW_MIN 2359

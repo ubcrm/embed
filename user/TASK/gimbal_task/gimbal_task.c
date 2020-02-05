@@ -26,6 +26,7 @@ float theta_setpoint;
 float phi_setpoint;
 float rc_channel_1;
 float rc_channel_2;
+const RC_ctrl_t* rc_ptr
 Gimbal_t gimbal;
 Gimbal_Motor_t gimbal_pitch_motor;
 Gimbal_Motor_t gimbal_yaw_motor;
@@ -74,19 +75,16 @@ void gimbal_task(void* parameters){
 
     PidTypeDef pid_yaw;
     PID_Init(&pid_yaw, PID_POSITION, pid_constants, max_out, max_iout);
+
+    rc_ptr = get_remote_control_point();
     
 	while(1){	
-        /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
         /* For now using strictly encoder feedback for position */
-        // theta_setpoint = linear_map_int_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
-        // phi_setpoint = linear_map_int_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
+        
 		// Gets update on position from encoders and gyro
 		// Comparison to setpoint
 		// run PID
         //vTaskDelay(CONTROL_TIME);
-
-        // Update RC pointer
-        
         
         // Get CAN received data
         gimbal_pitch_motor.pos_raw = gimbal_pitch_motor.gimbal_motor_raw->ecd;
@@ -97,9 +95,9 @@ void gimbal_task(void* parameters){
         gimbal_yaw_motor.speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
         gimbal_yaw_motor.current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
 
-        // Calculate setpoints based on RC signal
-        phi_setpoint = linear_map_float_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
-        theta_setpoint = linear_map_float_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
+        // Calculate setpoints based on RC signal. 
+        theta_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[2], RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
+        phi_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[3], RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
         
         pitch_signal = PID_Calc(&pid_pitch, gimbal_pitch_motor.pos_raw, phi_setpoint);
         yaw_signal = PID_Calc(&pid_yaw, gimbal_yaw_motor.pos_raw, theta_setpoint);
