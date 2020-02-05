@@ -48,6 +48,12 @@ char str[32] = {0};
     }
 
 
+/**
+ * @brief Initialises PID and fetches Gimbal motor data to ensure 
+ *  gimbal points in direction specified. 
+ * @param
+ * @retval 
+ */
 void gimbal_task(void* parameters){
 
     vTaskDelay(GIMBAL_TASK_INIT_TIME);
@@ -89,7 +95,11 @@ void gimbal_task(void* parameters){
 	}
 }
 
-
+/**
+ * @brief maps a value within a specified range to another specified range as a linear mapping 
+ * @param
+ * @retval 
+ */
 int linear_map_float_to_int(float val, float val_max, float val_min, int out_min, int out_max){
     float percentage = val / (val_max - val_min);
     
