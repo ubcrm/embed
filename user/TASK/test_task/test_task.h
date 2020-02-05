@@ -3,7 +3,7 @@
     * @file    TASK/test_task
     * @date    24-January/2020
     * @brief   This file contains tasks and functions used for hardware testing
-    * @attention Leave the task loop blank
+    * @attention Leave the main loop blank
   ******************************************************************************
 **/
 
@@ -22,7 +22,6 @@
 #define pid_kd 0.5
 #define max_out 15000
 #define max_iout 0
-
 
 /******************** Public Definitions & Structs ********************/
 
@@ -43,7 +42,6 @@ typedef struct
 	const fp32 *gyro_reading_raw;
 	const fp32 *acce_reading_raw;
 } Gimbal_t;
-
 
 /******************** Task/Functions Called Outside ********************/
 //Task used for testing. Usually left blank.

@@ -1,4 +1,7 @@
-#include "Start_Task.h"
+#include "start_task.h"
+#include "main.h"
+#include "stm32f4xx.h"
+#include <stdio.h>
 
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -8,6 +11,8 @@
 #include "revolver_task.h"
 #include "INS_task.h"
 #include "chassis_task.h"
+#include "vision_task.h"
+
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE 512
@@ -25,9 +30,9 @@ static TaskHandle_t chassis_task_handler;
 #define CHASSIS_STK_SIZE 512
 static TaskHandle_t INS_task_handler;
 
-#define REV_TASK_PRIO 10
-#define REV_STK_SIZE 256
-static TaskHandle_t revolver_task_Handler;
+#define VISION_TASK_PRIO 5
+#define VISION_STK_SIZE 512
+static TaskHandle_t vision_task_handler;
 
 void start_task(void *pvParameters)
 {
@@ -40,28 +45,26 @@ void start_task(void *pvParameters)
             (UBaseType_t)TEST_TASK_PRIO,
             (TaskHandle_t *)&test_task_handler);
 
-                                                            
     xTaskCreate((TaskFunction_t) INS_task,
             (const char *)"INS_task",
             (uint16_t) INS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)INS_TASK_PRIO,
             (TaskHandle_t *)&INS_task_handler);
-
+			
     xTaskCreate((TaskFunction_t) chassis_task,
             (const char *)"chassis_task",
             (uint16_t) CHASSIS_STK_SIZE,
             (void *)NULL,
             (UBaseType_t)CHASSIS_TASK_PRIO,
             (TaskHandle_t *)&chassis_task_handler);
-                            
-						
-    xTaskCreate((TaskFunction_t) revolver_task,
-            (const char *)"revolver_task",
-            (uint16_t) REV_STK_SIZE,
+            
+    xTaskCreate((TaskFunction_t) vision_task,
+            (const char *)"vision_task",
+            (uint16_t) VISION_STK_SIZE,
             (void *)NULL,
-            (UBaseType_t)REV_TASK_PRIO,
-            (TaskHandle_t *)&revolver_task_Handler);
+            (UBaseType_t)VISION_TASK_PRIO,
+            (TaskHandle_t *)&vision_task_handler);
 
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical

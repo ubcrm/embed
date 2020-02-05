@@ -370,6 +370,56 @@ void INS_task(void *pvParameters)
 }
 
 
+extern Gimbal_t gimbal;
+extern Gimbal_Motor_t gimbal_pitch_motor;
+extern char str[];
+
+/**
+ * @brief  Reading angle, gyro, and accelerometer data and printing to serial
+ * @param  angle: displays angle offset from start (zero) if TRUE
+ * @param  gyro: displays gyroscope data if TRUE
+ * @param  acce: displays accelerometer data if TRUE
+ * @retval None
+ */
+void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
+    //Link pointers
+    gimbal.angle_reading_raw = get_INS_angle_point();
+    gimbal.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
+	gimbal.acce_reading_raw = get_MPU6500_Accel_Data_Point();
+    
+    if (angle == TRUE) {        
+        //Sending angle data via UART
+        sprintf(str, "Angle yaw: %f\n\r", gimbal.angle_reading_raw[INS_YAW_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Angle pitch: %f\n\r", gimbal.angle_reading_raw[INS_PITCH_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Angle roll: %f\n\r", gimbal.angle_reading_raw[INS_ROLL_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        serial_send_string("\n");
+    }
+    
+    if (gyro == TRUE) {
+        //Sending gyro data via UART
+        sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Gyro Z: %f\n\r", gimbal.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        serial_send_string("\n");
+    }
+ 
+    if (acce == TRUE) {        
+        //Sending accelerometer data via UART
+        sprintf(str, "Acce X: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Acce Y: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        sprintf(str, "Acce Z: %f\n\r", gimbal.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
+        serial_send_string(str);
+        serial_send_string("\n");
+    }
+}
 
 
 /******************** Other Implementations, DO NOT TOUCH ********************/
@@ -465,7 +515,4 @@ void MPU6500_DMA_IRQHandler(void)
 }
 
 #endif
-
-
-
 
