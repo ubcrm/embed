@@ -16,7 +16,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
 /******************** User Includes ********************/
 #include "led.h"
 #include "CAN_Receive.h"
@@ -24,24 +23,17 @@
 #include "INS_task.h"
 #include "USART_comms.h"
 #include "mpu6500driver.h"
-#include "pid.h"
 #include "remote_control.h"
-#include "chassis_task.h"
+#include "string.h"
+#include "gimbal_task.h"
 
-/******************** Private User Declarations ********************/
-Gimbal_t gimbal;
-Gimbal_Motor_t gimbal_pitch_motor;
+Gimbal_t gimbal_test;
+Gimbal_Motor_t gimbal_pitch_motor_test;
 
 //UART mailbox
-char str[32] = {0};
-
-//Turns a gimbal motor (GM6020) and outputs its position, rpm, and current
-static void test_GM6020(void);
-//Enables Debug of P19 (chassis) motor
-static void test_P19(int id);
+char str_0[32] = {0};
 
 /******************** Task/Functions Called Outside ********************/
-
 /**
  * @brief: Task used for testing. Usually left blank.
  * @param: None
@@ -50,13 +42,12 @@ static void test_P19(int id);
 void test_task(void *pvParameters)
 {
     while(1) {
-        vTaskDelay(2000);
+
+        vTaskDelay(200);
+
     }  
 }
 
-
-
-/******************** Private Functions ********************/
 
 /** 
  * @brief  Turns P19 (Chassis Motor) and returns encoder position
@@ -77,23 +68,21 @@ static void test_P19(int id){
  */
 static void test_GM6020(void){
     //Link pointer (only needs to be done once)
-    gimbal.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
+    gimbal_test.yaw_motor->gimbal_motor_raw = get_Yaw_Gimbal_Motor_Measure_Point();
     
     //Make the motor turn
     CAN_CMD_GIMBAL(2000, 0, 0, 0);
 
     //Get CAN received data
-    gimbal.yaw_motor->pos_raw = gimbal.yaw_motor->gimbal_motor_raw->ecd;
-    gimbal.yaw_motor->speed_raw = gimbal.yaw_motor->gimbal_motor_raw->speed_rpm;
-    gimbal.yaw_motor->current_raw = gimbal.yaw_motor->gimbal_motor_raw->given_current;
-
+    gimbal_test.yaw_motor->pos_raw = gimbal_test.yaw_motor->gimbal_motor_raw->ecd;
+    gimbal_test.yaw_motor->speed_raw = gimbal_test.yaw_motor->gimbal_motor_raw->speed_rpm;
+    gimbal_test.yaw_motor->current_raw = gimbal_test.yaw_motor->gimbal_motor_raw->given_current;
 
     //Sending data via UART
-    sprintf(str, "position: %d\n\r", gimbal.yaw_motor->pos_raw);
-    serial_send_string(str);
-    sprintf(str, "speed: %d\n\r", gimbal.yaw_motor->speed_raw);
-    serial_send_string(str);
-    sprintf(str, "current: %d\n\r", gimbal.yaw_motor->current_raw);
-    serial_send_string(str);	
+    sprintf(str_0, "position: %d\n\r", gimbal_test.yaw_motor->pos_raw);
+    serial_send_string(str_0);
+    sprintf(str_0, "speed: %d\n\r", gimbal_test.yaw_motor->speed_raw);
+    serial_send_string(str_0);
+    sprintf(str_0, "current: %d\n\r", gimbal_test.yaw_motor->current_raw);
+    serial_send_string(str_0);	
 }
-
