@@ -3,7 +3,7 @@
     * @file    TASK/test_task
     * @date    24-January/2020
     * @brief   This file contains tasks and functions used for hardware testing
-    * @attention Leave the task loop blank
+    * @attention Leave the main loop blank
   ******************************************************************************
 **/
 
@@ -42,57 +42,10 @@ char str_0[32] = {0};
 void test_task(void *pvParameters)
 {
     while(1) {
+
         vTaskDelay(200);
+
     }  
-}
-
-/******************** Private Functions ********************/
-
-/**
- * @brief  Reading angle, gyro, and accelerometer data and printing to serial
- * @param  angle: displays angle offset from start (zero) if TRUE
- * @param  gyro: displays gyroscope data if TRUE
- * @param  acce: displays accelerometer data if TRUE
- * @retval None
- */
-static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
-    //Link pointers
-    gimbal_test.angle_reading_raw = get_INS_angle_point();
-    gimbal_test.gyro_reading_raw = get_MPU6500_Gyro_Data_Point();
-	gimbal_test.acce_reading_raw = get_MPU6500_Accel_Data_Point();
-    
-    if (angle == TRUE) {        
-        //Sending angle data via UART
-        sprintf(str_0, "Angle yaw: %f\n\r", gimbal_test.angle_reading_raw[INS_YAW_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Angle pitch: %f\n\r", gimbal_test.angle_reading_raw[INS_PITCH_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Angle roll: %f\n\r", gimbal_test.angle_reading_raw[INS_ROLL_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        serial_send_string("\n");
-    }
-    
-    if (gyro == TRUE) {
-        //Sending gyro data via UART
-        sprintf(str_0, "Gyro X: %f\n\r", gimbal_test.gyro_reading_raw[INS_GYRO_X_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Gyro Y: %f\n\r", gimbal_test.gyro_reading_raw[INS_GYRO_Y_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Gyro Z: %f\n\r", gimbal_test.gyro_reading_raw[INS_GYRO_Z_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        serial_send_string("\n");
-    }
- 
-    if (acce == TRUE) {        
-        //Sending accelerometer data via UART
-        sprintf(str_0, "Acce X: %f\n\r", gimbal_test.acce_reading_raw[INS_ACCEL_X_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Acce Y: %f\n\r", gimbal_test.acce_reading_raw[INS_ACCEL_Y_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        sprintf(str_0, "Acce Z: %f\n\r", gimbal_test.acce_reading_raw[INS_ACCEL_Z_ADDRESS_OFFSET]);
-        serial_send_string(str_0);
-        serial_send_string("\n");
-    }
 }
 
 
@@ -105,6 +58,7 @@ static void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
 static void test_P19(int id){
     //
 }
+
 
 /** 
  * @brief  Turns a gimbal motor (GM6020) and outputs its position, rpm, and current

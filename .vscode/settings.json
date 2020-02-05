@@ -1,7 +1,9 @@
 {
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "files.associations": {
-        "can.h": "c"
+        "can.h": "c",
+        "pid.h": "c",
+        "ins_task.h": "c"
     }
     
 }
