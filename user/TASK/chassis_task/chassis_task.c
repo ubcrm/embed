@@ -42,8 +42,8 @@ static Chassis_t chassis;
 
 /**
  * @brief Starts chassis motors and peripherals, initializes a front vector
- * @param
- * @retval TRUE if init is completed
+ * @param FreeRTOS parameters
+ * @retval None
  */
 void chassis_task(void *pvParameters){
     
@@ -74,7 +74,7 @@ void chassis_task(void *pvParameters){
 
 /**
  * @brief Util, returns a pointer to the main chassis struct
- * @param
+ * @param None
  * @retval A pointer to the main chassis struct
  */
 Chassis_t* get_chassis_point(void) {
@@ -88,8 +88,8 @@ Chassis_t* get_chassis_point(void) {
 
 /**
  * @brief Starts chassis motors and peripherals, initializes a front vector, a PID struct, and links motor data pointers.
- * @param
- * @retval TRUE if init is completed
+ * @param chassis_init pointer to chassis struct
+ * @retval None
  */
 static void chassis_init(Chassis_t *chassis_init){    
     //Init PID constants
@@ -131,8 +131,8 @@ static void chassis_update_data(Chassis_t *chassis_update){
 /**
  * @brief Based on the mode of operation, remote control data is processed. 
  *      Currently blank as raw control is implemented
- * @param 
- * @retval 
+ * @param None
+ * @retval None
  */
 
 static void chassis_set_mode(void){
@@ -144,8 +144,8 @@ static void chassis_set_mode(void){
 
 /**
  * @brief Takes the remote control data and converts as specified by user
- * @param  A value from the enum chassis_user_mode_e
- * @retval 
+ * @param  mode the chassis driving mode
+ * @retval None
  */
 
 static void chassis_remote_calc(chassis_user_mode_e mode){
@@ -167,8 +167,8 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
 
 /**
  * @brief Handles the data from remote controller. Converts xyz axis into mecanum wheel current values.
- * @param 
- * @retval 
+ * @param None
+ * @retval None
  */
 static void chassis_motor_calc(void){
 	//Take x_speed_set etc and handle mechanum wheels
@@ -187,7 +187,7 @@ char pid_out[64];
 /**
  * @brief PID calculations for motors, ensures that the motors run at a given speed
  * @param None
- * @retval 
+ * @retval None
  */
 static void chassis_PID(uint8_t debug){
 	//translation
