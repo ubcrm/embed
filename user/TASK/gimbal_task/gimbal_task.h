@@ -8,6 +8,7 @@
 #include "main.h"
 #include "CAN_receive.h"
 #include "pid.h"
+#include "shoot_task.h"
 
 
 /*************** Converts between motor position and degrees *****************/
@@ -53,6 +54,7 @@ typedef struct
     const fp32 *angle_reading_raw;
 	const fp32 *gyro_reading_raw;
 	const fp32 *acce_reading_raw;
+    Shoot_t *launcher;
 } Gimbal_t;
 
 

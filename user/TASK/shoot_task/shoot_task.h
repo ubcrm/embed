@@ -12,6 +12,7 @@
 #include "remote_control.h"
 #include "fric.h"
 #include "user_lib.h"
+#include "CAN_receive.h"
 
 #ifndef SHOOT_TASK_H
 #define SHOOT_TASK_H	
@@ -28,6 +29,19 @@
 #define ON 1
 #define OFF 0
 
+#define HOPPER_SPEED 1500
+#define HOPPER_OFF 0
+#define TRIGGER_90_DEGS 2048
+
+typedef struct
+{
+	const motor_measure_t *shoot_motor_raw;
+	int16_t pos_raw;
+	int16_t speed_raw;
+    int16_t pos_set;
+	int16_t speed_set;
+}Shoot_Motor_t;
+
 typedef struct 
 {
     ramp_function_source_t ramp1;
@@ -35,7 +49,9 @@ typedef struct
     uint16_t fric1_pwm;
     uint16_t fric2_pwm;
     const RC_ctrl_t *rc;
-}shoot_t;
+    Shoot_Motor_t hopper_motor;
+    Shoot_Motor_t trigger_motor;
+}Shoot_t;
 
 
 extern void shoot_task(void *pvParameters);

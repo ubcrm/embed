@@ -22,5 +22,6 @@ void startTask(void);
 #define INS_TASK_DELAY 10
 #define GIMBAL_TASK_DELAY 1
 #define SHOOT_TASK_DELAY 1
+#define SHOOT_INIT_DELAY 2000
 
 #endif
