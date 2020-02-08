@@ -56,14 +56,8 @@ void start_task(void *pvParameters)
             (void *)NULL,
             (UBaseType_t)GIMBAL_TASK_PRIO,
             (TaskHandle_t *)&gimbal_task_handler);
-    /*        
-    xTaskCreate((TaskFunction_t) vision_task,
-            (const char *)"vision_task",
-            (uint16_t) VISION_STK_SIZE,
-            (void *)NULL,
-            (UBaseType_t)VISION_TASK_PRIO,
-            (TaskHandle_t *)&vision_task_handler);
-*/
+            
+
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical
 }

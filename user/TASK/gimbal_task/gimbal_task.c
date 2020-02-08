@@ -57,8 +57,8 @@ char str[32] = {0};
 /**
  * @brief Initialises PID and fetches Gimbal motor data to ensure 
  *  gimbal points in direction specified. 
- * @param
- * @retval 
+ * @param FreeRTOS parameters
+ * @retval None
  */
 void gimbal_task(void* parameters){
 
@@ -182,7 +182,9 @@ int get_vision_signal(void) {
 /** 
  * @brief Updates Uart with position information on the yaw motor and the PID settings
  * This will block for several milliseconds
- * @param  
+ * @param gimbal_yaw_motor struct containing information about the gimbal yaw motor
+ * @param pid struct containing pid coefficients
+ * @param pitch_signal signal to pitch motor
  * @retval None
  */
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid_pitch, fp32 pitch_signal) 	
