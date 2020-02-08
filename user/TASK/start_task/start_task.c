@@ -7,12 +7,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "revolver_task.h"
 #include "INS_task.h"
 #include "chassis_task.h"
 #include "gimbal_task.h"
-#include "test_task.h"
-#include "vision_task.h"
 
 
 #define START_TASK_PRIO 1
@@ -31,11 +28,7 @@ static TaskHandle_t INS_task_handler;
 #define GIMBAL_STK_SIZE 512
 static TaskHandle_t gimbal_task_handler;
 
-#define TEST_TASK_PRIO 5
-#define TEST_STK_SIZE 512
-static TaskHandle_t test_task_handler;
-
-#define VISION_TASK_PRIO 6
+#define VISION_TASK_PRIO 5
 #define VISION_STK_SIZE 512
 static TaskHandle_t vision_task_handler;
 
@@ -63,20 +56,7 @@ void start_task(void *pvParameters)
             (void *)NULL,
             (UBaseType_t)GIMBAL_TASK_PRIO,
             (TaskHandle_t *)&gimbal_task_handler);
-
-    xTaskCreate((TaskFunction_t) test_task,
-            (const char *)"test_task",
-            (uint16_t) TEST_STK_SIZE,
-            (void *)NULL,
-            (UBaseType_t)TEST_TASK_PRIO,
-            (TaskHandle_t *)&test_task_handler);
             
-    xTaskCreate((TaskFunction_t) vision_task,
-            (const char *)"vision_task",
-            (uint16_t) VISION_STK_SIZE,
-            (void *)NULL,
-            (UBaseType_t)VISION_TASK_PRIO,
-            (TaskHandle_t *)&vision_task_handler);
 
     vTaskDelete(start_task_handler); //Delete start task
     taskEXIT_CRITICAL();            //Exit critical
