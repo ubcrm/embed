@@ -23,7 +23,6 @@
 #include "user_lib.h"
 #include "fric.h"
 #include "USART_comms.h"
-#include "test_task.h"
 
 shoot_t shoot;
 

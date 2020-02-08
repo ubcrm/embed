@@ -81,5 +81,7 @@ extern const fp32 *get_INS_angle_point(void);
 extern const fp32 *get_MPU6500_Gyro_Data_Point(void);
 //Returns a pointer to a vector of current accelerometer reading
 extern const fp32 *get_MPU6500_Accel_Data_Point(void);
+//Reading angle, gyro, and accelerometer data and printing to serial
+extern void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce); 	
 
 #endif
