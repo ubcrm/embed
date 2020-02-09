@@ -42,6 +42,16 @@ typedef struct
 	int16_t speed_set;
 }Shoot_Motor_t;
 
+
+typedef enum
+{
+    SHOOT_OFF,
+    SHOOT_READY,
+    SHOOT_SINGLE,
+    SHOOT_RAPID,
+    SHOOT_DONE,
+} shoot_mode_e;
+
 typedef struct 
 {
     ramp_function_source_t ramp1;
@@ -51,9 +61,8 @@ typedef struct
     const RC_ctrl_t *rc;
     Shoot_Motor_t hopper_motor;
     Shoot_Motor_t trigger_motor;
+    shoot_mode_e mode;
 }Shoot_t;
-
-
 extern void shoot_task(void *pvParameters);
 #endif
 

@@ -31,6 +31,9 @@ static void shoot_control_loop(void);
 static void shoot_ready_control(Shoot_Motor_t *trigger_motor);
 static void shoot_single_control(Shoot_Motor_t *trigger_motor);
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor);
+static void shoot_off_control(Shoot_Motor_t *trigger_motor);
+static void shoot_set_mode(void);
+static void shoot_feedback_update(void); 
 
 // user defines
 static uint16_t pwm_target = Fric_OFF;
@@ -80,35 +83,23 @@ static void shoot_init(Shoot_t *shoot_init) {
  * @param None
  * @retval None
  */
-static void shoot_control_loop(void) {
+static void shoot_control_loop(void) {    
     if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
-        pwm_target = Fric_DOWN;
-        
-        // Hopper:spin constantly
-        shoot.hopper_motor.speed_set = HOPPER_SPEED;
-        
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
+            pwm_target = Fric_DOWN;
             // no shoot
-            shoot_ready_control(&shoot.trigger_motor);
-
+            shoot.mode = SHOOT_READY;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
-            shoot_single_control(&shoot.trigger_motor);
-            // single shot
             pwm_target = Fric_UP;
-            
+            // single shot
+            shoot.mode = SHOOT_SINGLE;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
             // rapid fire
-            shoot_rapid_control(&shoot.trigger_motor);
-            // Trigger: turn 90 degrees
-        } else {
-            // throw some kind of error?
-            shoot.hopper_motor.speed_set = HOPPER_OFF;
-            pwm_target = Fric_OFF;
+            shoot.mode = SHOOT_RAPID;
         }
-        
     } else {
         pwm_target = Fric_OFF;
-        shoot.hopper_motor.speed_set = HOPPER_OFF;
+        shoot.mode = SHOOT_OFF;
     }
 
     //Ramping...
@@ -118,12 +109,35 @@ static void shoot_control_loop(void) {
         pwm_output -= 1;
     }
     
+    //Set pwm field to the ramp results
     shoot.fric1_pwm = pwm_output;
     shoot.fric2_pwm = pwm_output;
     
     //Set flywheels
     fric1_on(shoot.fric1_pwm);
     fric2_on(shoot.fric2_pwm);    
+    
+    shoot_feedback_update();
+    shoot_set_mode();
+}
+
+
+static void shoot_set_mode(void) {
+    if (shoot.mode == SHOOT_READY) {
+        shoot_ready_control(&shoot.hopper_motor);
+    } else if (shoot.mode == SHOOT_SINGLE) {
+        shoot_single_control(&shoot.hopper_motor);
+    } else if (shoot.mode == SHOOT_RAPID) {
+        shoot_rapid_control(&shoot.hopper_motor);
+    } else {
+        shoot_off_control(&shoot.hopper_motor);
+    }
+        
+}
+
+
+static void shoot_feedback_update(void) {
+    
 }
 
 /**
@@ -135,6 +149,7 @@ static void shoot_ready_control(Shoot_Motor_t *trigger_motor)
 {
     //Position control PID here for the trigger motor to force it in place
     //Takes pos_raw, result goes in pos_set and speed_set
+    shoot.hopper_motor.speed_set = HOPPER_SPEED;
 }
 
 
@@ -163,3 +178,8 @@ static void shoot_rapid_control(Shoot_Motor_t *trigger_motor)
     //Takes speed_raw, result goes in speed_set
 }
 
+
+static void shoot_off_control(Shoot_Motor_t *trigger_motor)
+{
+    shoot.hopper_motor.speed_set = HOPPER_OFF;
+}
