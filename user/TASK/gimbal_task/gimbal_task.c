@@ -98,18 +98,18 @@ void gimbal_task(void* parameters){
         gimbal_yaw_motor.current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
 
         // Calculate setpoints based on RC signal. 
-        theta_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[2], RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
-        phi_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[3], RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
+        theta_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[2], RC_MIN, RC_MAX, YAW_MAX, YAW_MIN);
+        phi_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[3], RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
         
         pitch_signal = PID_Calc(&pid_pitch, gimbal_pitch_motor.pos_raw, phi_setpoint);
         yaw_signal = PID_Calc(&pid_yaw, gimbal_yaw_motor.pos_raw, theta_setpoint);
 
         // Turn gimbal motor
-        CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
+        CAN_CMD_GIMBAL(yaw_signal, pitch_signal, 0, 0);
         
         vTaskDelay(1);
         
-        send_to_uart(gimbal_pitch_motor, pid_pitch, pitch_signal);  //Sending data via UART
+        //send_to_uart(gimbal_pitch_motor, pid_pitch, pitch_signal);  //Sending data via UART
 	}
 }
 

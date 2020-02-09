@@ -64,8 +64,8 @@ void chassis_task(void *pvParameters){
         //PID calculations, process 
         chassis_PID(FALSE);
         //output
-        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
-            chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
+        //CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
+        //    chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
         
         vTaskDelay(1);
     }
