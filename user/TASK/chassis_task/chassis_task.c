@@ -120,11 +120,11 @@ static void chassis_init(Chassis_t *chassis_init){
  * @retval None
  */
 static void chassis_update_data(Chassis_t *chassis_update){
-	for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
         chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
         chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
         chassis_update->motor[i].current_raw = chassis_update->motor[i].motor_raw->given_current;
-	}
+		}
 }
 
 
@@ -154,9 +154,21 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
     //Debug print out current 
     
     // get rc data and put into chassis struct
-    //chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
-    chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
-    chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
+	
+	//Switch Chassis Only
+	if(switch_is_down(chassis.rc_raw->rc.s[0])){
+        chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
+        chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
+        chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
+    }else if(switch_is_mid(chassis.rc_raw->rc.s[0])){
+        chassis.x_speed_raw = 0;
+        chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
+        chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
+    }else if(switch_is_up(chassis.rc_raw->rc.s[0])){
+        chassis.x_speed_raw = 0;
+        chassis.y_speed_raw = 0;
+        chassis.z_speed_raw = 0;
+    }
     
     // process raw sppeds based on modes (for now they are just the same)
     chassis.x_speed_set = chassis.x_speed_raw;

@@ -97,9 +97,14 @@ void gimbal_task(void* parameters){
         gimbal_yaw_motor.speed_raw = gimbal_yaw_motor.gimbal_motor_raw->speed_rpm;
         gimbal_yaw_motor.current_raw = gimbal_yaw_motor.gimbal_motor_raw->given_current;
 
-        // Calculate setpoints based on RC signal. 
-        theta_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[2], RC_MIN, RC_MAX, YAW_MAX, YAW_MIN);
-        phi_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[3], RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
+        // Calculate setpoints based on RC signal.
+        if(switch_is_mid(rc_ptr->rc.s[0]) || switch_is_up(rc_ptr->rc.s[0])){
+            theta_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[2], RC_MIN, RC_MAX, YAW_MAX, YAW_MIN);
+            phi_setpoint = linear_map_int_to_int(rc_ptr->rc.ch[3], RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
+        }else{
+            theta_setpoint = linear_map_int_to_int(0, RC_MIN, RC_MAX, YAW_MAX, YAW_MIN);
+            phi_setpoint = linear_map_int_to_int(0, RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
+        }
         
         pitch_signal = PID_Calc(&pid_pitch, gimbal_pitch_motor.pos_raw, phi_setpoint);
         yaw_signal = PID_Calc(&pid_yaw, gimbal_yaw_motor.pos_raw, theta_setpoint);
