@@ -64,8 +64,8 @@ void chassis_task(void *pvParameters){
         //PID calculations, process 
         chassis_PID(FALSE);
         //output
-        //CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
-        //    chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
+        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
+            chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
         
         vTaskDelay(1);
     }
@@ -154,7 +154,7 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
     //Debug print out current 
     
     // get rc data and put into chassis struct
-    chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
+    //chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
     chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
     chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
     
