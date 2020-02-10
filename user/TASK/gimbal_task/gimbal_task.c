@@ -32,6 +32,10 @@ Gimbal_Motor_t gimbal_pitch_motor;
 //UART mailbox
 char str[32] = {0};
 
+volatile char buffer_rx[100];
+int count_rx = 0;
+int vision_signal = 5700;
+
 /**
   * @brief      Handles cases when RC joystick is not quite centered
   * @author     RM
@@ -93,7 +97,7 @@ void gimbal_task(void* parameters){
         
         vTaskDelay(1);
         
-        send_to_uart(gimbal_pitch_motor, pid, pitch_signal);  //Sending data via UART
+        //send_to_uart(gimbal_pitch_motor, pid, pitch_signal);  //Sending data via UART
 	}
 }
 
@@ -151,14 +155,16 @@ float get_relative_angle(float alpha, float beta){
  * @retval Vision signal in range of 0 and 8191
  */
 int get_vision_signal(void) {
-    int vision_signal = 5700;  // TODO: Get real values from vision
-        
+    // int vision_signal = 5700;  // TODO: Get real values from vision
+	
+   
     while (vision_signal > 8191) {
         vision_signal -= 8191;
     }
     while (vision_signal < 0) {
         vision_signal+= 8192;
     }
+
     return vision_signal;
 }
 
@@ -196,3 +202,65 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
     sprintf(str, "pitch signal: %f\n\r", pitch_signal);
     serial_send_string(str);
 }
+
+
+
+
+
+// Interrupt handler for USART 6. This is called on the reception of every
+// byte on USART6
+void USART6_IRQHandler(void)
+{
+	// make sure USART6 was intended to be called for this interrupt
+	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
+		uint16_t USART_Data = USART_ReceiveData(USART6);
+		
+		// This just echos everything back once a CR (carriage return)
+		// character (13 in ascii) is received. Windows (or Putty, idk)
+		// appends a CR to enter/return so it should work 
+		if (USART_Data == 13) {
+			buffer_rx[count_rx] = 0;
+			vision_signal = 0;
+			for (int i =0; i < count_rx; i++)
+			{
+				if (buffer_rx[0] == 45){
+					if (i == 0){
+						vision_signal = -1;
+					}
+					else{
+						vision_signal -= (buffer_rx[i] - 48) * pow(10, count_rx - i - 1);
+						
+						if (i == 1){
+							vision_signal += 1;
+						}
+						
+					}
+				}
+				else{
+					vision_signal += (buffer_rx[i] - 48) * pow(10, count_rx - i - 1);
+				}
+			}
+			serial_send_string(buffer_rx);
+			serial_send_string("\n");
+			serial_send_int(vision_signal);
+			serial_send_string("\n");
+			serial_send_string("\n");
+			
+			count_rx = 0;
+			for (int i = 0; i < 100; i++) {
+				buffer_rx[i] = 0;
+			}
+			
+		} else if (count_rx < 100 - 1) {
+			buffer_rx[count_rx++] = USART_Data;
+		} else {
+			count_rx = 0;
+			for (int i = 0; i < 100; i++) {
+				buffer_rx[i] = 0;
+			}
+		}
+		
+	}
+}
+
+

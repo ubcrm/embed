@@ -33,8 +33,10 @@
 
 #include "USART_comms.h"
 
+/*
 volatile char buffer_rx[100];
 int count_rx = 0;
+*/
 
 /** @addtogroup Template_Project
   * @{
@@ -171,7 +173,9 @@ void SysTick_Handler(void)
 /**
   * @}
   */ 
-	
+
+
+/*
 
 // Interrupt handler for USART 6. This is called on the reception of every
 // byte on USART6
@@ -205,5 +209,5 @@ void USART6_IRQHandler(void)
 	}
 }
 
-
+*/
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

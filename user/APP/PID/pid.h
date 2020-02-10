@@ -19,6 +19,7 @@
 #define PID_H
 
 #include "main.h"
+#include "stdlib.h"
 
 enum PID_MODE
 {

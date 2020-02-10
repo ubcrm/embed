@@ -16,6 +16,7 @@
   */
 
 #include "pid.h"
+#include "stdlib.h"
 
 #define LimitMax(input, max)   \
     {                          \
@@ -56,7 +57,13 @@ fp32 PID_Calc(PidTypeDef *pid, fp32 ref, fp32 set)
     pid->error[1] = pid->error[0];
     pid->set = set;
     pid->fdb = ref;
-    pid->error[0] = set - ref;
+		if (ref > set)
+			pid->error[0] = 8191 - abs((int)(ref - set))  < abs((int)(ref - set))  ?  8191 - (ref - set) : set - ref;
+		else if (set > ref)
+			pid->error[0] =  abs((int)(set - ref)  - 8191) < abs((int)(set - ref)) ?  (set - ref)  - 8191 : set - ref;
+		else
+			pid->error[0] = 0.0;
+		
     if (pid->mode == PID_POSITION)
     {
         pid->Pout = pid->Kp * pid->error[0];
