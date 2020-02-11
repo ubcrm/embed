@@ -1,7 +1,27 @@
 #include "user_lib.h"
 #include "arm_math.h"
+#include "math.h"
+#include "main.h"
+#include "stm32f4xx.h"
 
-//Sqare root
+
+
+/**
+  * @brief      Handles cases when RC joystick is not quite centered
+  * @author     RM
+  * @param[in]  input, RC joystick value
+  * @param[in]  output, control value after deadline is applied
+  * @param[in]  deadline, specifies range in which joystick is considered centered
+  */
+#define rc_deadline_limit(input, output, deadline) \
+    {                                              \
+        if (input > deadline || input < -deadline) \
+            output = input;                        \
+        else                                       \
+            output = 0;                            \
+    }
+    
+//快速开方
 fp32 invSqrt(fp32 num)
 {
     fp32 halfnum = 0.5f * num;
@@ -180,4 +200,51 @@ fp32 loop_fp32_constrain(fp32 Input, fp32 minValue, fp32 maxValue)
 fp32 theta_format(fp32 Ang)
 {
     return loop_fp32_constrain(Ang, -180.0f, 180.0f);
+}
+
+/**
+ * @brief maps a value within a specified range to another specified range as a linear mapping 
+ * @param val is the value to be mapped. Must be within val_max and val_min for the output to be within the new bounds.
+ * @param val_min the lower bound on val
+ * @param val_max the upper bound on val
+ * @param out_min the new lower bound on val
+ * @param out_max the new upper bound on val
+ * @retval the new value within the new bounds
+ */
+int linear_map_int_to_int(int val, int val_min , int val_max, int out_min, int out_max){
+    float delta = val - average(val_max, val_min);
+    float expansion_factor = range(out_min, out_max) / (float) range(val_min, val_max);
+
+    return (int) (average(out_min, out_max) + delta * expansion_factor);
+}
+
+/**
+ * @brief Returns angle in [-PI, PI]
+ * @param alpha an angle in radians
+ * @retval the angle in range [-PI, PI]
+ */
+float get_domain_angle(float alpha){
+	int done = 0;
+	while(!done){
+		if(alpha > PI){
+			alpha -= PI;
+		}
+		else if(alpha < -PI){
+			alpha += PI;\
+		}
+		else{
+			done = TRUE;
+		}
+	}
+    return alpha;
+}
+
+/** 
+ * @brief Returns the smallest relative angle between two angles
+ * @param alpha an angle in radians
+ * @param beta an angle in radians
+ * @retval the smallest relative angle between alpha and beta in radians
+ */
+float get_relative_angle(float alpha, float beta){
+	return get_domain_angle(beta - alpha);
 }
