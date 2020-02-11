@@ -206,7 +206,7 @@
 
 /* check device defines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __CM4_hopper
+  #ifndef __CM4_REV
     #define __CM4_REV               0x0000
     #warning "__CM4_REV not defined in device header file; using default!"
   #endif
