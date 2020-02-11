@@ -47,9 +47,6 @@ typedef double fp64;
 
 #define Latitude_At_ShenZhen 22.57025f
 
-#define TRUE 1
-#define FALSE 0
-
 #ifndef NULL
 #define NULL 0
 #endif
@@ -57,6 +54,9 @@ typedef double fp64;
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0
+
+#define ON 1
+#define OFF 0
 #endif
 
 #ifndef PI

@@ -26,20 +26,29 @@
 #define POWER_SWITCH 1
 #define SHOOT_SWITCH 0
 
-#define ON 1
-#define OFF 0
-
+//Hopper motor
 #define HOPPER_SPEED 1500
 #define HOPPER_OFF 0
+
+//Trigger motor
 #define TRIGGER_90_DEGS 2048
+
+#define TRIGGER_ANGLE_PID_KP 800.0f
+#define TRIGGER_ANGLE_PID_KI 0.5f
+#define TRIGGER_ANGLE_PID_KD 0.0f
+#define HALF_ECD_RANGE 4096
+#define TRIGGER_RATIO 36
+
 
 typedef struct
 {
 	const motor_measure_t *shoot_motor_raw;
-	int16_t pos_raw;
+	uint16_t pos_raw;
+    uint16_t last_pos_raw;
 	int16_t speed_raw;
-    int16_t pos_set;
+    uint16_t pos_set;
 	int16_t speed_set;
+    int8_t ecd_count;
 }Shoot_Motor_t;
 
 

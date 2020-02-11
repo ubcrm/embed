@@ -23,6 +23,7 @@
 #include "user_lib.h"
 #include "fric.h"
 #include "USART_comms.h"
+#include "PID.h"
 
 Shoot_t shoot;
 
@@ -39,7 +40,7 @@ static void shoot_feedback_update(void);
 static uint16_t pwm_target = Fric_OFF;
 static uint16_t pwm_output = Fric_OFF;
 
-
+static PidTypeDef trigger_motor_pid;   
 
 /******************** Task/Functions Called from Outside ********************/
 
@@ -74,6 +75,10 @@ static void shoot_init(Shoot_t *shoot_init) {
     shoot_init->fric2_pwm = Fric_INIT;
     
     fric1_on(shoot.fric1_pwm);
+    
+    //Init PID for hopper and trigger motors
+    static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
+    PID_Init(&trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
 }
 
 
@@ -83,7 +88,31 @@ static void shoot_init(Shoot_t *shoot_init) {
  * @param None
  * @retval None
  */
-static void shoot_control_loop(void) {    
+static void shoot_control_loop(void) {   
+    shoot_feedback_update();
+    
+
+    shoot_set_mode();
+
+    //Ramping...
+    if (pwm_output < pwm_target) {
+        pwm_output += 1;
+    } else if (pwm_output > pwm_target) {
+        pwm_output -= 1;
+    }
+    
+    //Set pwm field to the ramp results
+    shoot.fric1_pwm = pwm_output;
+    shoot.fric2_pwm = pwm_output;
+    
+    //Set flywheels
+    fric1_on(shoot.fric1_pwm);
+    fric2_on(shoot.fric2_pwm);    
+}
+
+
+static void shoot_set_mode(void) {
+    //Gets outcome of rc
     if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
             pwm_target = Fric_DOWN;
@@ -101,28 +130,8 @@ static void shoot_control_loop(void) {
         pwm_target = Fric_OFF;
         shoot.mode = SHOOT_OFF;
     }
-
-    //Ramping...
-    if (pwm_output < pwm_target) {
-        pwm_output += 1;
-    } else if (pwm_output > pwm_target) {
-        pwm_output -= 1;
-    }
     
-    //Set pwm field to the ramp results
-    shoot.fric1_pwm = pwm_output;
-    shoot.fric2_pwm = pwm_output;
-    
-    //Set flywheels
-    fric1_on(shoot.fric1_pwm);
-    fric2_on(shoot.fric2_pwm);    
-    
-    shoot_feedback_update();
-    shoot_set_mode();
-}
-
-
-static void shoot_set_mode(void) {
+    //Switches control function
     if (shoot.mode == SHOOT_READY) {
         shoot_ready_control(&shoot.hopper_motor);
     } else if (shoot.mode == SHOOT_SINGLE) {
@@ -132,11 +141,31 @@ static void shoot_set_mode(void) {
     } else {
         shoot_off_control(&shoot.hopper_motor);
     }
-        
 }
 
 
 static void shoot_feedback_update(void) {
+    
+    //Accounts for gear box inside P19 
+    if (shoot.trigger_motor.pos_raw - shoot.trigger_motor.last_pos_raw > HALF_ECD_RANGE)
+    {
+        //Encoder reading went from 0 to 8192, finished one circle counterclockwise
+        shoot.trigger_motor.ecd_count--;
+    }
+    else if (shoot.trigger_motor.pos_raw - shoot.trigger_motor.last_pos_raw < -HALF_ECD_RANGE)
+    {
+        //Encoder reading went from 8192 to 0, finished one circle clockwise
+        shoot.trigger_motor.ecd_count++;
+    }
+    //Gear ratio of 36:1
+    if (shoot.trigger_motor.ecd_count == TRIGGER_RATIO)
+    {
+        shoot.trigger_motor.ecd_count = -(TRIGGER_RATIO - 1);
+    }
+    else if (shoot.trigger_motor.ecd_count == -TRIGGER_RATIO)
+    {
+        shoot.trigger_motor.ecd_count = TRIGGER_RATIO - 1;
+    }
     
 }
 
