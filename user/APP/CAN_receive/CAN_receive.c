@@ -10,7 +10,7 @@
     *                 motor ID     1     2     3     4
     *                 write ID 0x200 0x200 0x200 0x200
     *                 read ID  0x201 0x202 0x203 0x204 
-    *          CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
+    *          CAN 2: gimbal M6020_yaw M6020_pitch P36_trigger P36_hopper
     *                 motor ID     1     2     3     4
     *                 motor bits 001   010   N/A   N/A
     *                 write ID 0x1FF 0x1FF 0x1FF 0x1FF
@@ -54,7 +54,7 @@
 //CAN received data handler
 static void CAN_hook(CanRxMsg *rx_message);
 //motor measure pointers declaration
-static motor_measure_t motor_yaw, motor_pit, motor_shoot, motor_revolver, motor_chassis[4];
+static motor_measure_t motor_yaw, motor_pit, motor_trigger, motor_hopper, motor_chassis[4];
 //CAN transmit message struct declaration
 static CanTxMsg GIMBAL_TxMessage;
 		
@@ -65,11 +65,11 @@ static CanTxMsg GIMBAL_TxMessage;
 /**
 * @brief  Writes a CAN message to 4 gimbal motors
 * @param  yaw, pitch: speed for the yaw and pitch channelM6020 motors, in range of 0 to 4095
-* @param  shoot, rev: speed for the revolver and shoot triggering motors, in range of 0 to 4095
+* @param  trigger, rev: speed for the revolver and trigger triggering motors, in range of 0 to 4095
 * @retval None
 */
 
-void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
+void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t trigger, int16_t hopper)
 {
     GIMBAL_TxMessage.StdId = CAN_GIMBAL_ALL_ID;
     GIMBAL_TxMessage.IDE = CAN_ID_STD;
@@ -79,10 +79,10 @@ void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
     GIMBAL_TxMessage.Data[1] = yaw;
     GIMBAL_TxMessage.Data[2] = (pitch >> 8);
     GIMBAL_TxMessage.Data[3] = pitch;
-    GIMBAL_TxMessage.Data[4] = (shoot >> 8);
-    GIMBAL_TxMessage.Data[5] = shoot;
-    GIMBAL_TxMessage.Data[6] = (rev >> 8);
-    GIMBAL_TxMessage.Data[7] = rev;
+    GIMBAL_TxMessage.Data[4] = (trigger >> 8);
+    GIMBAL_TxMessage.Data[5] = trigger;
+    GIMBAL_TxMessage.Data[6] = (hopper >> 8);
+    GIMBAL_TxMessage.Data[7] = hopper;
 
 #if GIMBAL_MOTOR_6020_CAN_LOSE_SLOVE
 
@@ -182,16 +182,16 @@ const motor_measure_t *get_Pitch_Gimbal_Motor_Measure_Point(void)
     return &motor_pit;
 }
 
-//Return a pointer to shoot trigger motor data
-const motor_measure_t *get_Shoot_Motor_Measure_Point(void)
+//Return a pointer to trigger trigger motor data
+const motor_measure_t *get_trigger_Motor_Measure_Point(void)
 {
-    return &motor_shoot;
+    return &motor_trigger;
 }
 
 //Return a pointer to revolver motor data
-const motor_measure_t *get_Revolver_Motor_Measure_Point(void)
+const motor_measure_t *get_hopper_Motor_Measure_Point(void)
 {
-    return &motor_revolver;
+    return &motor_hopper;
 }
 
 //Return a pointer to chassis motor data
@@ -244,7 +244,7 @@ void CAN2_RX0_IRQHandler(void)
 * @brief  Handles CAN messages received, takes motor ID and calls handling function of that motor
 *					The method runs in the background and updates the relevant motor information automatically
 * @param  rx_message: pointer to the raw data read on CAN
-* @modify (one of) motor_yaw, motor_pit, motor_shoot, motor_revolver, and motor_chassis
+* @modify (one of) motor_yaw, motor_pit, motor_trigger, motor_revolver, and motor_chassis
 
 * @retval None
 */
@@ -262,14 +262,14 @@ static void CAN_hook(CanRxMsg *rx_message)
         get_motor_measure(&motor_pit, rx_message);
         break;
     }
-    case CAN_SHOOT_MOTOR_ID:
+    case CAN_TRIGGER_MOTOR_ID:
     {
-        get_motor_measure(&motor_shoot, rx_message);
+        get_motor_measure(&motor_trigger, rx_message);
         break;
     }
-		case CAN_REVOLVER_MOTOR_ID:
+		case CAN_HOPPER_MOTOR_ID:
     {
-        get_motor_measure(&motor_revolver, rx_message);
+        get_motor_measure(&motor_hopper, rx_message);
         break;
     }
     case CAN_3508_M1_ID:

@@ -84,7 +84,7 @@ void gimbal_task(void* parameters){
         gimbal.yaw_speed_set = PID_Calc(&pid_yaw, gimbal.yaw_motor->pos_raw, gimbal.yaw_pos_set);
 
         // Turn gimbal motor
-        CAN_CMD_GIMBAL(gimbal.yaw_speed_set, gimbal.pitch_speed_set, 0, 0);
+        CAN_CMD_GIMBAL(gimbal.yaw_speed_set, gimbal.pitch_speed_set, gimbal.launcher->trigger_motor.speed_out, gimbal.launcher->hopper_motor.speed_out);
         
         vTaskDelay(GIMBAL_TASK_DELAY);
         

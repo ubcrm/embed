@@ -10,7 +10,7 @@
     *                 motor ID     1     2     3     4
     *                 write ID 0x200 0x200 0x200 0x200
     *                 read ID  0x201 0x202 0x203 0x204 
-    *          CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_shoot
+    *          CAN 2: gimbal M6020_yaw M6020_pitch P36_revolver P36_trigger
     *                 motor ID     1     2     3     4
     *                 motor bits 001   010   N/A   N/A
     *                 write ID 0x1FF 0x1FF 0x1FF 0x1FF
@@ -39,8 +39,8 @@ typedef enum
 
     CAN_YAW_MOTOR_ID = 0x205,
     CAN_PIT_MOTOR_ID = 0x206,
-    CAN_SHOOT_MOTOR_ID = 0x207,
-	CAN_REVOLVER_MOTOR_ID = 0x208,
+    CAN_TRIGGER_MOTOR_ID = 0x207,
+	CAN_HOPPER_MOTOR_ID = 0x208,
     CAN_GIMBAL_ALL_ID = 0x1FF,
 
 } can_msg_id_e;
@@ -63,7 +63,7 @@ typedef struct
 //Resets chassis motor CAN ID
 extern void CAN_CMD_CHASSIS_RESET_ID(void);
 //Send to yaw, pitch , trigger, and revolver
-extern void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev);
+extern void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t trigger, int16_t hopper);
 //Send to chassis
 extern void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 //Return a pointer to yaw motor data
