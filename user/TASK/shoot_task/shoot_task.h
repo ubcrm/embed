@@ -30,14 +30,22 @@
 #define HOPPER_SPEED 1500
 #define HOPPER_OFF 0
 
-//Trigger motor
-#define TRIGGER_90_DEGS 2048
-
+//Trigger motor PID
+#define TRIGGER_MAX_OUT 5000.0f
+#define TRIGGER_MAX_IOUT 2500.0f
 #define TRIGGER_ANGLE_PID_KP 800.0f
 #define TRIGGER_ANGLE_PID_KI 0.5f
 #define TRIGGER_ANGLE_PID_KD 0.0f
+
+//Trigger motor
+#define TRIGGER_90_DEGS 2048
 #define HALF_ECD_RANGE 4096
-#define TRIGGER_RATIO 36
+#define FULL_ECD_RANGE 8192
+#define HALF_TRIGGER_RATIO 18
+#define FULL_TRIGGER_RATIO 36
+#define TRIGGER_REACHED_POS_RANGE 500
+#define TRIGGER_SPEED 1000
+#define TRIGGER_OFF 0
 
 
 typedef struct
@@ -48,7 +56,14 @@ typedef struct
 	int16_t speed_raw;
     uint16_t pos_set;
 	int16_t speed_set;
+    int16_t speed_out;
+    
+    //Variables used by the trigger motor only
     int8_t ecd_count;
+    uint16_t geared_down_pos_raw;
+    uint16_t geared_down_pos_set;
+    uint8_t move_flag;
+    uint16_t cmd_time;
 }Shoot_Motor_t;
 
 
@@ -71,6 +86,7 @@ typedef struct
     Shoot_Motor_t hopper_motor;
     Shoot_Motor_t trigger_motor;
     shoot_mode_e mode;
+
 }Shoot_t;
 extern void shoot_task(void *pvParameters);
 #endif
