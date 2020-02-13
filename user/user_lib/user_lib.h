@@ -26,10 +26,6 @@ void ramp_init(ramp_function_source_t *ramp_source_type, fp32 frame_period, fp32
 
 //斜波函数计算
 void ramp_calc(ramp_function_source_t *ramp_source_type, fp32 input);
-//一阶滤波初始化
-extern void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 frame_period, const fp32 num[1]);
-//一阶滤波计算
-extern void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, fp32 input);
 //绝对限制
 extern void abs_limit(fp32 *num, fp32 Limit);
 //判断符号位
@@ -47,7 +43,29 @@ extern fp32 loop_fp32_constrain(fp32 Input, fp32 minValue, fp32 maxValue);
 //角度 °限幅 180 ~ -180
 extern fp32 theta_format(fp32 Ang);
 
+/*
+* Returns an angle between -pi and pi
+* Requires: an angle in radians
+* Returns: an equivalent angle in radians between -pi and pi
+*/
+float get_domain_angle(float alpha);
+
+/*
+* Gets smallest angle required to travel from alpha to beta
+* requires: two angles in radians
+* returns: angle in radians with magnitude < 2*pi
+*/
+float get_relative_angle(float alpha, float beta);
+
+/**
+ * Maps float in a specified range to an int in a new range as a linear mapping function
+ */
+int linear_map_int_to_int(int val, int val_min, int val_max, int out_min, int out_max);
+
 //弧度格式化为-PI~PI
 #define rad_format(Ang) loop_fp32_constrain((Ang), -PI, PI)
+#define average(x,y) ((x + y) / 2.0)
+#define range(x,y) (y - x)
+
 
 #endif

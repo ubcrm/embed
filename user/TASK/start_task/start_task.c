@@ -27,11 +27,11 @@ static TaskHandle_t INS_task_handler;
 #define GIMBAL_TASK_PRIO 4
 #define GIMBAL_STK_SIZE 512
 static TaskHandle_t gimbal_task_handler;
-
+/*
 #define VISION_TASK_PRIO 5
 #define VISION_STK_SIZE 512
 static TaskHandle_t vision_task_handler;
-
+*/
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();
