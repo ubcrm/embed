@@ -27,12 +27,12 @@
 
 /******************** Private User Declarations ********************/
 static void chassis_init(Chassis_t *chassis_init);
-static void chassis_update_data(Chassis_t *chassis_update);
-static void chassis_set_mode(void);
-static void chassis_remote_calc(chassis_user_mode_e mode);
-static void chassis_set_mode(void);
-static void chassis_motor_calc(void);
-static void chassis_PID(uint8_t debug);
+static void get_new_data(Chassis_t *chassis_update);
+static void set_control_mode(void);
+static void calculate_chassis_motion_setpoints(chassis_user_mode_e mode);
+static void set_control_mode(void);
+static void calculate_motor_setpoints(void);
+static void increment_PID(uint8_t debug);
 
 static Chassis_t chassis;
     
@@ -47,25 +47,22 @@ static Chassis_t chassis;
  */
 void chassis_task(void *pvParameters){
     
-    // Delay to make sure critical has been initialised
+    // Delay to make sure critical communications/timers have been initialised
     vTaskDelay(20);
-    //Initializes chassis
+    //Initializes chassis with pointers to RC commands and CAN feedback messages
     chassis_init(&chassis);
     
 	while(1) {
-        //update info
-        chassis_update_data(&chassis);
-        //set mode
-        chassis_set_mode();
-        //process RC data into xyz speed
-        chassis_remote_calc(CHASSIS_VECTOR_RAW);
-        //process xyz speed into vector decomposition 
-        chassis_motor_calc();
-        //PID calculations, process 
-        chassis_PID(FALSE);
+        get_new_data(&chassis); //updates RC commands and CAN motor feedback
+        set_control_mode(); //Note: currently not implemented
+        calculate_chassis_motion_setpoints(CHASSIS_VECTOR_RAW);
+        calculate_motor_setpoints();
+        increment_PID(FALSE);
         //output
-        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, chassis.motor[FRONT_LEFT].speed_out, 
-            chassis.motor[BACK_LEFT].speed_out, chassis.motor[BACK_RIGHT].speed_out);
+        CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].speed_out, 
+                        chassis.motor[FRONT_LEFT].speed_out, 
+                        chassis.motor[BACK_LEFT].speed_out, 
+                        chassis.motor[BACK_RIGHT].speed_out);
         
         vTaskDelay(1);
     }
@@ -113,11 +110,11 @@ static void chassis_init(Chassis_t *chassis_init){
 
 
 /**
- * @brief Updates speed, position, and current data from all motors. Runs at the start of every loop.
+ * @brief Updates speed, position, and current data from all motors.
  * @param None
  * @retval None
  */
-static void chassis_update_data(Chassis_t *chassis_update){
+static void get_new_data(Chassis_t *chassis_update){
 		for (int i = 0; i < 4; i++) {
         chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
         chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
@@ -133,7 +130,7 @@ static void chassis_update_data(Chassis_t *chassis_update){
  * @retval None
  */
 
-static void chassis_set_mode(void){
+static void set_control_mode(void){
 	//Don't do anything
     //Implement chassis_follow_gimbal_yaw mode in the future
 }
@@ -141,12 +138,12 @@ static void chassis_set_mode(void){
 
 
 /**
- * @brief Takes the remote control data and converts as specified by user
+ * @brief Takes the remote control data and converts to the desired robot velocities
  * @param  mode the chassis driving mode
  * @retval None
  */
 
-static void chassis_remote_calc(chassis_user_mode_e mode){
+static void calculate_chassis_motion_setpoints(chassis_user_mode_e mode){
     //Get remote control data and put into x_speed_raw etc
     //process based on mode (which is currently none) and put into x_speed_set
     //Debug print out current 
@@ -180,7 +177,7 @@ static void chassis_remote_calc(chassis_user_mode_e mode){
  * @param None
  * @retval None
  */
-static void chassis_motor_calc(void){
+static void calculate_motor_setpoints(void){
 	//Take x_speed_set etc and handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
     chassis.motor[FRONT_LEFT].speed_set = MULTIPLIER * (chassis.y_speed_set + chassis.z_speed_set + chassis.x_speed_set);
@@ -199,7 +196,7 @@ char pid_out[64];
  * @param None
  * @retval None
  */
-static void chassis_PID(uint8_t debug){
+static void increment_PID(uint8_t debug){
 	//translation
     //rotation
 	fp32 front_right;
