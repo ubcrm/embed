@@ -41,7 +41,7 @@
 
 typedef struct 
 {
-    const motor_measure_t *motor_raw;
+    const motor_data_t *motor_raw;
     
     //Current speed read from motors
     int16_t pos_raw;

@@ -39,7 +39,7 @@
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
-	const motor_measure_t *gimbal_motor_raw;
+	const motor_data_t *gimbal_motor_raw;
 	uint16_t pos_raw;
 	uint16_t speed_raw;
 	uint16_t current_raw;

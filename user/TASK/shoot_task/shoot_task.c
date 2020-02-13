@@ -62,7 +62,7 @@ void shoot_task(void *pvParameters) {
 /******************** Private Implementations ********************/
 
 /**
- * @brief Initializes launcher, links RC ointer and ramps up flywheels
+ * @brief Initializes launcher, links RC pointer and ramps up flywheels
  * @param Shoot_t struct
  * @retval None
  */
@@ -75,6 +75,7 @@ static void shoot_init(Shoot_t *shoot_init) {
     shoot_init->fric2_pwm = Fric_INIT;
     
     fric1_on(shoot.fric1_pwm);
+    fric2_on(shoot.fric2_pwm);
     
     //Init PID for hopper and trigger motors
     static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
@@ -185,7 +186,7 @@ static void shoot_feedback_update(void) {
 /**
  * @brief Trigger motor locks in place while flywheels ramp up to speed
  *        Hopper motor continues to spin to provide constant feed
- * @param trigger motor and hopper motor structs 
+ * @param Trigger motor and hopper motor structs 
  * @retval None
  */
 static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
@@ -198,7 +199,7 @@ static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
 /**
  * @brief Trigger motor moves 90 degrees to allow one ball into the launcher
  *        Hopper motor continues to spin to provide constant feed
- * @param trigger motor and hopper motor structs
+ * @param Trigger motor and hopper motor structs
  * @retval None
  */
 static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
@@ -226,7 +227,7 @@ static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *ho
 
 /**
  * @brief Trigger motor continues spinning to allow for rapid firing
- * @param trigger motor and hopper motor structs
+ * @param Trigger motor and hopper motor structs
  * @retval None
  */
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
@@ -238,7 +239,7 @@ static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
 
 /**
  * @brief Trigger and hopper motors both set to stop
- * @param trigger motor and hopper motor structs
+ * @param Trigger motor and hopper motor structs
  * @retval None
  */
 static void shoot_off_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
