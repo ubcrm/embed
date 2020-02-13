@@ -3,7 +3,7 @@
     "files.associations": {
         "can.h": "c",
         "remote_control.h": "c",
-        "freertosconfig.h": "c"
+        "freertosconfig.h": "c",
         "pid.h": "c",
         "ins_task.h": "c"
     }
