@@ -94,10 +94,10 @@ static void chassis_init(Chassis_t *chassis_init){
     
     //Link pointers with CAN motors
     for (int i = 0; i < 4; i++) {
-        chassis_init->motor[i].motor_raw = get_Chassis_Motor_Measure_Point(i);
-        chassis_init->motor[i].speed_raw = chassis_init->motor[i].motor_raw->speed_rpm;
-        chassis_init->motor[i].pos_raw = chassis_init->motor[i].motor_raw->ecd;
-        chassis_init->motor[i].current_raw = chassis_init->motor[i].motor_raw->given_current;
+        chassis_init->motor[i].latest_motor_data = get_Chassis_Motor_Measure_Point(i);
+        chassis_init->motor[i].speed_read = chassis_init->motor[i].latest_motor_data->speed_rpm;
+        chassis_init->motor[i].pos_read = chassis_init->motor[i].latest_motor_data->ecd;
+        chassis_init->motor[i].current_read = chassis_init->motor[i].latest_motor_data->given_current;
 			
 		PID_Init(&chassis_init->motor[i].pid_control, PID_DELTA, def_pid_constants, M3508_MAX_OUT, M3508_MIN_OUT);
     }
@@ -107,7 +107,7 @@ static void chassis_init(Chassis_t *chassis_init){
     chassis_init->yaw_pos_raw = chassis_init->vec_raw + INS_YAW_ADDRESS_OFFSET;
 		
     //Pointer remote
-    chassis_init->rc_raw = get_remote_control_point();
+    chassis_init->rc_update = get_remote_control_point();
 }
 
 
@@ -118,9 +118,9 @@ static void chassis_init(Chassis_t *chassis_init){
  */
 static void get_new_data(Chassis_t *chassis_update){
 		for (int i = 0; i < 4; i++) {
-        chassis_update->motor[i].speed_raw = chassis_update->motor[i].motor_raw->speed_rpm;
-        chassis_update->motor[i].pos_raw = chassis_update->motor[i].motor_raw->ecd;
-        chassis_update->motor[i].current_raw = chassis_update->motor[i].motor_raw->given_current;
+        chassis_update->motor[i].speed_read = chassis_update->motor[i].latest_motor_data->speed_rpm;
+        chassis_update->motor[i].pos_read = chassis_update->motor[i].latest_motor_data->ecd;
+        chassis_update->motor[i].current_read = chassis_update->motor[i].latest_motor_data->given_current;
 		}
 }
 
@@ -146,31 +146,31 @@ static void set_control_mode(void){
  */
 
 static void calculate_chassis_motion_setpoints(chassis_user_mode_e mode){
-    //Get remote control data and put into x_speed_raw etc
+    //Get remote control data and put into x_speed_read etc
     //process based on mode (which is currently none) and put into x_speed_set
     //Debug print out current 
     
     // get rc data and put into chassis struct
 	
 	//Switch Chassis Only
-	if(switch_is_down(chassis.rc_raw->rc.s[0])){
-        chassis.x_speed_raw = chassis.rc_raw->rc.ch[RC_X];
-        chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
-        chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
-    }else if(switch_is_mid(chassis.rc_raw->rc.s[0])){
-        chassis.x_speed_raw = 0;
-        chassis.y_speed_raw = chassis.rc_raw->rc.ch[RC_Y];
-        chassis.z_speed_raw = chassis.rc_raw->rc.ch[RC_Z];
-    }else if(switch_is_up(chassis.rc_raw->rc.s[0])){
-        chassis.x_speed_raw = 0;
-        chassis.y_speed_raw = 0;
-        chassis.z_speed_raw = 0;
+	if(switch_is_down(chassis.rc_update->rc.s[0])){
+        chassis.x_speed_read = chassis.rc_update->rc.ch[RC_X];
+        chassis.y_speed_read = chassis.rc_update->rc.ch[RC_Y];
+        chassis.z_speed_read = chassis.rc_update->rc.ch[RC_Z];
+    }else if(switch_is_mid(chassis.rc_update->rc.s[0])){
+        chassis.x_speed_read = 0;
+        chassis.y_speed_read = chassis.rc_update->rc.ch[RC_Y];
+        chassis.z_speed_read = chassis.rc_update->rc.ch[RC_Z];
+    }else if(switch_is_up(chassis.rc_update->rc.s[0])){
+        chassis.x_speed_read = 0;
+        chassis.y_speed_read = 0;
+        chassis.z_speed_read = 0;
     }
     
     // process raw sppeds based on modes (for now they are just the same)
-    chassis.x_speed_set = chassis.x_speed_raw;
-    chassis.y_speed_set = chassis.y_speed_raw;
-    chassis.z_speed_set = chassis.z_speed_raw;
+    chassis.x_speed_set = chassis.x_speed_read;
+    chassis.y_speed_set = chassis.y_speed_read;
+    chassis.z_speed_set = chassis.z_speed_read;
 }
 
 
@@ -207,47 +207,47 @@ static void increment_PID(uint8_t debug){
     fp32 back_left;
 
 	front_right = PID_Calc(&chassis.motor[FRONT_RIGHT].pid_control, 
-	chassis.motor[FRONT_RIGHT].speed_raw,
+	chassis.motor[FRONT_RIGHT].speed_read,
 	chassis.motor[FRONT_RIGHT].speed_set);
 	chassis.motor[FRONT_RIGHT].speed_out += front_right;
 	
 	back_right = PID_Calc(&chassis.motor[BACK_RIGHT].pid_control, 
-	chassis.motor[BACK_RIGHT].speed_raw, 
+	chassis.motor[BACK_RIGHT].speed_read, 
 	chassis.motor[BACK_RIGHT].speed_set);
 	chassis.motor[BACK_RIGHT].speed_out += back_right;
 	
 	front_left = PID_Calc(&chassis.motor[FRONT_LEFT].pid_control, 
-	chassis.motor[FRONT_LEFT].speed_raw, 
+	chassis.motor[FRONT_LEFT].speed_read, 
 	chassis.motor[FRONT_LEFT].speed_set);
 	chassis.motor[FRONT_LEFT].speed_out += front_left;
 	
 	back_left = PID_Calc(&chassis.motor[BACK_LEFT].pid_control, 
-	chassis.motor[BACK_LEFT].speed_raw, 
+	chassis.motor[BACK_LEFT].speed_read, 
 	chassis.motor[BACK_LEFT].speed_set);
 	chassis.motor[BACK_LEFT].speed_out += back_left;
 	
     if (debug == 1) {
         sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
         chassis.motor[FRONT_RIGHT].speed_set, 
-        chassis.motor[FRONT_RIGHT].speed_raw, 
+        chassis.motor[FRONT_RIGHT].speed_read, 
         chassis.motor[FRONT_RIGHT].speed_out);
         serial_send_string(pid_out);
         
         sprintf(pid_out, "Back Right - target: %d, sensor: %d, output: %d \n\r", 
         chassis.motor[BACK_RIGHT].speed_set, 
-        chassis.motor[BACK_RIGHT].speed_raw, 
+        chassis.motor[BACK_RIGHT].speed_read, 
         chassis.motor[BACK_RIGHT].speed_out);
         serial_send_string(pid_out);
         
         sprintf(pid_out, "Front Left - target: %d, sensor: %d, output: %d \n\r", 
         chassis.motor[FRONT_LEFT].speed_set, 
-        chassis.motor[FRONT_LEFT].speed_raw, 
+        chassis.motor[FRONT_LEFT].speed_read, 
         chassis.motor[FRONT_LEFT].speed_out);
         serial_send_string(pid_out);
         
         sprintf(pid_out, "Back Left - target: %d, sensor: %d, output: %d \n\r", 
         chassis.motor[BACK_LEFT].speed_set, 
-        chassis.motor[BACK_LEFT].speed_raw, 
+        chassis.motor[BACK_LEFT].speed_read, 
         chassis.motor[BACK_LEFT].speed_out);
         serial_send_string(pid_out);
     }

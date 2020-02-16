@@ -39,27 +39,27 @@
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
-	const motor_measure_t *gimbal_motor_raw;
-	uint16_t pos_raw;
-	uint16_t speed_raw;
-	uint16_t current_raw;
+	const motor_measure_t *gimbal_motor_feedback;
+	uint16_t pos_read;
+	uint16_t speed_read;
+	uint16_t current_read;
 } Gimbal_Motor_t;
 
 typedef struct 
 {
 	Gimbal_Motor_t *yaw_motor;
 	Gimbal_Motor_t *pitch_motor;
-    const fp32 *angle_reading_raw;
-	const fp32 *gyro_reading_raw;
-	const fp32 *acce_reading_raw;
-    
-    uint16_t pitch_pos_raw;
-    uint16_t yaw_pos_raw;
+    const fp32 *angle_update;
+	const fp32 *gyro_update;
+	const fp32 *accel_update;
+
+    uint16_t pitch_pos_read;
+    uint16_t yaw_pos_read;
     uint16_t pitch_pos_set;
     uint16_t yaw_pos_set;
     
-    int16_t pitch_speed_raw;
-    int16_t yaw_speed_raw;
+    int16_t pitch_speed_read;
+    int16_t yaw_speed_read;
     int16_t pitch_speed_set;
     int16_t yaw_speed_set;
 } Gimbal_t;

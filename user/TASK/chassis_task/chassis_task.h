@@ -41,12 +41,12 @@
 
 typedef struct 
 {
-    const motor_measure_t *motor_raw;
+    const motor_measure_t *latest_motor_data;
     
     //Current speed read from motors
-    int16_t pos_raw;
-    int16_t speed_raw;
-    int16_t current_raw;
+    int16_t pos_read;
+    int16_t speed_read;
+    int16_t current_read;
     
     //Target speed set by user/remote control
     int16_t pos_set;
@@ -65,16 +65,16 @@ typedef struct
     Chassis_Motor_t motor[4];
     
     //Raw remote control data
-    const RC_ctrl_t *rc_raw;
+    const RC_ctrl_t *rc_update;
     
-    //Current front vector
+    //Current front vectord
     const fp32 *vec_raw;
     const fp32 *yaw_pos_raw;
     
     //Current speed, vector combination of the speed read from motors
-    int16_t x_speed_raw;
-    int16_t y_speed_raw;
-    int16_t z_speed_raw;
+    int16_t x_speed_read;
+    int16_t y_speed_read;
+    int16_t z_speed_read;
     
     //Speed set by user/remote control
     int16_t x_speed_set;
