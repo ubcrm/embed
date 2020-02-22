@@ -53,12 +53,8 @@ void gimbal_task(void* parameters){
     
     while(1){	
         /* For now using strictly encoder feedback for position */
-     
         get_new_data(&gimbal);
-        
         update_setpoints(&gimbal);
-
-        
         increment_PID(&gimbal);
 
         // Turn gimbal motor
@@ -106,6 +102,11 @@ static void get_new_data(Gimbal_t *gimbal){
         gimbal->yaw_motor->speed_read = gimbal->yaw_motor->motor_feedback->speed_rpm;
 }
 
+/** 
+ * @brief  Updates desired setpoints from RC signal
+ * @param  Gimbal struct containing info on Gimbal
+ * @retval None
+ */
 static void update_setpoints(Gimbal_t *gimbal){
     // Calculate setpoints based on RC signal. //TODO:Place in function
     if(switch_is_mid(gimbal->rc_update->rc.s[0]) || switch_is_up(gimbal->rc_update->rc.s[0])){
@@ -117,13 +118,15 @@ static void update_setpoints(Gimbal_t *gimbal){
     }
 }
 
+/** 
+ * @brief  Increments PID loop based on latest setpoints and latest positions
+ * @param  None
+ * @retval None
+ */
 static void increment_PID(Gimbal_t *gimbal){
     gimbal->pitch_motor->current_out = PID_Calc(&gimbal->pitch_motor->pid_controller, gimbal->pitch_motor->pos_read, gimbal->pitch_motor->pos_set);
     gimbal->yaw_motor->current_out = PID_Calc(&gimbal->yaw_motor->pid_controller, gimbal->yaw_motor->pos_read, gimbal->yaw_motor->pos_set);
 }
-
-
-
 
 /** 
  * @brief  Reads vision instruction from UART and cap to certin values
@@ -141,7 +144,6 @@ int get_vision_signal(void) {
     }
     return vision_signal;
 }
-
 
 /** 
  * @brief Updates Uart with position information on the yaw motor and the PID settings
