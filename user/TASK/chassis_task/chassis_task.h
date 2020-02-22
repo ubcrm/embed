@@ -39,9 +39,17 @@
 #define M3508_KI 0.00
 #define M3508_KD 0.1
 
+
+typedef enum{
+    CHASSIS_VECTOR_RAW,
+    CHASSIS_FOLLOW_GIMBAL_YAW,
+    CHASSIS_INDIVIDUAL_CONTROL,
+} chassis_user_mode_e;
+
+
 typedef struct 
 {
-    const motor_measure_t *latest_motor_data;
+    const motor_measure_t *motor_feedback;
     
     //Current speed read from motors
     int16_t pos_read;
@@ -53,16 +61,17 @@ typedef struct
     int16_t speed_set;
     
     //Final output speed
-    int16_t speed_out;
+    int16_t current_out;
 	
     //Control
-    PidTypeDef pid_control;
+    PidTypeDef pid_controller;
 } Chassis_Motor_t;
 
 
 typedef struct 
 {
     Chassis_Motor_t motor[4];
+    chassis_user_mode_e mode;
     
     //Raw remote control data
     const RC_ctrl_t *rc_update;
@@ -83,11 +92,7 @@ typedef struct
 } Chassis_t;
 
 
-typedef enum{
-    CHASSIS_VECTOR_RAW,
-    CHASSIS_FOLLOW_GIMBAL_YAW,
-    CHASSIS_INDIVIDUAL_CONTROL,
-} chassis_user_mode_e;
+
 
 
 

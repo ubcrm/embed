@@ -8,6 +8,7 @@
 #include "main.h"
 #include "CAN_receive.h"
 #include "pid.h"
+#include "remote_control.h"
 
 
 /*************** Converts between motor position and degrees *****************/
@@ -17,11 +18,17 @@
 
 
 /****************************** PID Constants ********************************/
-#define pid_kp 40.0f
-#define pid_ki 0.0f
-#define pid_kd 0.0f
-#define max_out 5000.0f
-#define max_iout 0
+#define pid_kp_yaw 40.0f
+#define pid_ki_yaw 0.0f
+#define pid_kd_yaw 0.0f
+#define max_out_yaw 5000.0f
+#define max_i_term_out_yaw 1000.0f
+
+#define pid_kp_pitch 40.0f
+#define pid_ki_pitch 0.0f
+#define pid_kd_pitch 0.0f
+#define max_out_pitch 5000.0f
+#define max_i_term_out_pitch 1000.0f
 
 /***************************** Gimbal Constants *****************************/
 #define GIMBAL_TASK_INIT_TIME 201
@@ -39,29 +46,26 @@
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
-	const motor_measure_t *gimbal_motor_feedback;
+	const motor_measure_t *motor_feedback;
 	uint16_t pos_read;
 	uint16_t speed_read;
 	uint16_t current_read;
+
+    uint16_t pos_set;
+    int16_t current_out;
+
+    PidTypeDef pid_controller;
 } Gimbal_Motor_t;
 
 typedef struct 
 {
+    const RC_ctrl_t *rc_update;
 	Gimbal_Motor_t *yaw_motor;
 	Gimbal_Motor_t *pitch_motor;
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
-
-    uint16_t pitch_pos_read;
-    uint16_t yaw_pos_read;
-    uint16_t pitch_pos_set;
-    uint16_t yaw_pos_set;
-    
-    int16_t pitch_speed_read;
-    int16_t yaw_speed_read;
-    int16_t pitch_speed_set;
-    int16_t yaw_speed_set;
+    // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
 } Gimbal_t;
 
 

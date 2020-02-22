@@ -381,7 +381,7 @@ extern char str[];
  * @param  acce: displays accelerometer data if TRUE
  * @retval None
  */
-void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
+void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t accel){
     //Link pointers
     gimbal.angle_update = get_INS_angle_point();
     gimbal.gyro_update = get_MPU6500_Gyro_Data_Point();
@@ -409,7 +409,7 @@ void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t acce){
         serial_send_string("\n");
     }
  
-    if (acce == TRUE) {        
+    if (accel == TRUE) {        
         //Sending accelerometer data via UART
         sprintf(str, "Acce X: %f\n\r", gimbal.accel_update[INS_ACCEL_X_ADDRESS_OFFSET]);
         serial_send_string(str);
