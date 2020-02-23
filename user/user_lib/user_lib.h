@@ -31,9 +31,9 @@ extern void abs_limit(fp32 *num, fp32 Limit);
 //判断符号位
 extern fp32 sign(fp32 value);
 //浮点死区
-extern fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue);
+extern fp32 fp32_deadzone(fp32 Value, fp32 minValue, fp32 maxValue);
 //int26死区
-extern int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue);
+extern int16_t int16_deadzone(int16_t Value, int16_t minValue, int16_t maxValue);
 //限幅函数
 extern fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
 //限幅函数

@@ -129,7 +129,7 @@ fp32 sign(fp32 value)
 }
 
 //¸¡µãËÀÇø
-fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue)
+fp32 fp32_deadzone(fp32 Value, fp32 minValue, fp32 maxValue)
 {
     if (Value < maxValue && Value > minValue)
     {
@@ -139,7 +139,7 @@ fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue)
 }
 
 //int26ËÀÇø
-int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue)
+int16_t int16_deadzone(int16_t Value, int16_t minValue, int16_t maxValue)
 {
     if (Value < maxValue && Value > minValue)
     {

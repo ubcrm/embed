@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include "pid.h"
 
+#define DEADBAND 10
+
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
 
@@ -102,13 +104,13 @@ static void initialization(Gimbal_t *gimbal_ptr){
  * @param  None
  * @retval None
  */
-static void get_new_data(Gimbal_t *gimbal){
+static void get_new_data(Gimbal_t *gimbal_data){
         // Get CAN received data 
-        gimbal->pitch_motor.pos_read = gimbal->pitch_motor.motor_feedback->ecd;
-        gimbal->pitch_motor.speed_read = gimbal->pitch_motor.motor_feedback->speed_rpm;
+        gimbal_data->pitch_motor.pos_read = gimbal_data->pitch_motor.motor_feedback->ecd;
+        gimbal_data->pitch_motor.speed_read = gimbal_data->pitch_motor.motor_feedback->speed_rpm;
 
-        gimbal->yaw_motor.pos_read = gimbal->yaw_motor.motor_feedback->ecd;
-        gimbal->yaw_motor.speed_read = gimbal->yaw_motor.motor_feedback->speed_rpm;
+        gimbal_data->yaw_motor.pos_read = gimbal_data->yaw_motor.motor_feedback->ecd;
+        gimbal_data->yaw_motor.speed_read = gimbal_data->yaw_motor.motor_feedback->speed_rpm;
 }
 
 /** 
@@ -116,21 +118,16 @@ static void get_new_data(Gimbal_t *gimbal){
  * @param  Gimbal struct containing info on Gimbal
  * @retval None
  */
-static void update_setpoints(Gimbal_t *gimbal){
+static void update_setpoints(Gimbal_t *gimbal_set){
     
-    gimbal->yaw_motor.pos_set += gimbal->rc_update->rc.ch[2] / 10;
-    gimbal->pitch_motor.pos_set += gimbal->rc_update->rc.ch[3] / 10;
+    gimbal_set->yaw_motor.pos_set += (-1) * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND) / 10;
+    gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 10;
     
-    // Calculate setpoints based on RC signal. //TODO:Place in function
-//    if(switch_is_mid(gimbal->rc_update->rc.s[0]) || switch_is_up(gimbal->rc_update->rc.s[0])){
-        
-        //linear_map_int_to_int(gimbal->rc_update->rc.ch[2], RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
-        //linear_map_int_to_int(gimbal->rc_update->rc.ch[3], RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
-    
-    /*}else{
-        gimbal->yaw_motor.pos_set = linear_map_int_to_int(average(YAW_MIN, YAW_MAX), RC_MIN, RC_MAX, YAW_MAX, YAW_MIN);
-        gimbal->pitch_motor.pos_set = linear_map_int_to_int(average(PITCH_MIN, PITCH_MAX), RC_MIN, RC_MAX, PITCH_MAX, PITCH_MIN);
-    }*/
+    int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
+    int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
+
+    //TODO: worry about the case where pos_set is unsigned and rc channel manages to push it    
+    // negative for a moment, causing the position to wrap from below 0 to a maxvalue. 
 }
 
 /** 
@@ -138,9 +135,9 @@ static void update_setpoints(Gimbal_t *gimbal){
  * @param  None
  * @retval None
  */
-static void increment_PID(Gimbal_t *gimbal){
-    gimbal->pitch_motor.current_out = PID_Calc(&gimbal->pitch_motor.pid_controller, gimbal->pitch_motor.pos_read, gimbal->pitch_motor.pos_set);
-    gimbal->yaw_motor.current_out = PID_Calc(&gimbal->yaw_motor.pid_controller, gimbal->yaw_motor.pos_read, gimbal->yaw_motor.pos_set);
+static void increment_PID(Gimbal_t *gimbal_pid){
+    gimbal_pid->pitch_motor.current_out = PID_Calc(&gimbal_pid->pitch_motor.pid_controller, gimbal_pid->pitch_motor.pos_read, gimbal_pid->pitch_motor.pos_set);
+    gimbal_pid->yaw_motor.current_out = PID_Calc(&gimbal_pid->yaw_motor.pid_controller, gimbal_pid->yaw_motor.pos_read, gimbal_pid->yaw_motor.pos_set);
 }
 
 /** 
@@ -168,11 +165,11 @@ int get_vision_signal(void) {
  * @param pitch_signal signal to pitch motor
  * @retval None
  */
-void send_to_uart(Gimbal_t *gimbal) 	
+void send_to_uart(Gimbal_t *gimbal_msg) 	
 {
     char str[20]; //uart data buffer
 
-    if(gimbal->yaw_motor.pos_read == NULL){
+    if(gimbal_msg->yaw_motor.pos_read == NULL){
         sprintf(str, "null ... :( %d\n\r", 123);
     serial_send_string(str);
     } else{

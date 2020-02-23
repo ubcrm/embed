@@ -893,14 +893,14 @@
               <FilePath>..\user\TASK\start_task\start_task.h</FilePath>
             </File>
             <File>
-              <FileName>INS_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user\TASK\INS_task\INS_task.c</FilePath>
-            </File>
-            <File>
               <FileName>INS_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\TASK\INS_task\INS_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>INS_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\TASK\INS_task\INS_task.c</FilePath>
             </File>
             <File>
               <FileName>chassis_task.c</FileName>
