@@ -31,7 +31,7 @@
 #define max_i_term_out_pitch 1000.0f
 
 /***************************** Gimbal Constants *****************************/
-#define GIMBAL_TASK_INIT_TIME 201
+#define GIMBAL_TASK_INIT_TIME 300
 #define CONTROL_TIME 1
 #define RC_MIN -660
 #define RC_MAX 660
@@ -60,19 +60,20 @@ typedef struct
 typedef struct 
 {
     const RC_ctrl_t *rc_update;
-	Gimbal_Motor_t *yaw_motor;
-	Gimbal_Motor_t *pitch_motor;
+	Gimbal_Motor_t yaw_motor;
+	Gimbal_Motor_t pitch_motor;
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
+    
 } Gimbal_t;
 
 
 /******************************* Function Declarations ***********************/
 int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
-extern void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal); 
+extern void send_to_uart(Gimbal_t *gimbal); 
 
 
 
