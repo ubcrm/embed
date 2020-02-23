@@ -51,7 +51,7 @@ static void increment_PID(Gimbal_t *gimbal);
  */
 void gimbal_task(void* parameters){
 
-    vTaskDelay(200);
+    vTaskDelay(GIMBAL_INIT_DELAY);
 	initialization(&gimbal);
     
     while(1){	
@@ -74,7 +74,7 @@ void gimbal_task(void* parameters){
                         0);
         
           //Sending data via UART
-        vTaskDelay(5);
+        vTaskDelay(GIMBAL_TASK_DELAY);
 	}
 }
 
@@ -169,14 +169,7 @@ void send_to_uart(Gimbal_t *gimbal_msg)
 {
     char str[20]; //uart data buffer
 
-    if(gimbal_msg->yaw_motor.pos_read == NULL){
-        sprintf(str, "null ... :( %d\n\r", 123);
-    serial_send_string(str);
-    } else{
-        sprintf(str, "yaw position read: %d\n\r", 321);
-    serial_send_string(str);
-    }
-        
+    //TODO - fix below / fill as needed
 
 /*
     sprintf(str, "yaw speed read: %d\n\r", gimbal->yaw_motor->speed_read);

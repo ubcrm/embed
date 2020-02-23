@@ -16,6 +16,10 @@
 #include "remote_control.h"
 #include "pid.h"
 
+/******************************* Task Delays *********************************/
+#define CHASSIS_TASK_DELAY 1
+#define CHASSIS_INIT_DELAY 20
+
 /******************** User Definitions ********************/
 
 //Chassis motor CAN ID offset 

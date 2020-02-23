@@ -10,6 +10,10 @@
 #include "pid.h"
 #include "remote_control.h"
 
+/******************************* Task Delays *********************************/
+#define GIMBAL_TASK_DELAY 1
+#define GIMBAL_INIT_DELAY 300
+
 
 /*************** Converts between motor position and degrees *****************/
 #define Motor_Ecd_to_Rad 0.000766990394f

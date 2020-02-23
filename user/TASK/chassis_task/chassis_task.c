@@ -47,7 +47,7 @@ static Chassis_t chassis;
 void chassis_task(void *pvParameters){
     
     // Delay to make sure critical communications/timers have been initialised
-    vTaskDelay(20);
+    vTaskDelay(CHASSIS_INIT_DELAY);
     //Initializes chassis with pointers to RC commands and CAN feedback messages
     
     chassis_init(&chassis);
@@ -65,7 +65,7 @@ void chassis_task(void *pvParameters){
                         chassis.motor[BACK_LEFT].current_out, 
                         chassis.motor[BACK_RIGHT].current_out);
         
-        vTaskDelay(1);
+        vTaskDelay(CHASSIS_TASK_DELAY);
     
     }
 }
