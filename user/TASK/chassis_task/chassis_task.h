@@ -76,7 +76,7 @@ typedef struct
     //Raw remote control data
     const RC_ctrl_t *rc_update;
     
-    //Current front vectord
+    //Current front vector
     const fp32 *vec_raw;
     const fp32 *yaw_pos_raw;
     
