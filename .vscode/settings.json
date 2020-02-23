@@ -3,7 +3,8 @@
     "files.associations": {
         "can.h": "c",
         "pid.h": "c",
-        "ins_task.h": "c"
+        "ins_task.h": "c",
+        "gimbal_task.h": "c"
     }
     
 }
