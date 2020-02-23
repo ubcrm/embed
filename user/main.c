@@ -42,6 +42,7 @@
 
 #include "start_task.h"
 #include "remote_control.h"
+#include "dcmotor.h"
 
 void BSP_init(void);
 
@@ -90,6 +91,8 @@ void BSP_init(void)
 		
     USART_6_INIT();
     remote_control_init();
+
+    init_dc_motor();
 
     //24v power output on
     for (uint8_t i = POWER1_CTRL_SWITCH; i < POWER4_CTRL_SWITCH + 1; i++)

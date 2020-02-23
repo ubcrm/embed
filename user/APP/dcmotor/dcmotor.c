@@ -1,39 +1,37 @@
-#include "dc_motor.h"
+#include "dcmotor.h"
 #include "stm32f4xx.h"
 
-dc_motor dcm;
+void setup_pwm(void);
+void setup_gpio(void);
 
-void setup_pwm();
-void setup_gpio();
-
-void init_dc_motor(){
+void init_dc_motor(void){
     setup_pwm();
-    setup_gpio();
+    //setup_gpio(); //not ready yet
 }
 
 void dc_motor_set_vel(int vel){
-    TIM_SetCompare1(TIM1, vel); //TODO not TIM1 necessarly
+    TIM_SetCompare4(TIM5, vel); //TODO not TIM5 necessarly
 }
 
-int dc_motor_read_pos(){
+int dc_motor_read_pos(void){
     return 0;
 }
 
 //Private functions for hardware
-void setup_pwm(){ //TODO change port
+void setup_pwm(void){ //TODO change port
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(GPIO_CLOCK, ENABLE);
     //RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
 
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_TIM1);
-    //GPIO_PinAFConfig(GPIOE, GPIO_PinSource14, GPIO_AF_TIM1);
+    GPIO_PinAFConfig(GPIOA, PWM_PIN_SOURCE, GPIO_AF_TIM5);
+    //GPIO_PinAFConfig(GPIOE, GPIO_PinSource14, GPIO_AF_TIM5);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Pin = PWM_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -43,8 +41,8 @@ void setup_pwm(){ //TODO change port
     //GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
     //GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-    RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM1, ENABLE);
-    RCC_APB2PeriphResetCmd(RCC_APB2Periph_TIM1, DISABLE);
+    RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM5, ENABLE);
+    RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM5, DISABLE);
 
     TIM_TimeBaseInitStructure.TIM_Period = 2000 - 1;
     TIM_TimeBaseInitStructure.TIM_Prescaler = 180 - 1;
@@ -52,7 +50,7 @@ void setup_pwm(){ //TODO change port
 
     TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 
-    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseInitStructure);
+    TIM_TimeBaseInit(TIM5, &TIM_TimeBaseInitStructure);
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
@@ -63,17 +61,17 @@ void setup_pwm(){ //TODO change port
     TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset;
     TIM_OCInitStructure.TIM_Pulse = 1000;
 
-    TIM_OC1Init(TIM1, &TIM_OCInitStructure);
-    //TIM_OC4Init(TIM1, &TIM_OCInitStructure);
+    TIM_OC1Init(TIM5, &TIM_OCInitStructure);
+    //TIM_OC4Init(TIM5, &TIM_OCInitStructure);
 
-    TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
-    //TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+    TIM_OC1PreloadConfig(TIM5, TIM_OCPreload_Enable);
+    //TIM_OC4PreloadConfig(TIM5, TIM_OCPreload_Enable);
 
-    TIM_ARRPreloadConfig(TIM1, ENABLE);
+    TIM_ARRPreloadConfig(TIM5, ENABLE);
 
-    TIM_CtrlPWMOutputs(TIM1, ENABLE);
+    TIM_CtrlPWMOutputs(TIM5, ENABLE);
 
-    TIM_Cmd(TIM1, ENABLE);
+    TIM_Cmd(TIM5, ENABLE);
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
     /*GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
@@ -85,7 +83,7 @@ void setup_pwm(){ //TODO change port
     GPIO_SetBits(GPIOF, GPIO_Pin_10);*/
 }
 
-void setup_gpio(){ //TODO change port
+void setup_gpio(void){ //TODO change port
     GPIO_InitTypeDef GPIO_InitStructure;
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOG, ENABLE); //
