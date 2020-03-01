@@ -21,7 +21,6 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "dcmotor.h"
 
 float theta_setpoint;
 float phi_setpoint;
@@ -69,8 +68,6 @@ void gimbal_task(void* parameters){
     PidTypeDef pid;
     fp32 pid_constants[3] = {pid_kp, pid_ki, pid_kd};
     PID_Init(&pid, PID_POSITION, pid_constants, max_out, max_iout);
-    
-    dc_motor_set_vel(1800);
     
 	while(1){	
         /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/

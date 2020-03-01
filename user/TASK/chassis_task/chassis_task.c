@@ -16,7 +16,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
 /******************** User Includes ********************/
 #include "CAN_Receive.h"
 #include "USART_comms.h"
@@ -139,8 +138,6 @@ static void chassis_set_mode(void){
 	//Don't do anything
     //Implement chassis_follow_gimbal_yaw mode in the future
 }
-
-
 
 /**
  * @brief Takes the remote control data and converts as specified by user

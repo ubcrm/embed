@@ -45,7 +45,7 @@ void setup_pwm(void){ //TODO change port to PD 12 port H
     // TIM4 Clock Enable
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
     
-    // GPIOB Clock Enable
+    // GPIOD Clock Enable
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
     
     // Initalize PB6 (TIM4 Ch1) and PB7 (TIM4 Ch2)
@@ -54,10 +54,10 @@ void setup_pwm(void){ //TODO change port to PD 12 port H
     GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_100MHz;    // GPIO_High_Speed
     GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP;         // Weak Pull-up for safety during startup
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
     
     // Assign Alternate Functions to pins
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource12, GPIO_AF_TIM4);
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
     //GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_TIM4);
     
     /* Setup TIM / PWM values
