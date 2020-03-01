@@ -7,12 +7,12 @@ void direction(int speed);
 
 void init_dc_motor(void){
     setup_pwm();
-    setup_gpio(); //not ready yet
+    setup_gpio();
 }
 
 void dc_motor_set_vel(int vel){
     direction(vel);
-    TIM_SetCompare1(TIM4, vel); //TODO not TIM4 necessarly
+    TIM_SetCompare1(DC_MOTOR_TIM, vel); //TODO not always channel 1 but idk how to handle
 }
 
 int dc_motor_read_pos(void){
@@ -43,21 +43,21 @@ void setup_pwm(void){ //TODO change port to PD 12 port H
     TIM_OCInitTypeDef           TIM_OCInitStructure;
     
     // TIM4 Clock Enable
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    RCC_APB1PeriphClockCmd(DC_MOTOR_PERIPH, ENABLE);
     
-    // GPIOD Clock Enable
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+    // GPIO_PORT Clock Enable
+    RCC_AHB1PeriphClockCmd(RCC_PERIF, ENABLE);
     
     // Initalize PB6 (TIM4 Ch1) and PB7 (TIM4 Ch2)
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_12; // | GPIO_Pin_7;
+    GPIO_InitStructure.GPIO_Pin     = DC_MOTOR_PIN; // | GPIO_Pin_7;
     GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_100MHz;    // GPIO_High_Speed
     GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP;         // Weak Pull-up for safety during startup
-    GPIO_Init(GPIOD, &GPIO_InitStructure);
+    GPIO_Init(DC_GPIO_PORT, &GPIO_InitStructure);
     
     // Assign Alternate Functions to pins
-    GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+    GPIO_PinAFConfig(DC_GPIO_PORT, DC_PIN_SOURCE, DC_ALT_FUNC);
     //GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_TIM4);
     
     /* Setup TIM / PWM values
@@ -103,7 +103,7 @@ void setup_pwm(void){ //TODO change port to PD 12 port H
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
     
-    TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(DC_MOTOR_TIM, &TIM_TimeBaseStructure);
     
     // Common TIM Settings
     TIM_OCInitStructure.TIM_OCMode      = TIM_OCMode_PWM1;
@@ -112,42 +112,42 @@ void setup_pwm(void){ //TODO change port to PD 12 port H
     TIM_OCInitStructure.TIM_OCPolarity  = TIM_OCPolarity_High;
     
     // Channel 1
-    TIM_OC1Init(TIM4, &TIM_OCInitStructure);
-    TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+    TIM_OC1Init(DC_MOTOR_TIM, &TIM_OCInitStructure);
+    TIM_OC1PreloadConfig(DC_MOTOR_TIM, TIM_OCPreload_Enable);
   
     // Channel 2
     //TIM_OC2Init(TIM4, &TIM_OCInitStructure);
     //TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
     
-    TIM_ARRPreloadConfig(TIM4, ENABLE);
+    TIM_ARRPreloadConfig(DC_MOTOR_TIM, ENABLE);
     
     // Start timer
-    TIM_Cmd(TIM4, ENABLE);
+    TIM_Cmd(DC_MOTOR_TIM, ENABLE);
 }
 
 void setup_gpio(void){ //TODO change port to PF10 and PI9 (Q1 and Q2)
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF | RCC_AHB1Periph_GPIOI, ENABLE); //
+    RCC_AHB1PeriphClockCmd(RCC_PORT_1 | RCC_PORT_2, ENABLE); //
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Pin = DIR_GPIO_PIN_1;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_Init(GPIOF, &GPIO_InitStructure);
+    GPIO_Init(DIR_GPIO_PORT_1, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-    GPIO_Init(GPIOI, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = DIR_GPIO_PIN_2;
+    GPIO_Init(DIR_GPIO_PORT_2, &GPIO_InitStructure);
 }
 
 void direction(int speed){
     if(speed >= 0){
-        GPIO_SetBits(GPIOF, GPIO_Pin_10);
-        GPIO_ResetBits(GPIOI, GPIO_Pin_9);
+        GPIO_SetBits(DIR_GPIO_PORT_1, DIR_GPIO_PIN_1);
+        GPIO_ResetBits(DIR_GPIO_PORT_2, DIR_GPIO_PIN_2);
     }else{
-        GPIO_SetBits(GPIOI, GPIO_Pin_9);
-        GPIO_ResetBits(GPIOF, GPIO_Pin_10);
+        GPIO_SetBits(DIR_GPIO_PORT_2, DIR_GPIO_PIN_2);
+        GPIO_ResetBits(DIR_GPIO_PORT_1, DIR_GPIO_PIN_1);
     }
 }
 
