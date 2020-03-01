@@ -58,7 +58,7 @@ typedef struct
 
 
 /******************************* Function Declarations ***********************/
-int get_vision_signal(void);
+int get_signal(int signal);
 extern void gimbal_task(void *pvParameters);
 void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal); 
 

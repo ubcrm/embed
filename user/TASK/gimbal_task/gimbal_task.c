@@ -34,7 +34,8 @@ char str[32] = {0};
 
 volatile char buffer_rx[100];
 int count_rx = 0;
-int vision_signal = 5700;
+int vision_signal = 4000;
+int yaw_signal = 4000;
 
 /**
   * @brief      Handles cases when RC joystick is not quite centered
@@ -66,38 +67,56 @@ void gimbal_task(void* parameters){
 	
     gimbal_pitch_motor.gimbal_motor_raw = get_Pitch_Gimbal_Motor_Measure_Point();
     
-    fp32 pitch_signal;
+    fp32 pid_yaw_signal;
+	  fp32 pid_vision_signal;
     int vision_signal;
+		int yaw_signal;
     
     PidTypeDef pid;
     fp32 pid_constants[3] = {pid_kp, pid_ki, pid_kd};
     PID_Init(&pid, PID_POSITION, pid_constants, max_out, max_iout);
     
+		// haha
+		int old_vision_signal = 0;
+	
 	while(1){	
         /* For now we assume channel 1 is left-right stick and channel 2 is dn-up stick*/
         /* For now using strictly encoder feedback for position */
         // theta_setpoint = linear_map_int_to_int(rc_channel_1, RC_MIN, RC_MAX, YAW_MIN, YAW_MAX);
         // phi_setpoint = linear_map_int_to_int(rc_channel_2, RC_MIN, RC_MAX, PITCH_MIN, PITCH_MAX);
-		// Gets update on position from encoders and gyro
-		// Comparison to setpoint
-		// run PID
-        //vTaskDelay(CONTROL_TIME);
+				// Gets update on position from encoders and gyro
+				// Comparison to setpoint
+				// run PID
+				// vTaskDelay(CONTROL_TIME);
         
         // Get CAN received data
         gimbal_pitch_motor.pos_raw = gimbal_pitch_motor.gimbal_motor_raw->ecd;
         gimbal_pitch_motor.speed_raw = gimbal_pitch_motor.gimbal_motor_raw->speed_rpm;
         gimbal_pitch_motor.current_raw = gimbal_pitch_motor.gimbal_motor_raw->given_current;
 
-        vision_signal = get_vision_signal();
+        vision_signal = get_signal(vision_signal);
+				// yaw_signal = get_signal(yaw_signal);
         
-        pitch_signal = PID_Calc(&pid, gimbal_pitch_motor.pos_raw, vision_signal);
+        // pid_yaw_signal = PID_Calc(&pid, gimbal_pitch_motor.pos_raw, yaw_signal);
+				pid_vision_signal = PID_Calc(&pid, gimbal_pitch_motor.pos_raw, vision_signal);
+				
+				if(vision_signal != old_vision_signal)
+				{
+					serial_send_int(vision_signal);
+					serial_send_int(old_vision_signal);
+				}
+		
 
         // Turn gimbal motor
-        CAN_CMD_GIMBAL(0, pitch_signal, 0, 0);
+        CAN_CMD_GIMBAL(0, pid_vision_signal, 0, 0);
         
+				
+				old_vision_signal = vision_signal;
         vTaskDelay(1);
         
-        //send_to_uart(gimbal_pitch_motor, pid, pitch_signal);  //Sending data via UART
+        //send_to_uart(gimbal_pitch_motor, pid, pid_yaw_signal);  //Sending data via UART
+				
+				
 	}
 }
 
@@ -154,18 +173,18 @@ float get_relative_angle(float alpha, float beta){
  * @param  None
  * @retval Vision signal in range of 0 and 8191
  */
-int get_vision_signal(void) {
+int get_signal(int signal) {
     // int vision_signal = 5700;  // TODO: Get real values from vision
 	
    
-    while (vision_signal > 8191) {
-        vision_signal -= 8191;
+    while (signal > 8191) {
+        signal -= 8191;
     }
-    while (vision_signal < 0) {
-        vision_signal+= 8192;
+    while (signal < 0) {
+        signal+= 8192;
     }
 
-    return vision_signal;
+    return signal;
 }
 
 
@@ -174,10 +193,10 @@ int get_vision_signal(void) {
  * This will block for several milliseconds
  * @param gimbal_yaw_motor struct containing information about the gimbal yaw motor
  * @param pid struct containing pid coefficients
- * @param pitch_signal signal to pitch motor
+ * @param pid_yaw_signal signal to pitch motor
  * @retval None
  */
-void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal) 	
+void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pid_yaw_signal) 	
 {
     char str[20]; //uart data buffer
 
@@ -199,7 +218,7 @@ void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_si
     sprintf(str, "motor ki: %f\n\r", pid.Ki);
     serial_send_string(str);
     
-    sprintf(str, "pitch signal: %f\n\r", pitch_signal);
+    sprintf(str, "pitch signal: %f\n\r", pid_yaw_signal);
     serial_send_string(str);
 }
 
@@ -221,7 +240,8 @@ void USART6_IRQHandler(void)
 		if (USART_Data == 13) {
 			buffer_rx[count_rx] = 0;
 			vision_signal = 0;
-			for (int i =0; i < count_rx; i++)
+			yaw_signal = 0;
+/*			for (int i =0; i < count_rx; i++)
 			{
 				if (buffer_rx[0] == 45){
 					if (i == 0){
@@ -240,10 +260,78 @@ void USART6_IRQHandler(void)
 					vision_signal += (buffer_rx[i] - 48) * pow(10, count_rx - i - 1);
 				}
 			}
+*/
+
+			int comma_count = 0;
+			int start_index = 0;
+			int comma_indx[2];
+			
+			for (int i = 0; i < count_rx; i++){
+				if (buffer_rx[i] == 44) {
+					if (comma_count == 0){
+						comma_indx[0] = i;
+						comma_count++;
+					}
+					else{
+						comma_indx[1] = i;
+					}
+				}
+			}
+			
+			comma_count = 0;
+			
+			for (int i = 0; i < count_rx; i++)
+			{
+			  if (buffer_rx[i] == 44){
+					comma_count++;
+					start_index = i+1;
+				}
+				
+				else if (comma_count == 0){
+					if (buffer_rx[0] == 45){
+						if (i == 0){
+							vision_signal = -1;
+						}
+						else{
+							vision_signal -= (buffer_rx[i] - 48) * pow(10, comma_indx[0] - i - 1);
+							
+							if (i == 1){
+								vision_signal += 1;
+							}
+							
+						}
+					}
+					else{
+						vision_signal += (buffer_rx[i] - 48) * pow(10, comma_indx[0] - i - 1);
+					}
+				}
+				
+				else if (comma_count == 1){
+					if (buffer_rx[start_index] == 45){
+						if (i == start_index){
+							yaw_signal = -1;
+						}
+						else{
+							yaw_signal -= (buffer_rx[i] - 48) * pow(10, count_rx - i - 1);
+							
+							if (i == start_index + 1){
+								yaw_signal += 1;
+							}
+							
+						}
+					}
+					else{
+						yaw_signal += (buffer_rx[i] - 48) * pow(10, count_rx - i - 1);
+					}
+				}
+				
+			}			
+			
 			serial_send_string(buffer_rx);
 			serial_send_string("\n");
 			serial_send_int(vision_signal);
 			serial_send_string("\n");
+			serial_send_int(yaw_signal);
 			serial_send_string("\n");
 			
 			count_rx = 0;
