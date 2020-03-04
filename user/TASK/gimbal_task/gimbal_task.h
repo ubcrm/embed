@@ -9,6 +9,11 @@
 #include "CAN_receive.h"
 #include "pid.h"
 #include "shoot_task.h"
+#include "remote_control.h"
+
+/******************************* Task Delays *********************************/
+#define GIMBAL_TASK_DELAY 1
+#define GIMBAL_INIT_DELAY 300
 
 
 /*************** Converts between motor position and degrees *****************/
@@ -18,14 +23,21 @@
 
 
 /****************************** PID Constants ********************************/
-#define pid_kp 40.0f
-#define pid_ki 0.0f
-#define pid_kd 0.0f
-#define max_out 5000.0f
-#define max_iout 0
+#define pid_kp_yaw 40.0f
+#define pid_ki_yaw 0.0f
+#define pid_kd_yaw 0.0f
+#define max_out_yaw 5000.0f
+#define max_i_term_out_yaw 1000.0f
+
+#define pid_kp_pitch 40.0f
+#define pid_ki_pitch 0.0f
+#define pid_kd_pitch 0.0f
+#define max_out_pitch 5000.0f
+#define max_i_term_out_pitch 1000.0f
 
 /***************************** Gimbal Constants *****************************/
-#define GIMBAL_TASK_INIT_TIME 201
+#define GIMBAL_TASK_INIT_TIME 300
+#define CONTROL_TIME 1
 #define RC_MIN -660
 #define RC_MAX 660
 #define ENCODER_MIN 0
@@ -39,38 +51,50 @@
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
+<<<<<<< HEAD
 	const motor_data_t *gimbal_motor_raw;
 	uint16_t pos_raw;
 	uint16_t speed_raw;
 	uint16_t current_raw;
+=======
+	const motor_measure_t *motor_feedback;
+	uint16_t pos_read;
+	uint16_t speed_read;
+	uint16_t current_read;
+
+    uint16_t pos_set;
+    int16_t current_out;
+
+    PidTypeDef pid_controller;
+>>>>>>> 8fcb2525a1dbfc250577a6580e61bdb7fc360243
 } Gimbal_Motor_t;
 
 typedef struct 
 {
-	Gimbal_Motor_t *yaw_motor;
-	Gimbal_Motor_t *pitch_motor;
-    const fp32 *angle_reading_raw;
-	const fp32 *gyro_reading_raw;
-	const fp32 *acce_reading_raw;
+    const RC_ctrl_t *rc_update;
+	Gimbal_Motor_t yaw_motor;
+	Gimbal_Motor_t pitch_motor;
+    const fp32 *angle_update;
+	const fp32 *gyro_update;
+	const fp32 *accel_update;
+    // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
-    uint16_t pitch_pos_raw;
-    uint16_t yaw_pos_raw;
-    uint16_t pitch_pos_set;
-    uint16_t yaw_pos_set;
-    
+<<<<<<< HEAD
     int16_t pitch_speed_raw;
     int16_t yaw_speed_raw;
     int16_t pitch_speed_set;
     int16_t yaw_speed_set;
 
     Shoot_t *launcher;
+=======
+>>>>>>> 8fcb2525a1dbfc250577a6580e61bdb7fc360243
 } Gimbal_t;
 
 
 /******************************* Function Declarations ***********************/
 int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
-extern void send_to_uart(Gimbal_Motor_t gimbal_yaw_motor, PidTypeDef pid, fp32 pitch_signal); 
+extern void send_to_uart(Gimbal_t *gimbal); 
 
 
 

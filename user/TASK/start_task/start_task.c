@@ -17,13 +17,13 @@
 #define START_STK_SIZE 512
 static TaskHandle_t start_task_handler;
 
-#define INS_TASK_PRIO 2
+#define INS_TASK_PRIO 20
 #define INS_STK_SIZE 512
-static TaskHandle_t chassis_task_handler;
-
-#define CHASSIS_TASK_PRIO 3
-#define CHASSIS_STK_SIZE 512
 static TaskHandle_t INS_task_handler;
+
+#define CHASSIS_TASK_PRIO 5
+#define CHASSIS_STK_SIZE 512
+static TaskHandle_t chassis_task_handler;
 
 #define SHOOT_TASK_PRIO 10
 #define SHOOT_STK_SIZE 256

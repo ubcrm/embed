@@ -16,6 +16,10 @@
 #include "remote_control.h"
 #include "pid.h"
 
+/******************************* Task Delays *********************************/
+#define CHASSIS_TASK_DELAY 1
+#define CHASSIS_INIT_DELAY 20
+
 /******************** User Definitions ********************/
 
 //Chassis motor CAN ID offset 
@@ -39,42 +43,51 @@
 #define M3508_KI 0.00
 #define M3508_KD 0.1
 
+
+typedef enum{
+    CHASSIS_VECTOR_RAW,
+    CHASSIS_FOLLOW_GIMBAL_YAW,
+    CHASSIS_INDIVIDUAL_CONTROL,
+} chassis_user_mode_e;
+
+
 typedef struct 
 {
-    const motor_data_t *motor_raw;
+    const motor_measure_t *motor_feedback;
     
     //Current speed read from motors
-    int16_t pos_raw;
-    int16_t speed_raw;
-    int16_t current_raw;
+    int16_t pos_read;
+    int16_t speed_read;
+    int16_t current_read;
     
     //Target speed set by user/remote control
     int16_t pos_set;
     int16_t speed_set;
     
     //Final output speed
-    int16_t speed_out;
+    int16_t current_out;
 	
     //Control
-    PidTypeDef pid_control;
+    PidTypeDef pid_controller;
 } Chassis_Motor_t;
 
 
 typedef struct 
 {
     Chassis_Motor_t motor[4];
+    chassis_user_mode_e mode;
     
     //Raw remote control data
-    const RC_ctrl_t *rc_raw;
+    const RC_ctrl_t *rc_update;
     
     //Current front vector
     const fp32 *vec_raw;
     const fp32 *yaw_pos_raw;
     
     //Current speed, vector combination of the speed read from motors
-    int16_t x_speed_raw;
-    int16_t y_speed_raw;
-    int16_t z_speed_raw;
+    int16_t x_speed_read;
+    int16_t y_speed_read;
+    int16_t z_speed_read;
     
     //Speed set by user/remote control
     int16_t x_speed_set;
@@ -83,11 +96,7 @@ typedef struct
 } Chassis_t;
 
 
-typedef enum{
-    CHASSIS_VECTOR_RAW,
-    CHASSIS_FOLLOW_GIMBAL_YAW,
-    CHASSIS_INDIVIDUAL_CONTROL,
-} chassis_user_mode_e;
+
 
 
 
