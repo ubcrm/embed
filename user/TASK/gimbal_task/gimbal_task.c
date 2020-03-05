@@ -168,7 +168,7 @@ int get_vision_signal(void) {
  */
 void send_to_uart(Gimbal_t *gimbal_msg) 	
 {
-    char str[20]; //uart data buffer
+    //char str[20]; //uart data buffer
 
     //TODO - fix below / fill as needed
 

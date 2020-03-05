@@ -27,7 +27,7 @@
 #define SHOOT_SWITCH 0
 
 //Hopper motor
-#define HOPPER_SPEED 1500
+#define HOPPER_SPEED 600
 #define HOPPER_OFF 0
 
 //Trigger motor PID

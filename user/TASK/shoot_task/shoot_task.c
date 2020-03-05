@@ -32,8 +32,8 @@ static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
 static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_off_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
-static void shoot_set_mode(void);
-static void shoot_feedback_update(void); 
+static void set_control_mode(void);
+static void get_new_data(void); 
 
 // user defines
 static uint16_t pwm_target = Fric_OFF;
@@ -52,8 +52,8 @@ void shoot_task(void *pvParameters) {
     shoot_init(&shoot);
     vTaskDelay(SHOOT_INIT_DELAY);
     while(1) {
-        shoot_feedback_update();
-        shoot_set_mode();
+        get_new_data();
+        set_control_mode();
         //Handle trigger motor
         shoot.hopper_motor.speed_out = shoot.hopper_motor.speed_set;
         shoot.trigger_motor.speed_out = PID_Calc(&trigger_motor_pid, shoot.trigger_motor.speed_raw, shoot.trigger_motor.speed_set);
@@ -109,7 +109,7 @@ static void shoot_init(Shoot_t *shoot_init) {
  * @param None
  * @retval None
  */
-static void shoot_set_mode(void) {
+static void set_control_mode(void) {
     //Gets outcome of rc
     if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
@@ -147,7 +147,7 @@ static void shoot_set_mode(void) {
  * @param None
  * @retval None
  */
-static void shoot_feedback_update(void) {
+static void get_new_data(void) {
     
     //Accounts for gear box inside P19 
     if (shoot.trigger_motor.pos_raw - shoot.trigger_motor.last_pos_raw > HALF_ECD_RANGE)
