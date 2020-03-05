@@ -54,7 +54,7 @@
 //CAN received data handler
 static void CAN_hook(CanRxMsg *rx_message);
 //motor measure pointers declaration
-static motor_data_t motor_yaw, motor_pit, motor_trigger, motor_hopper, motor_chassis[4];
+static motor_measure_t motor_yaw, motor_pit, motor_trigger, motor_hopper, motor_chassis[4];
 //CAN transmit message struct declaration
 static CanTxMsg GIMBAL_TxMessage;
 		
@@ -171,31 +171,31 @@ void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 /******************* Public CAN Read Functions *******************/
 
 //Return a pointer to yaw motor data
-const motor_data_t *get_Yaw_Gimbal_Motor_Measure_Point(void)
+const motor_measure_t *get_Yaw_Gimbal_Motor_Measure_Point(void)
 {
     return &motor_yaw;
 }
 
 //Return a pointer to pitch motor data
-const motor_data_t *get_Pitch_Gimbal_Motor_Measure_Point(void)
+const motor_measure_t *get_Pitch_Gimbal_Motor_Measure_Point(void)
 {
     return &motor_pit;
 }
 
 //Return a pointer to trigger trigger motor data
-const motor_data_t *get_trigger_Motor_Measure_Point(void)
+const motor_measure_t *get_trigger_Motor_Measure_Point(void)
 {
     return &motor_trigger;
 }
 
 //Return a pointer to revolver motor data
-const motor_data_t *get_hopper_Motor_Measure_Point(void)
+const motor_measure_t *get_hopper_Motor_Measure_Point(void)
 {
     return &motor_hopper;
 }
 
 //Return a pointer to chassis motor data
-const motor_data_t *get_Chassis_Motor_Measure_Point(uint8_t i)
+const motor_measure_t *get_Chassis_Motor_Measure_Point(uint8_t i)
 {
     return &motor_chassis[(i & 0x03)];
 }

@@ -51,12 +51,6 @@
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
-<<<<<<< HEAD
-	const motor_data_t *gimbal_motor_raw;
-	uint16_t pos_raw;
-	uint16_t speed_raw;
-	uint16_t current_raw;
-=======
 	const motor_measure_t *motor_feedback;
 	uint16_t pos_read;
 	uint16_t speed_read;
@@ -66,7 +60,6 @@ typedef struct
     int16_t current_out;
 
     PidTypeDef pid_controller;
->>>>>>> 8fcb2525a1dbfc250577a6580e61bdb7fc360243
 } Gimbal_Motor_t;
 
 typedef struct 
@@ -79,15 +72,6 @@ typedef struct
 	const fp32 *accel_update;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
-<<<<<<< HEAD
-    int16_t pitch_speed_raw;
-    int16_t yaw_speed_raw;
-    int16_t pitch_speed_set;
-    int16_t yaw_speed_set;
-
-    Shoot_t *launcher;
-=======
->>>>>>> 8fcb2525a1dbfc250577a6580e61bdb7fc360243
 } Gimbal_t;
 
 

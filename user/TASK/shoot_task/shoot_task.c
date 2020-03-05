@@ -28,7 +28,6 @@
 Shoot_t shoot;
 
 static void shoot_init(Shoot_t *shoot_init);
-static void shoot_control_loop(void);
 static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
@@ -53,7 +52,26 @@ void shoot_task(void *pvParameters) {
     shoot_init(&shoot);
     vTaskDelay(SHOOT_INIT_DELAY);
     while(1) {
-        shoot_control_loop();
+        shoot_feedback_update();
+        shoot_set_mode();
+        //Handle trigger motor
+        shoot.hopper_motor.speed_out = shoot.hopper_motor.speed_set;
+        shoot.trigger_motor.speed_out = PID_Calc(&trigger_motor_pid, shoot.trigger_motor.speed_raw, shoot.trigger_motor.speed_set);
+
+        //Ramping...
+        if (pwm_output < pwm_target) {
+            pwm_output += 1;
+        } else if (pwm_output > pwm_target) {
+            pwm_output -= 1;
+        }
+        
+        //Set pwm field to the ramp results
+        shoot.fric1_pwm = pwm_output;
+        shoot.fric2_pwm = pwm_output;
+        
+        //Set flywheels
+        fric1_on(shoot.fric1_pwm);
+        fric2_on(shoot.fric2_pwm);  
         vTaskDelay(SHOOT_TASK_DELAY);
     }
 }
@@ -82,34 +100,6 @@ static void shoot_init(Shoot_t *shoot_init) {
     PID_Init(&trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_MAX_OUT, TRIGGER_MAX_IOUT);
 }
 
-
-/**
- * @brief Initializes launcher, links RC ointer and ramps up flywheels
- * @param Shoot_t struct
- * @retval None
- */
-static void shoot_control_loop(void) {   
-    shoot_feedback_update();
-    shoot_set_mode();
-    //Handle trigger motor
-    shoot.hopper_motor.speed_out = shoot.hopper_motor.speed_set;
-    shoot.trigger_motor.speed_out = PID_Calc(&trigger_motor_pid, shoot.trigger_motor.speed_raw, shoot.trigger_motor.speed_set);
-
-    //Ramping...
-    if (pwm_output < pwm_target) {
-        pwm_output += 1;
-    } else if (pwm_output > pwm_target) {
-        pwm_output -= 1;
-    }
-    
-    //Set pwm field to the ramp results
-    shoot.fric1_pwm = pwm_output;
-    shoot.fric2_pwm = pwm_output;
-    
-    //Set flywheels
-    fric1_on(shoot.fric1_pwm);
-    fric2_on(shoot.fric2_pwm);    
-}
 
 
 
@@ -204,7 +194,7 @@ static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
  */
 static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
 {
-    //Set target to be 1/4pi from now
+    //Set target to be 90 degrees from now
     if (trigger_motor->move_flag == 0 && shoot.mode == SHOOT_SINGLE)
     {
         trigger_motor->geared_down_pos_set = trigger_motor->geared_down_pos_raw + TRIGGER_90_DEGS;
