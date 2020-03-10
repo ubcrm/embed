@@ -23,11 +23,13 @@
 #define SHOOT_FRIC_PWM_ADD_VALUE    100.0f
 
 // User defines
-#define POWER_SWITCH 1
-#define SHOOT_SWITCH 0
+#define POWER_SWITCH 0
+#define SHOOT_SWITCH 1
+
+#define DIR_REVERSED -1
 
 //Hopper motor
-#define HOPPER_SPEED 600
+#define HOPPER_SPEED 800
 #define HOPPER_OFF 0
 
 //Trigger motor PID
@@ -44,13 +46,13 @@
 #define HALF_TRIGGER_RATIO 18
 #define FULL_TRIGGER_RATIO 36
 #define TRIGGER_REACHED_POS_RANGE 500
-#define TRIGGER_SPEED 1000
+#define TRIGGER_SPEED -400
 #define TRIGGER_OFF 0
 
 
 typedef struct
 {
-	const motor_measure_t *shoot_motor_raw;
+    const motor_measure_t *shoot_motor_raw;
 	uint16_t pos_raw;
     uint16_t last_pos_raw;
 	int16_t speed_raw;
@@ -71,7 +73,7 @@ typedef enum
 {
     SHOOT_OFF,
     SHOOT_READY,
-    SHOOT_SINGLE,
+    SHOOT_REVERSED,
     SHOOT_RAPID,
     SHOOT_DONE,
 } shoot_mode_e;
@@ -89,6 +91,7 @@ typedef struct
 
 }Shoot_t;
 extern void shoot_task(void *pvParameters);
+extern Shoot_t* get_launcher_pointer(void);
 #endif
 
 

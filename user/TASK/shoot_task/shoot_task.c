@@ -3,7 +3,13 @@
     * @file    TASK/shoot_task
     * @date    24-January/2020
     * @brief   Shooting controls
-    * @attention Shoot motors are plugged into pins A8 and E14, order unknown (update this if you find out)
+    * @attention Shoot motors are plugged into pins A8 and E14, 
+    *           Controls: 
+    *           Right switch (power switch): top is gimbal, bottom is full drive
+    *                                       launcher only enabled in those cases
+    *           Left switch (shoot switch): mid is shoot_ready with flywheels and trigger motors only
+    *                                       up is shoot_rapid with all motors running and firing balls          
+    *                                       down is shoot_reverse with trigger and hopper only, rotating backwards
   ******************************************************************************
 **/
 
@@ -29,7 +35,7 @@ Shoot_t shoot;
 
 static void shoot_init(Shoot_t *shoot_init);
 static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
-static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
+static void shoot_reversed_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void shoot_off_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor);
 static void set_control_mode(void);
@@ -77,6 +83,11 @@ void shoot_task(void *pvParameters) {
 }
 
 
+Shoot_t* get_launcher_pointer(void) {
+    return &shoot;
+}
+
+
 /******************** Private Implementations ********************/
 
 /**
@@ -111,17 +122,18 @@ static void shoot_init(Shoot_t *shoot_init) {
  */
 static void set_control_mode(void) {
     //Gets outcome of rc
-    if (shoot.rc->rc.s[POWER_SWITCH] == ON) {
+    if (shoot.rc->rc.s[POWER_SWITCH] == RC_SW_UP || shoot.rc->rc.s[POWER_SWITCH] == RC_SW_DOWN) {
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
             pwm_target = Fric_DOWN;
             // no shoot
             shoot.mode = SHOOT_READY;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_DOWN) {
-            pwm_target = Fric_UP;
+            pwm_target = Fric_OFF;
             // single shot
-            shoot.mode = SHOOT_SINGLE;
+            shoot.mode = SHOOT_REVERSED;
         } else if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_UP) {
             // rapid fire
+            pwm_target = Fric_UP;
             shoot.mode = SHOOT_RAPID;
         }
     } else {
@@ -132,8 +144,8 @@ static void set_control_mode(void) {
     //Switches control function
     if (shoot.mode == SHOOT_READY) {
         shoot_ready_control(&shoot.trigger_motor, &shoot.hopper_motor);
-    } else if (shoot.mode == SHOOT_SINGLE) {
-        shoot_single_control(&shoot.trigger_motor, &shoot.hopper_motor);
+    } else if (shoot.mode == SHOOT_REVERSED) {
+        shoot_reversed_control(&shoot.trigger_motor, &shoot.hopper_motor);
     } else if (shoot.mode == SHOOT_RAPID) {
         shoot_rapid_control(&shoot.trigger_motor, &shoot.hopper_motor);
     } else {
@@ -143,12 +155,13 @@ static void set_control_mode(void) {
 
 
 /**
- * @brief Update data in the shoot struct. Handles the 36:1 gear ratio in p36
+ * @brief Update data in the shoot struct. Handles the 36:1 gear ratio in p36. 
+ *   This function is commented out temporarily because it's not tested and not high priority before MT video
  * @param None
  * @retval None
  */
 static void get_new_data(void) {
-    
+    /*
     //Accounts for gear box inside P19 
     if (shoot.trigger_motor.pos_raw - shoot.trigger_motor.last_pos_raw > HALF_ECD_RANGE)
     {
@@ -170,53 +183,35 @@ static void get_new_data(void) {
         shoot.trigger_motor.ecd_count = HALF_TRIGGER_RATIO - 1;
     }
     shoot.trigger_motor.geared_down_pos_raw = (shoot.trigger_motor.ecd_count * FULL_ECD_RANGE + shoot.trigger_motor.pos_raw) / FULL_TRIGGER_RATIO;
-    
+    */
 }
 
 /**
- * @brief Trigger motor locks in place while flywheels ramp up to speed
- *        Hopper motor continues to spin to provide constant feed
+ * @brief Trigger motor spins; Hopper motor stopped
  * @param Trigger motor and hopper motor structs 
  * @retval None
  */
 static void shoot_ready_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
 {
-    trigger_motor->speed_set = TRIGGER_OFF;
-    hopper_motor->speed_set = HOPPER_SPEED;
+    trigger_motor->speed_set = TRIGGER_SPEED;
+    hopper_motor->speed_set = HOPPER_OFF;
 }
 
 
 /**
- * @brief Trigger motor moves 90 degrees to allow one ball into the launcher
- *        Hopper motor continues to spin to provide constant feed
+ * @brief Reverses hopper and trigger in an attemp to unjam balls
  * @param Trigger motor and hopper motor structs
  * @retval None
  */
-static void shoot_single_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
+static void shoot_reversed_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
 {
-    //Set target to be 90 degrees from now
-    if (trigger_motor->move_flag == 0 && shoot.mode == SHOOT_SINGLE)
-    {
-        trigger_motor->geared_down_pos_set = trigger_motor->geared_down_pos_raw + TRIGGER_90_DEGS;
-        trigger_motor->cmd_time = xTaskGetTickCount();
-        trigger_motor->move_flag = 1;
-    }
-
-    //Check for whether target is reached
-    if (trigger_motor->geared_down_pos_set - trigger_motor->geared_down_pos_raw > TRIGGER_REACHED_POS_RANGE)
-    {
-        trigger_motor->speed_set = TRIGGER_SPEED;
-    }
-    else
-    {
-        trigger_motor->move_flag = 0;
-    }
-    hopper_motor->speed_set = HOPPER_SPEED;
+    hopper_motor->speed_set = HOPPER_SPEED * DIR_REVERSED;
+    trigger_motor->speed_set = TRIGGER_SPEED * DIR_REVERSED;
 }
 
 
 /**
- * @brief Trigger motor continues spinning to allow for rapid firing
+ * @brief Trigger motor and hopper motor continuously spinning to allow for rapid firing
  * @param Trigger motor and hopper motor structs
  * @retval None
  */
@@ -224,6 +219,7 @@ static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
 {
     //Hopper and trigger motor both spinning, used for clearing bullets
     hopper_motor->speed_set = HOPPER_SPEED;
+    trigger_motor->speed_set = TRIGGER_SPEED;
 }
 
 

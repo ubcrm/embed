@@ -2,7 +2,7 @@
 #define FRIC_H
 #include "main.h"
 
-#define Fric_UP 1900
+#define Fric_UP 1100
 #define Fric_DOWN 1000
 #define Fric_OFF 900
 
