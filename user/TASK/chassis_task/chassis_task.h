@@ -17,7 +17,7 @@
 #include "pid.h"
 
 /******************************* Task Delays *********************************/
-#define CHASSIS_TASK_DELAY 1
+#define CHASSIS_TASK_DELAY 5
 #define CHASSIS_INIT_DELAY 20
 
 /******************** User Definitions ********************/
@@ -41,8 +41,7 @@
 //M3508 speed PID constants
 #define M3508_KP 0.02
 #define M3508_KI 0.00
-#define M3508_KD 0.1
-
+#define M3508_KD 0.25
 
 typedef enum{
     CHASSIS_VECTOR_RAW,
