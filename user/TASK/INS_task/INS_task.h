@@ -48,8 +48,6 @@
 
 #define INS_DELTA_TICK 1 //任务调用的间隔
 
-#define INS_TASK_INIT_TIME 7 //任务开始初期 delay 一段时间
-
 #define MPU6500_TEMP_PWM_MAX 5000 //mpu6500控制温度的设置TIM的重载值，即给PWM最大为 MPU6500_TEMP_PWM_MAX - 1
 
 //Data index offset for angle vector

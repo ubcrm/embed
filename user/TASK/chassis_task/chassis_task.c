@@ -81,8 +81,6 @@ Chassis_t* get_chassis_point(void) {
 }
 
 
-
-
 /******************** Private User Functions ********************/
 
 /**

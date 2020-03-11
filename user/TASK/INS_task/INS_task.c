@@ -32,6 +32,7 @@
 #include "USART_comms.h"
 #include <stdio.h>
 #include "gimbal_task.h"
+#include "start_task.h"
 
 #define IMUWarnBuzzerOn() buzzer_on(95, 10000) //开机陀螺仪校准蜂鸣器
 
@@ -205,7 +206,7 @@ const fp32 *get_MPU6500_Accel_Data_Point(void)
   */
 void INS_task(void *pvParameters)
 {
-    vTaskDelay(INS_TASK_INIT_TIME);
+    vTaskDelay(INS_TASK_DELAY);
 	
     //Initializes MPU6500, stays in the loop if not initialized
     while (mpu6500_init() != MPU6500_NO_ERROR)

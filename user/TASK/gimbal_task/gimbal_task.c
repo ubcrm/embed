@@ -18,6 +18,7 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "start_task.h"
 
 
 /******************** User Includes ********************/
@@ -27,6 +28,7 @@
 #include "USART_comms.h"
 #include <stdio.h>
 #include "pid.h"
+#include "shoot_task.h"
 
 #define DEADBAND 10
 
@@ -66,12 +68,10 @@ void gimbal_task(void* parameters){
         increment_PID(&gimbal);
         //send_to_uart(&gimbal);
         // Turn gimbal motor
-        
-        
         CAN_CMD_GIMBAL( (int16_t) gimbal.yaw_motor.current_out, 
                         (int16_t) gimbal.pitch_motor.current_out,
-                        0,
-                        0);
+                        (int16_t) gimbal.launcher->trigger_motor.speed_set, 
+                        (int16_t) gimbal.launcher->hopper_motor.speed_set);
         
           //Sending data via UART
         vTaskDelay(GIMBAL_TASK_DELAY);
@@ -86,7 +86,7 @@ void gimbal_task(void* parameters){
 static void initialization(Gimbal_t *gimbal_ptr){
     gimbal_ptr->pitch_motor.motor_feedback = get_Pitch_Gimbal_Motor_Measure_Point();
     gimbal_ptr->yaw_motor.motor_feedback = get_Yaw_Gimbal_Motor_Measure_Point(); 
-
+    gimbal_ptr->launcher = get_launcher_pointer();
     fp32 pid_constants_yaw[3] = {pid_kp_yaw, pid_ki_yaw, pid_kd_yaw};
     fp32 pid_constants_pitch[3] = {pid_kp_pitch, pid_ki_pitch, pid_kd_pitch};
 
@@ -95,7 +95,7 @@ static void initialization(Gimbal_t *gimbal_ptr){
     
     gimbal_ptr->rc_update = get_remote_control_point();
     
-    gimbal_ptr->pitch_motor.pos_set = 6000;
+    gimbal_ptr->pitch_motor.pos_set = 5500;
     gimbal_ptr->yaw_motor.pos_set = 6000;
 }
 
@@ -111,6 +111,7 @@ static void get_new_data(Gimbal_t *gimbal_data){
 
         gimbal_data->yaw_motor.pos_read = gimbal_data->yaw_motor.motor_feedback->ecd;
         gimbal_data->yaw_motor.speed_read = gimbal_data->yaw_motor.motor_feedback->speed_rpm;
+    
 }
 
 /** 
@@ -167,7 +168,7 @@ int get_vision_signal(void) {
  */
 void send_to_uart(Gimbal_t *gimbal_msg) 	
 {
-    char str[20]; //uart data buffer
+    //char str[20]; //uart data buffer
 
     //TODO - fix below / fill as needed
 

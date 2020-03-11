@@ -72,3 +72,6 @@
 *.l1p
 *.l2p
 *.iex
+
+# Editor generated directories
+*.vscode/

@@ -34,13 +34,12 @@ fp32 invSqrt(fp32 num)
 }
 
 /**
-  * @brief          斜波函数初始化
-  * @author         RM
-  * @param[in]      斜波函数结构体
-  * @param[in]      间隔的时间，单位 s
-  * @param[in]      最大值
-  * @param[in]      最小值
-  * @retval         返回空
+  * @brief      Init ramp struct values
+  * @param      ramp_source_type: struct representing ramp values
+  * @param      frame_period: time gap for each step of ramp, in seconds
+  * @param      max: max value
+  * @param      min: min value
+  * @retval     None
   */
 void ramp_init(ramp_function_source_t *ramp_source_type, fp32 frame_period, fp32 max, fp32 min)
 {
@@ -52,13 +51,11 @@ void ramp_init(ramp_function_source_t *ramp_source_type, fp32 frame_period, fp32
 }
 
 /**
-  * @brief          斜波函数计算，根据输入的值进行叠加， 输入单位为 /s 即一秒后增加输入的值
-  * @author         RM
-  * @param[in]      斜波函数结构体
-  * @param[in]      输入值
-  * @param[in]      滤波参数
-  * @retval         返回空
-  */
+  * @brief      Performs ramp calculation, updates output so it reaches maximum
+  * @param      ramp_source_type: struct representing ramp values
+  * @param      input: starting point for ramping
+  * @retval     None
+  */ 
 void ramp_calc(ramp_function_source_t *ramp_source_type, fp32 input)
 {
     ramp_source_type->input = input;
