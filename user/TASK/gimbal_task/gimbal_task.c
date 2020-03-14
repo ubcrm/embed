@@ -158,30 +158,19 @@ int get_vision_signal(void) {
     return vision_signal;
 }
 
-/** 
- * @brief Updates Uart with position information on the yaw motor and the PID settings
- * This will block for several milliseconds
- * @param gimbal_yaw_motor struct containing information about the gimbal yaw motor
- * @param pid struct containing pid coefficients
- * @param pitch_signal signal to pitch motor
- * @retval None
- */
-void send_to_uart(Gimbal_t *gimbal_msg) 	
-{
-    //char str[20]; //uart data buffer
 
-    //TODO - fix below / fill as needed
 
-/*
-    sprintf(str, "yaw speed read: %d\n\r", gimbal->yaw_motor->speed_read);
-    serial_send_string(str);       
+static char message[64] = {0};
+static int counter = 0;
 
-    sprintf(str, "yaw current read: %d\n\r", gimbal->yaw_motor->current_read);
-    serial_send_string(str);
-*/  
-    //sprintf(str, "yaw setpoint: %d\n\r", gimbal->yaw_motor->pos_set);
-    //serial_send_string(str);
+static void send_feedback_to_uart(Gimbal_t *gimbal){
+    if(counter == 0){
+        sprintf(message, "(2,3) rpm is: %i \n\r", gimbal->yaw_motor.motor_feedback->speed_rpm);
+        serial_send_string(message);
+        sprintf(message, "(4,5) torque feedback is: %i \n\r", gimbal->yaw_motor.motor_feedback->current_read);
+        serial_send_string(message);
+    }
     
-    //sprintf(str, "yaw current out: %d\n\r", gimbal->yaw_motor->current_out);
-    //serial_send_string(str);
+    counter = (counter + 1) % 1000;
+    
 }

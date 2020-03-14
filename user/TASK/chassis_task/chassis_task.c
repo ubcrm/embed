@@ -32,6 +32,7 @@ static void set_control_mode(Chassis_t *chassis);
 static void calculate_chassis_motion_setpoints(Chassis_t *chassis_set);
 static void calculate_motor_setpoints(Chassis_t *chassis_motors);
 static void increment_PID(Chassis_t *chassis_pid);
+static void send_feedback_to_uart(Chassis_t *chassis);
 
 static Chassis_t chassis;
     
@@ -97,7 +98,7 @@ static void chassis_init(Chassis_t *chassis_init){
         chassis_init->motor[i].motor_feedback = get_Chassis_Motor_Measure_Point(i);
         chassis_init->motor[i].speed_read = chassis_init->motor[i].motor_feedback->speed_rpm;
         chassis_init->motor[i].pos_read = chassis_init->motor[i].motor_feedback->ecd;
-        chassis_init->motor[i].current_read = chassis_init->motor[i].motor_feedback->given_current;
+        chassis_init->motor[i].current_read = chassis_init->motor[i].motor_feedback->current_read;
 			
 		PID_Init(&chassis_init->motor[i].pid_controller, PID_DELTA, def_pid_constants, M3508_MAX_OUT, M3508_MIN_OUT);
     }
@@ -120,7 +121,7 @@ static void get_new_data(Chassis_t *chassis_update){
 		for (int i = 0; i < 4; i++) {
         chassis_update->motor[i].speed_read = chassis_update->motor[i].motor_feedback->speed_rpm;
         chassis_update->motor[i].pos_read = chassis_update->motor[i].motor_feedback->ecd;
-        chassis_update->motor[i].current_read = chassis_update->motor[i].motor_feedback->given_current;
+        chassis_update->motor[i].current_read = chassis_update->motor[i].motor_feedback->current_read;
 		}
 }
 
@@ -252,4 +253,20 @@ static void increment_PID(Chassis_t *chassis_pid){
         serial_send_string(pid_out);
     }
 	
+}
+
+
+static char message[64] = {0};
+static int counter = 0;
+
+static void send_feedback_to_uart(Chassis_t *chassis){
+    if(counter == 0){
+        sprintf(message, "(2,3) rpm is: %i \n\r", chassis->motor[0].motor_feedback->speed_rpm);
+        serial_send_string(message);
+        sprintf(message, "(4,5) torque feedback is: %i \n\r", chassis->motor[0].motor_feedback->current_read);
+        serial_send_string(message);
+    }
+    
+    counter = (counter + 1) % 1000;
+    
 }
