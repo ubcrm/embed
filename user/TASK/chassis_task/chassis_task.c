@@ -43,7 +43,7 @@ static Chassis_t chassis;
 static char message[64] = {0};
 static int counter = 0;
     
-#define DEBUG 0
+#define DEBUG 1
 
 /******************** Main Task/Functions Called from Outside ********************/
 
@@ -284,6 +284,7 @@ static void check_allowed_current(Chassis_t *chassis_feedback){
     for(int i = 0; i < 4; i++){
        if(abs(chassis_feedback->motor[i].motor_feedback->current_read) > CURRENT_LIMIT){
            sprintf(message, "current limit reached, limiter state is %d", chassis_feedback->motor[i].limiter);
+           serial_send_string(message);
             if(chassis_feedback->motor[i].limiter == FULL_CURRENT){
                 chassis_feedback->motor[i].limiter = HALF_CURRENT;
             }

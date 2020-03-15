@@ -116,7 +116,7 @@ static void initialization(Gimbal_t *gimbal_ptr){
     
     gimbal_ptr->rc_update = get_remote_control_point();
     
-    gimbal_ptr->pitch_motor.pos_set = 5500;
+    gimbal_ptr->pitch_motor.pos_set = 2700;
     gimbal_ptr->yaw_motor.pos_set = 6000;
 }
 

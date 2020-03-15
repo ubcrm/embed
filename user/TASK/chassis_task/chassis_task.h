@@ -28,7 +28,7 @@
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
 
-#define MULTIPLIER 3
+#define MULTIPLIER 6
 
 // RC channels
 #define RC_X 2
@@ -36,13 +36,13 @@
 #define RC_Z 0
 
 //M3508 motors max and min CAN output
-#define M3508_MAX_OUT 1500
+#define M3508_MAX_OUT 2000
 #define M3508_MIN_OUT 50.0
+#define M3508_MAX_IOUT 40
 //M3508 speed PID constants
-#define M3508_KP 0.04
-#define M3508_KI 0.00
-#define M3508_KD 0.1
-
+#define M3508_KP 4.0f
+#define M3508_KI 0.0001f
+#define M3508_KD 0.01f
 // Current Limiting Constants
 #define HYSTERESIS_PERIOD 5
 #define CURRENT_LIMIT 1000
