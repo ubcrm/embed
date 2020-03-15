@@ -211,7 +211,12 @@ char pid_out[64];
  * @retval None
  */
 static void increment_PID(Chassis_t *chassis_pid){
-	//translation
+    
+    for(int i = 0; i < 4; i++){
+        chassis_pid->motor[i].current_out = chassis_pid->motor[i].speed_set;
+    }
+	/*
+    //translation
     //rotation
 	fp32 front_right;
     fp32 back_right;
@@ -264,7 +269,8 @@ static void increment_PID(Chassis_t *chassis_pid){
         chassis_pid->motor[BACK_LEFT].speed_read, 
         chassis_pid->motor[BACK_LEFT].current_out);
         serial_send_string(pid_out);
-    }
+        
+    }*/
 	
 }
 

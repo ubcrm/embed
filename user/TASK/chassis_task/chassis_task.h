@@ -28,7 +28,7 @@
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
 
-#define MULTIPLIER 6
+#define MULTIPLIER 10
 
 // RC channels
 #define RC_X 2
@@ -40,12 +40,12 @@
 #define M3508_MIN_OUT 50.0
 #define M3508_MAX_IOUT 40
 //M3508 speed PID constants
-#define M3508_KP 4.0f
-#define M3508_KI 0.0001f
-#define M3508_KD 0.01f
+#define M3508_KP 1.0f
+#define M3508_KI 0.0f
+#define M3508_KD 0.0f
 // Current Limiting Constants
 #define HYSTERESIS_PERIOD 5
-#define CURRENT_LIMIT 1000
+#define CURRENT_LIMIT 25000
 
 typedef enum{
     FULL_CURRENT,  

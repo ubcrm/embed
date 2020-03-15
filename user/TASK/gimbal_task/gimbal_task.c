@@ -45,6 +45,7 @@ static void initialization(Gimbal_t *gimbal);
 static void get_new_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
+static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
 
 /**
 * Slew Control
@@ -290,6 +291,6 @@ static void send_feedback_to_uart(Gimbal_t *gimbal){
         serial_send_string(message);
     }
     
-    counter = (counter + 1) % 1000;
+    counter = (counter + 1) % 1000; */
     
 }
