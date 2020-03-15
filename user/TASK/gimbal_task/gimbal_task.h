@@ -17,7 +17,7 @@
 
 
 /*************** Converts between motor position and degrees *****************/
-#define Motor_Ecd_to_Rad 0.000766990394f
+#define Motor_Ecd_to_Rad 0.000766990394f /* 2PI / 8191 */
 #define FALSE 0
 #define TRUE 1
 
@@ -46,13 +46,14 @@
 #define YAW_MAX 6576
 #define PITCH_MIN 2020
 #define PITCH_MAX 3000
+#define ERROR_MULTIPLIER 2048
 
 
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
 	const motor_measure_t *motor_feedback;
-	int16_t pos_read;
+	uint16_t pos_read;
 	int16_t speed_read;
 	int16_t current_read;
 
@@ -71,6 +72,10 @@ typedef struct
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
+    
+    fp32 yaw_setpoint[2]; // {real, imaj}
+    fp32 yaw_position[2]; // {real, imaj}
+    fp32 yaw_error;
     
     Shoot_t *launcher;
 } Gimbal_t;
