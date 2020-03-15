@@ -194,8 +194,6 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
     sprintf(print, "Constrained to %d \n\r", gimbal_set->pitch_motor.pos_set);
     serial_send_string(print);
-    //TODO: worry about the case where pos_set is unsigned and rc channel manages to push it    
-    // negative for a moment, causing the position to wrap from below 0 to a maxvalue. 
 }
 
 static fp32 a_dot_b(fp32 a[2], fp32 b[2]){
