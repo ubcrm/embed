@@ -177,7 +177,7 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     
     //yaw:
     //rc -> theta -> complex rotation -> new setpoint
-    fp32 theta = int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
+    fp32 theta = -1 * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
                 * Motor_Ecd_to_Rad / 40.0f;
     fp32 rotation[2] = {cos(theta), sin(theta)}; // TODO: consider alternative {cos{theta}, sin{theta}}
     multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
@@ -187,9 +187,13 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     //gimbal_set->yaw_motor.pos_set += (-1) * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND) / 10;
     gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 40;
     
+    char print[30];
+    sprintf(print, "Constrain pitch %d between %d, %d \n\r", gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
+    serial_send_string(print);
     //int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
-    int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
-
+    gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
+    sprintf(print, "Constrained to %d \n\r", gimbal_set->pitch_motor.pos_set);
+    serial_send_string(print);
     //TODO: worry about the case where pos_set is unsigned and rc channel manages to push it    
     // negative for a moment, causing the position to wrap from below 0 to a maxvalue. 
 }
@@ -264,14 +268,14 @@ void send_to_uart(Gimbal_t *gimbal_msg)
     //TODO - fix below / fill as needed
     
     if(loop_counter == 0){
-        sprintf(message, "yaw position re: %.2f im: %.2f \n\r", gimbal_msg->yaw_position[0], gimbal_msg->yaw_position[1]);
+        /*sprintf(str, "yaw position re: %.2f im: %.2f \n\r", gimbal_msg->yaw_position[0], gimbal_msg->yaw_position[1]);
         serial_send_string(str);
         sprintf(message, "yaw setpoint re: %.2f im: %.2f \n\r", gimbal_msg->yaw_setpoint[0], gimbal_msg->yaw_setpoint[1]);
         serial_send_string(message);
         sprintf(message, "--- \n\r");
         serial_send_string(message);
         sprintf(message, "pitch: %i", gimbal_msg->pitch_motor.pos_read);
-        serial_send_string(message);
+        serial_send_string(message);*/
     }
     loop_counter = (loop_counter + 1) % 1000;
     
