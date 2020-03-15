@@ -8,6 +8,7 @@
 #include "main.h"
 #include "CAN_receive.h"
 #include "pid.h"
+#include "shoot_task.h"
 #include "remote_control.h"
 
 /******************************* Task Delays *********************************/
@@ -51,11 +52,11 @@
 typedef struct 
 {
 	const motor_measure_t *motor_feedback;
-	uint16_t pos_read;
-	uint16_t speed_read;
-	uint16_t current_read;
+	int16_t pos_read;
+	int16_t speed_read;
+	int16_t current_read;
 
-    uint16_t pos_set;
+    int16_t pos_set;
     int16_t current_out;
 
     PidTypeDef pid_controller;
@@ -72,6 +73,7 @@ typedef struct
     const uint24_t current_angle;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
+    Shoot_t *launcher;
 } Gimbal_t;
 
 
