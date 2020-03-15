@@ -44,8 +44,8 @@
 #define ENCODER_MAX 8191
 #define YAW_MIN 2359
 #define YAW_MAX 6576
-#define PITCH_MIN 5800
-#define PITCH_MAX 5000
+#define PITCH_MIN 2020
+#define PITCH_MAX 3000
 #define ERROR_MULTIPLIER 2048
 
 

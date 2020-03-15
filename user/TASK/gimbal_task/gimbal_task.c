@@ -256,6 +256,8 @@ void send_to_uart(Gimbal_t *gimbal_msg)
         serial_send_string(message);
         sprintf(message, "--- \n\r");
         serial_send_string(message);
+        sprintf(message, "pitch: %i", gimbal_msg->pitch_motor.pos_read);
+        serial_send_string(message);
     }
     loop_counter = (loop_counter + 1) % 1000;
     
