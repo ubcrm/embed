@@ -23,10 +23,10 @@
 
 
 /****************************** PID Constants ********************************/
-#define pid_kp_yaw 40.0f
+#define pid_kp_yaw 250.0f
 #define pid_ki_yaw 0.0f
-#define pid_kd_yaw 0.0f
-#define max_out_yaw 5000.0f
+#define pid_kd_yaw 250.0f
+#define max_out_yaw 15000.0f
 #define max_i_term_out_yaw 1000.0f
 
 #define pid_kp_pitch 40.0f
