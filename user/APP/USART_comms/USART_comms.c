@@ -2,6 +2,8 @@
 #include "USART_comms.h"
 #include <stdio.h>
 
+// Debugging
+
 // Sends one string over USART
 // Example usage: serial_send_string("Nando eats Nando's at Nando's");
 void serial_send_string(volatile char *str)
@@ -47,4 +49,17 @@ int num_digits(int n) {
 	}
 	
 	return count;	
+}
+
+// Vision
+
+// Sends one string over UART8
+void vision_send_string(volatile char *str)
+{
+	while (*str) {
+		// Once previous byte is finished being transmitted, transmit next byte
+		while (USART_GetFlagStatus(UART8, USART_FLAG_TC) == RESET);
+		USART_SendData(UART8, *str);
+		str++;
+	}
 }

@@ -70,7 +70,7 @@ typedef struct
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
-    const uint24_t current_angle;
+    //const uint24_t current_angle;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
     Shoot_t *launcher;

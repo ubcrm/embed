@@ -88,7 +88,8 @@ void BSP_init(void)
     CAN1_mode_init(CAN_SJW_1tq, CAN_BS2_2tq, CAN_BS1_6tq, 5, CAN_Mode_Normal);
     CAN2_mode_init(CAN_SJW_1tq, CAN_BS2_2tq, CAN_BS1_6tq, 5, CAN_Mode_Normal);
 		
-    USART_6_INIT();
+    USART_6_INIT(); // debugging
+    USART_8_INIT(); // vision
     remote_control_init();
 
     //24v power output on

@@ -29,12 +29,14 @@
 #include <stdio.h>
 #include "pid.h"
 #include "shoot_task.h"
+#include "vision.h"
 
 
 #define DEADBAND 10
 
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
+Gimbal_buffer *gimbal_buff;
 
 //UART mailbox
 char str[32] = {0};
@@ -58,7 +60,7 @@ void gimbal_task(void* parameters){
 	initialization(&gimbal);
     
     while(1){	
-        serial_send_string(READY);  //sends 0 to Python
+        serial_send_string(&READY);  //sends 1 to Python
         //send_to_uart(&gimbal);
         
         /* For now using strictly encoder feedback for position */
@@ -100,8 +102,9 @@ static void initialization(Gimbal_t *gimbal_ptr){
     gimbal_ptr->pitch_motor.pos_set = 5500;
     gimbal_ptr->yaw_motor.pos_set = 6000;
     
-    gimbal_buff.ready_signal = 1;
-    gimbal_buff.num_filled = 0;
+    gimbal_buff = get_gimbal_angle_buffer();
+    // gimbal_buff.ready_signal = 1;
+    gimbal_buff->num_filled = 0;
 }
 
 /** 
