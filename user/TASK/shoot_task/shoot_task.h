@@ -15,7 +15,10 @@
 #include "CAN_receive.h"
 
 #ifndef SHOOT_TASK_H
-#define SHOOT_TASK_H	
+#define SHOOT_TASK_H
+
+#define SHOOT_TASK_DELAY 1
+#define SHOOT_INIT_DELAY 2000
 
 //Time between ramp steps, in seconds
 #define RAMP_PRD 0.001

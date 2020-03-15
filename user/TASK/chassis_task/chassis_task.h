@@ -17,7 +17,7 @@
 #include "pid.h"
 
 /******************************* Task Delays *********************************/
-#define CHASSIS_TASK_DELAY 1
+#define CHASSIS_TASK_DELAY 5
 #define CHASSIS_INIT_DELAY 20
 
 /******************** User Definitions ********************/

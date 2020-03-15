@@ -122,7 +122,7 @@ static void shoot_init(Shoot_t *shoot_init) {
  */
 static void set_control_mode(void) {
     //Gets outcome of rc
-    if (shoot.rc->rc.s[POWER_SWITCH] == RC_SW_UP || shoot.rc->rc.s[POWER_SWITCH] == RC_SW_DOWN) {
+    if (shoot.rc->rc.s[POWER_SWITCH] == RC_SW_UP) {
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
             pwm_target = Fric_DOWN;
             // no shoot
