@@ -52,7 +52,9 @@
         (ptr)->speed_rpm = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]);     \
         (ptr)->temperate = (rx_message)->Data[6];                                              \
     }
-		/// TODO: Check real message format, delete one of these if unecessary...
+		// TODO: Check real message format -> most likely delete the gimbal version
+        // The ordering of current_read and speed_rpm in the documentation and the dji code do not match
+  
 		
 		
 		

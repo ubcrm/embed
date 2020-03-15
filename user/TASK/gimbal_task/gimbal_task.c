@@ -44,6 +44,27 @@ static void get_new_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
 
+/**
+* Slew Control
+* While the current is over a limiting constant:
+* Reduce control signal by 0.5 every 5 ms
+* When current returns the acceptable range, double the 
+* allowed current every 5 ms until it returns to full output. 
+* 
+* Disable/reset I-term at this time whenever current limiting is active.\
+* 
+* Do we want reductions to follow : 1/2, 1/4, 1/8, ... 
+*                                    or 1/2, 1/4 , OFF
+* Or mutliply out put constant
+* Tunable Parameters
+* redutions factor: e.g. reduce current by 0.5
+* reduction time: e.g. reduce current every 5 ms
+* increase factor
+* increase time
+* I-term off/reset
+* hysteresis time: how long should the current limiter 
+*       wait before starting to increase/decrease current.
+*/
 
 /**
  * @brief Initializes PID and fetches Gimbal motor data to ensure 
@@ -165,9 +186,9 @@ static int counter = 0;
 
 static void send_feedback_to_uart(Gimbal_t *gimbal){
     if(counter == 0){
-        sprintf(message, "(2,3) rpm is: %i \n\r", gimbal->yaw_motor.motor_feedback->speed_rpm);
+        sprintf(message, "(2,3) yaw rpm is: %i \n\r", gimbal->yaw_motor.motor_feedback->speed_rpm);
         serial_send_string(message);
-        sprintf(message, "(4,5) torque feedback is: %i \n\r", gimbal->yaw_motor.motor_feedback->current_read);
+        sprintf(message, "(4,5) yaw torque current is: %i \n\r", gimbal->yaw_motor.motor_feedback->current_read);
         serial_send_string(message);
     }
     

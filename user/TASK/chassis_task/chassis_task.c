@@ -23,7 +23,7 @@
 #include "remote_control.h"
 #include "INS_task.h"
 #include "pid.h"
-
+#include <stdlib.h>
 
 /******************** Private User Declarations ********************/
 static void chassis_init(Chassis_t *chassis_init);
@@ -33,8 +33,15 @@ static void calculate_chassis_motion_setpoints(Chassis_t *chassis_set);
 static void calculate_motor_setpoints(Chassis_t *chassis_motors);
 static void increment_PID(Chassis_t *chassis_pid);
 static void send_feedback_to_uart(Chassis_t *chassis);
+static void check_allowed_current(Chassis_t *chassis_feedback);
+static void limit_current(Chassis_Motor_t *motor);
 
 static Chassis_t chassis;
+    
+    
+    
+static char message[64] = {0};
+static int counter = 0;
     
 #define DEBUG 0
 
@@ -60,6 +67,8 @@ void chassis_task(void *pvParameters){
         calculate_chassis_motion_setpoints(&chassis);
         calculate_motor_setpoints(&chassis);
         increment_PID(&chassis);
+        check_allowed_current(&chassis);
+        send_feedback_to_uart(&chassis);
         //output
         CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].current_out, 
                         chassis.motor[FRONT_LEFT].current_out, 
@@ -100,7 +109,9 @@ static void chassis_init(Chassis_t *chassis_init){
         chassis_init->motor[i].pos_read = chassis_init->motor[i].motor_feedback->ecd;
         chassis_init->motor[i].current_read = chassis_init->motor[i].motor_feedback->current_read;
 			
-		PID_Init(&chassis_init->motor[i].pid_controller, PID_DELTA, def_pid_constants, M3508_MAX_OUT, M3508_MIN_OUT);
+        chassis_init->motor[i].limiter = FULL_CURRENT;
+        chassis_init->motor[i].limiter_counter = 0;
+		PID_Init(&chassis_init->motor[i].pid_controller, PID_POSITION, def_pid_constants, M3508_MAX_OUT, M3508_MIN_OUT);
     }
     
     //Init yaw and front vector
@@ -206,6 +217,8 @@ static void increment_PID(Chassis_t *chassis_pid){
     fp32 back_right;
     fp32 front_left;
     fp32 back_left;
+    
+    // TODO: eliminate in place declaration & cast of floats 
 
 	front_right = PID_Calc(&chassis_pid->motor[FRONT_RIGHT].pid_controller, 
 	chassis_pid->motor[FRONT_RIGHT].speed_read,
@@ -256,14 +269,82 @@ static void increment_PID(Chassis_t *chassis_pid){
 }
 
 
-static char message[64] = {0};
-static int counter = 0;
+
+
+/**
+* Current limiter has 4 states,
+* If over move to half
+* If over still for longer than hysteresis time, move to quarter,
+* If still over for longer than hysteresis time, move to off.
+* for all of these cases:
+* If current stays below limit for hysteresis time, reduce limitation by 1 level. 
+*/
+
+static void check_allowed_current(Chassis_t *chassis_feedback){
+    for(int i = 0; i < 4; i++){
+       if(abs(chassis_feedback->motor[i].motor_feedback->current_read) > CURRENT_LIMIT){
+           sprintf(message, "current limit reached, limiter state is %d", chassis_feedback->motor[i].limiter);
+            if(chassis_feedback->motor[i].limiter == FULL_CURRENT){
+                chassis_feedback->motor[i].limiter = HALF_CURRENT;
+            }
+            
+            chassis_feedback->motor[i].limiter_counter++;
+            if(chassis_feedback->motor[i].limiter_counter > HYSTERESIS_PERIOD){
+                if(chassis_feedback->motor[i].limiter != NO_CURRENT){
+                    chassis_feedback->motor[i].limiter++;
+                }
+                
+                chassis_feedback->motor[i].limiter_counter = 0;                
+            }
+        }
+        else{
+            chassis_feedback->motor[i].limiter_counter--;
+            if(chassis_feedback->motor[i].limiter_counter < -HYSTERESIS_PERIOD){
+                if(chassis_feedback->motor[i].limiter != FULL_CURRENT){
+                    chassis_feedback->motor[i].limiter--;
+                }
+                
+                chassis_feedback->motor[i].limiter_counter = 0;
+            }
+        }
+        
+        limit_current(&chassis_feedback->motor[i]);
+    }
+}
+
+    
+static void limit_current(Chassis_Motor_t *motor){
+    sprintf(message, "limiter state is changing from %d", motor->limiter);
+    switch(motor->limiter){
+        case FULL_CURRENT:
+            break;
+        case HALF_CURRENT:
+            motor->current_out *= 0.5f;
+            break;
+        case QUARTER_CURRENT:
+            motor->current_out *= 0.25f;
+            break;
+        case NO_CURRENT:
+            motor->current_out = 0;
+            break;
+    }
+    
+}
+
+//static void under_current_limit(Chassis_Motor_t motor
+    
+
+    
+
+
 
 static void send_feedback_to_uart(Chassis_t *chassis){
     if(counter == 0){
-        sprintf(message, "(2,3) rpm is: %i \n\r", chassis->motor[0].motor_feedback->speed_rpm);
+        sprintf(message, "chassis rpm is: %i \n\r", chassis->motor[0].motor_feedback->speed_rpm);
         serial_send_string(message);
-        sprintf(message, "(4,5) torque feedback is: %i \n\r", chassis->motor[0].motor_feedback->current_read);
+        sprintf(message, "chassis torque current is: %i \n\r", chassis->motor[0].motor_feedback->current_read);
+        serial_send_string(message);
+        sprintf(message, "chassis limiter state: %d", chassis->motor[0].limiter);
         serial_send_string(message);
     }
     
