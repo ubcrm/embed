@@ -36,6 +36,7 @@
 volatile char buffer_rx[100];
 int count_rx = 0;
 
+
 /** @addtogroup Template_Project
   * @{
   */
@@ -171,7 +172,15 @@ void SysTick_Handler(void)
 /**
   * @}
   */ 
-	
+  
+READY = 1;
+NOT_READY = 0;
+
+// get a pointer to the gimbal struct
+const Gimbal_buffer* get_gimbal_angle_buffer(void)
+{
+    return &gimbal_buff;
+}
 
 // Interrupt handler for USART 6. This is called on the reception of every
 // byte on USART6
@@ -180,7 +189,60 @@ void USART6_IRQHandler(void)
 	// make sure USART6 was intended to be called for this interrupt
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
 		uint16_t USART_Data = USART_ReceiveData(USART6);
-		
+        serial_send_string(&NOT_READY);
+ 
+        uint8_t mask = 0x01;
+        
+        // first 10 bits are decimal, next 9 integer, next 5 checksum
+        switch(gimbal_buff.num_filled) {
+            case 0: {
+                gimbal_buff.packets[0] = (uint8_t)USART_Data;
+                gimbal_buff.decimal = (uint8_t)USART_Data;
+                serial_send_string(&READY);
+            };
+            case 1: {
+                gimbal_buff.packets[1] = (uint8_t)USART_Data;
+                uint8_t last_decimal_bits;
+                uint8_t first_int_bits;
+                
+                for (int i=0; i < 8; i++) {
+                    if (i < 2) {
+                         last_decimal_bits += (uint8_t)USART_Data & mask;
+                         last_decimal_bits = last_decimal_bits << 1;
+                    }
+                    else {
+                        first_int_bits += (uint8_t)USART_Data & mask;
+                        first_int_bits = first_int_bits << 1;
+                    }
+                    mask = mask << 1;
+                }
+                gimbal_buff.integer = first_int_bits;
+                gimbal_buff.decimal += last_decimal_bits;
+                serial_send_string(&READY);
+            };
+            case 2: {
+                gimbal_buff.packets[2] = (uint8_t)USART_Data;
+                uint8_t last_int_bits;
+                uint8_t checksum_bits;
+
+                for (int i=0; i < 8; i++) {
+                    if (i < 3) {
+                         last_int_bits += (uint8_t)USART_Data & mask;
+                         last_int_bits = last_int_bits << 1;
+                    }
+                    else {
+                        checksum_bits += (uint8_t)USART_Data & mask;
+                        checksum_bits = checksum_bits << 1;
+                    }
+                    mask = mask << 1;
+                }
+                gimbal_buff.checksum = checksum_bits;
+                serial_send_string(&READY);
+            }
+            default:
+                serial_send_string(&READY);
+        }
+ 
 		// This just echos everything back once a CR (carriage return)
 		// character (13 in ascii) is received. Windows (or Putty, idk)
 		// appends a CR to enter/return so it should work 

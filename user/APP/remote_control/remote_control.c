@@ -1,13 +1,13 @@
 /**
   ****************************(C) COPYRIGHT 2016 DJI****************************
   * @file       remote_control.c/h
-  * @brief      Ò£¿ØÆ÷´¦Àí£¬Ò£¿ØÆ÷ÊÇÍ¨¹ýÀàËÆSBUSµÄÐ­Òé´«Êä£¬ÀûÓÃDMA´«Êä·½Ê½½ÚÔ¼CPU
-  *             ×ÊÔ´£¬ÀûÓÃ´®¿Ú¿ÕÏÐÖÐ¶ÏÀ´À­Æð´¦Àíº¯Êý£¬Í¬Ê±Ìá¹©Ò»Ð©µôÏßÖØÆôDMA£¬´®¿Ú
-  *             µÄ·½Ê½±£Ö¤ÈÈ²å°ÎµÄÎÈ¶¨ÐÔ¡£
-  * @note       ¸ÃÈÎÎñÊÇÍ¨¹ý´®¿ÚÖÐ¶ÏÆô¶¯£¬²»ÊÇfreeRTOSÈÎÎñ
+  * @brief      ?????????????????????????SBUS???????????DMA????????CPU
+  *             ????????ô???????????????????????????h?????????DMA??????
+  *             ?k????????e???????
+  * @note       ????????????????????????????freeRTOS????
   * @history
   *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. Íê³É
+  *  V1.0.0     Dec-26-2018     RM              1. ???
   *
   @verbatim
   ==============================================================================
@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 // #include "Detect_Task.h" 		// see todo l.134
-//Ò£¿ØÆ÷³ö´íÊý¾ÝÉÏÏÞ
+//?????????????????
 #define RC_CHANNAL_ERROR_VALUE 700
 
 // Function prototypes
@@ -123,38 +123,38 @@ void USART1_IRQHandler(void)
 
         if(DMA_GetCurrentMemoryTarget(DMA2_Stream2) == 0)
         {
-            //ÖØÐÂÉèÖÃDMA
+            //????????DMA
             DMA_Cmd(DMA2_Stream2, DISABLE);
             this_time_rx_len = SBUS_RX_BUF_NUM - DMA_GetCurrDataCounter(DMA2_Stream2);
             DMA_SetCurrDataCounter(DMA2_Stream2, SBUS_RX_BUF_NUM);
             DMA2_Stream2->CR |= DMA_SxCR_CT;
-            //ÇåDMAÖÐ¶Ï±êÖ¾
+            //??DMA?????
             DMA_ClearFlag(DMA2_Stream2, DMA_FLAG_TCIF2 | DMA_FLAG_HTIF2);
             DMA_Cmd(DMA2_Stream2, ENABLE);
             if(this_time_rx_len == RC_FRAME_LENGTH)
             {
-                //´¦ÀíÒ£¿ØÆ÷Êý¾Ý
+                //?????????????
                 SBUS_TO_RC(SBUS_rx_buf[0], &rc_ctrl);
-                //¼ÇÂ¼Êý¾Ý½ÓÊÕÊ±¼ä
+                //??¼??????????
 							  //TODO - need to implement this
                 // DetectHook(DBUSTOE);
             }
         }
         else
         {
-            //ÖØÐÂÉèÖÃDMA
+            //????????DMA
             DMA_Cmd(DMA2_Stream2, DISABLE);
             this_time_rx_len = SBUS_RX_BUF_NUM - DMA_GetCurrDataCounter(DMA2_Stream2);
             DMA_SetCurrDataCounter(DMA2_Stream2, SBUS_RX_BUF_NUM);
             DMA2_Stream2->CR &= ~(DMA_SxCR_CT);
-            //ÇåDMAÖÐ¶Ï±êÖ¾
+            //??DMA?????
             DMA_ClearFlag(DMA2_Stream2, DMA_FLAG_TCIF2 | DMA_FLAG_HTIF2);
             DMA_Cmd(DMA2_Stream2, ENABLE);
             if(this_time_rx_len == RC_FRAME_LENGTH)
             {
-                //´¦ÀíÒ£¿ØÆ÷Êý¾Ý
+                //?????????????
                 SBUS_TO_RC(SBUS_rx_buf[1], &rc_ctrl);
-                //¼ÇÂ¼Êý¾Ý½ÓÊÕÊ±¼ä
+                //??¼??????????
                 // DetectHook(DBUSTOE);
             }
 
