@@ -30,7 +30,7 @@
 #include "shoot_task.h"
 #include <math.h>
 
-#define DEADBAND 10
+#define DEADBAND 1
 
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
@@ -115,10 +115,10 @@ static void initialization(Gimbal_t *gimbal_ptr){
     fp32 pid_constants_yaw[3] = {pid_kp_yaw, pid_ki_yaw, pid_kd_yaw};
     fp32 pid_constants_pitch[3] = {pid_kp_pitch, pid_ki_pitch, pid_kd_pitch};
     
-    gimbal_ptr->yaw_setpoint[0] = 1.0;
-    gimbal_ptr->yaw_setpoint[1] = 0.0;
-    gimbal_ptr->yaw_position[0] = 1.0;
-    gimbal_ptr->yaw_position[1] = 0.0;
+    gimbal_ptr->yaw_setpoint[0] = 0.0;
+    gimbal_ptr->yaw_setpoint[1] = -1.0;
+    gimbal_ptr->yaw_position[0] = 0.0;
+    gimbal_ptr->yaw_position[1] = -1.0;
     gimbal_ptr->yaw_error = 0.0;
     
     PID_Init(&(gimbal_ptr->pitch_motor.pid_controller), PID_POSITION, pid_constants_pitch, max_out_pitch, max_i_term_out_pitch);
@@ -181,12 +181,12 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     // TODO: FIX
     if(gimbal_set->rc_update->rc.s[0] == RC_SW_MID || gimbal_set->rc_update->rc.s[0] == RC_SW_UP){
         fp32 theta = -1 * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
-                * Motor_Ecd_to_Rad / 40.0f;
+                * Motor_Ecd_to_Rad / 80.0f;
         fp32 rotation[2] = {cos(theta), sin(theta)}; // TODO: consider alternative {cos{theta}, sin{theta}}
         multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
         make_unit_length(gimbal_set->yaw_setpoint);
 
-        gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 40.0f;
+        gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 80.0f;
     }
     
     char print[30];

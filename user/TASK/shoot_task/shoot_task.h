@@ -36,7 +36,7 @@
 #define HOPPER_OFF 0
 
 //Trigger motor PID
-#define TRIGGER_MAX_OUT 5000.0f
+#define TRIGGER_MAX_OUT 8000.0f
 #define TRIGGER_MAX_IOUT 2500.0f
 #define TRIGGER_ANGLE_PID_KP 800.0f
 #define TRIGGER_ANGLE_PID_KI 0.5f

@@ -43,7 +43,7 @@ static Chassis_t chassis;
 static char message[64] = {0};
 static int counter = 0;
     
-#define DEBUG 1
+#define DEBUG 0
 
 /******************** Main Task/Functions Called from Outside ********************/
 
@@ -215,7 +215,7 @@ static void increment_PID(Chassis_t *chassis_pid){
     for(int i = 0; i < 4; i++){
         chassis_pid->motor[i].current_out = chassis_pid->motor[i].speed_set;
     }
-	/*
+	
     //translation
     //rotation
 	fp32 front_right;
@@ -270,8 +270,7 @@ static void increment_PID(Chassis_t *chassis_pid){
         chassis_pid->motor[BACK_LEFT].current_out);
         serial_send_string(pid_out);
         
-    }*/
-	
+    }
 }
 
 
