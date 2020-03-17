@@ -2,8 +2,8 @@
 #define USART_COMMS_H
 #include "main.h"
 
-static volatile char READY = 1;
-static volatile char NOT_READY = 0;
+#define READY 1
+#define NOT_READY 0
 
 extern void serial_send_string(volatile char *str);
 extern void serial_send_int_array(volatile int *arr, int length);

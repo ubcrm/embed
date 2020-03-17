@@ -103,7 +103,7 @@ void USART_8_INIT(void)
 	// enable interrupts
 	USART_ITConfig(UART8, USART_IT_RXNE, ENABLE);
 
-	// enable USART6 peripheral
+	// enable USART8 peripheral
 	USART_Cmd(UART8, ENABLE);
 
 	// configure NVIC for interrupts - only on Rx

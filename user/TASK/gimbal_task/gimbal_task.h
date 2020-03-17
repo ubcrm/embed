@@ -10,6 +10,7 @@
 #include "pid.h"
 #include "shoot_task.h"
 #include "remote_control.h"
+#include "USART_comms.h"
 
 /******************************* Task Delays *********************************/
 #define GIMBAL_TASK_DELAY 1
@@ -70,7 +71,7 @@ typedef struct
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
-    //const uint24_t current_angle;
+    const uint32_t current_angle;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
     Shoot_t *launcher;
@@ -82,7 +83,8 @@ int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
 extern void send_to_uart(Gimbal_t *gimbal); 
 
-
+// get a pointer to the gimbal struct
+extern const Gimbal_buffer* get_gimbal_angle_buffer(void);
 
 /******************************* Variable Declarations ***********************/
 // These will later be produced from RC
