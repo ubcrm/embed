@@ -35,20 +35,20 @@
 
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
-Gimbal_buffer *gimbal_buff;
+Gimbal_Angles gimbal_angles;
 
 //UART mailbox
 char str[32] = {0};
 
 /******************** Functions ********************/
-static void initialization(Gimbal_t *gimbal);
+static void initialization(Gimbal_t *gimbal, Gimbal_Angles *gimbal_angles);
 static void get_new_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
 
-const Gimbal_buffer* get_gimbal_angle_buffer(void)
+extern const Gimbal_Angles* get_gimbal_angle_buffer(void)
 {
-    return &gimbal_buff;
+    return &gimbal_angles;
 }
 
 
@@ -61,11 +61,11 @@ const Gimbal_buffer* get_gimbal_angle_buffer(void)
 void gimbal_task(void* parameters){
 
     vTaskDelay(GIMBAL_INIT_DELAY);
-	initialization(&gimbal);
+	initialization(&gimbal, &gimbal_angles);
     
     while(1){	
-        serial_send_string((char)READY);  //sends 1 to Python
         //send_to_uart(&gimbal);
+        send_vision_angle();
         
         /* For now using strictly encoder feedback for position */
         
@@ -91,7 +91,7 @@ void gimbal_task(void* parameters){
  * @param  None
  * @retval None
  */
-static void initialization(Gimbal_t *gimbal_ptr){
+static void initialization(Gimbal_t *gimbal_ptr, Gimbal_Angles *gimbal_angles){
     gimbal_ptr->pitch_motor.motor_feedback = get_Pitch_Gimbal_Motor_Measure_Point();
     gimbal_ptr->yaw_motor.motor_feedback = get_Yaw_Gimbal_Motor_Measure_Point(); 
     gimbal_ptr->launcher = get_launcher_pointer();
@@ -106,8 +106,8 @@ static void initialization(Gimbal_t *gimbal_ptr){
     gimbal_ptr->pitch_motor.pos_set = 5500;
     gimbal_ptr->yaw_motor.pos_set = 6000;
     
-    gimbal_buff = get_gimbal_angle_buffer();
-    gimbal_buff->num_filled = 0;
+    gimbal_angles->count_rx = 0;
+    gimbal_angles->new_angle_flag = 0;
 }
 
 /** 
@@ -195,4 +195,10 @@ void send_to_uart(Gimbal_t *gimbal_msg)
     
     //sprintf(str, "yaw current out: %d\n\r", gimbal->yaw_motor->current_out);
     //serial_send_string(str);
+}
+
+void send_vision_angle() {
+    char hex[5];
+    sprintf(hex, "%x", gimbal_angles.yaw_angle);
+    vision_send_string(hex);
 }

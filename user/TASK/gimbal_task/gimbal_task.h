@@ -48,6 +48,7 @@
 #define PITCH_MIN 5500
 #define PITCH_MAX 7000
 
+#define BUFFER_SIZE 100
 
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
@@ -77,14 +78,25 @@ typedef struct
     Shoot_t *launcher;
 } Gimbal_t;
 
+/////////////////////////
+typedef struct
+{
+    uint8_t new_angle_flag;
+    uint16_t yaw_angle;
+    uint16_t pitch_angle;
+    uint8_t count_rx;
+    char buffer_rx[BUFFER_SIZE];
+} Gimbal_Angles;
+
 
 /******************************* Function Declarations ***********************/
 int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
 extern void send_to_uart(Gimbal_t *gimbal); 
+void send_vision_angle();
 
 // get a pointer to the gimbal struct
-extern const Gimbal_buffer* get_gimbal_angle_buffer(void);
+extern const Gimbal_Angles* get_gimbal_angle_struct(void);
 
 /******************************* Variable Declarations ***********************/
 // These will later be produced from RC
