@@ -32,10 +32,17 @@
 #include "main.h"
 #include "gimbal_task.h"
 #include "USART_comms.h"
+#include <string.h>
 
 volatile char buffer_rx[BUFFER_SIZE]; //holds 100 bytes
 int count_rx = 0;
 
+volatile char UART8_buffer_rx[100];
+int UART8_count_rx = 0;
+
+char rando[] = "hello\n\r";
+char new_line[] = "\n\r";
+int atoi(const char *str);
 /** @addtogroup Template_Project
   * @{
   */
@@ -206,53 +213,10 @@ void USART6_IRQHandler(void)
 	}
 }
 
-int hex_char_to_int(char c){
-    int num;
-    if (c == '0') 
-        num = 0x0;
-    else if (c == '1') 
-        num = 0x1;
-    else if (c == '2') 
-        num = 0x2;
-    else if (c == '3') 
-        num = 0x3;
-    else if (c == '4') 
-        num = 0x4;
-    else if (c == '5') 
-        num = 0x5;
-    else if (c == '6') 
-        num = 0x6;
-    else if (c =='7') 
-        num = 0x7;
-    else if (c =='8') 
-        num = 0x8;
-    else if (c =='9') 
-        num = 0x9;
-    else if (c =='a') 
-        num = 0xa;
-    else if (c == 'b')  
-        num = 0xb;
-    else if (c == 'c') 
-        num = 0xc;
-    else if (c == 'd') 
-        num = 0xd;
-    else if (c == 'e')  
-        num = 0xe;
-    else if (c =='f') 
-        num = 0xf;
-    else 
-        num = 0;
-    return num;
-}
 
 void clear_gimbal_buffer(void) {
     Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
-    uint16_t angle = 0;
-    
-    for (int i=0; i < gimbal_angles->count_rx; i++) {
-        angle = angle << 4;
-        angle += hex_char_to_int(gimbal_angles->buffer_rx[i]);
-    }
+    uint16_t angle = atoi(gimbal_angles->buffer_rx);
     
     gimbal_angles->yaw_angle = angle; 
     gimbal_angles->new_angle_flag = 1;
@@ -266,110 +230,49 @@ void clear_gimbal_buffer(void) {
 // Interrupt handler for UART 8. This is called on the reception of every
 // byte on UART8
 // Note: USART_Data only holds 1 byte of data despite being a uint16_t variable
-void USART8_IRQHandler(void)
+void UART8_IRQHandler(void)
 {
-	// make sure USART8 was intended to be called for this interrupt
+	// make sure UART8 was intended to be called for this interrupt
 	if(USART_GetITStatus(UART8, USART_IT_RXNE) != RESET) {
-		uint16_t USART_Data = USART_ReceiveData(UART8);
+		uint16_t UART_Data = USART_ReceiveData(UART8);
+        
         Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
  
-		// Once a carriage return is read, move data into struct, and
-        // clear the buffer
-		if (USART_Data == 13 || gimbal_angles->count_rx >= BUFFER_SIZE-1) {
+		// Once a carriage return is read or the buffer full, move 
+        // data into struct, and clear the buffer
+		if (UART_Data == 13 || gimbal_angles->count_rx >= BUFFER_SIZE-1) {
             vision_send_string(gimbal_angles->buffer_rx); //echo
+            vision_send_string(new_line);
             clear_gimbal_buffer();
 		} 
         else {
-			buffer_rx[count_rx++] = USART_Data;
+			gimbal_angles->buffer_rx[gimbal_angles->count_rx++] = UART_Data;
 		} 
-	}
-}
-
-/*
-// Interrupt handler for USART 8. This is called on the reception of every
-// byte on USART8
-void USART8_IRQHandler(void)
-{
-	// make sure USART8 was intended to be called for this interrupt
-	if(USART_GetITStatus(UART8, USART_IT_RXNE) != RESET) {
-		uint16_t USART_Data = USART_ReceiveData(UART8);
-        serial_send_string(NOT_READY);
- 
-        uint8_t mask = 0x01;
-        Gimbal_buffer *gimbal_buff = get_gimbal_angle_buffer();
-        // first 10 bits are decimal, next 9 integer, next 5 checksum
-        switch(gimbal_buff->num_filled) {
-            case 0: {
-                gimbal_buff->packets[0] = (uint8_t)USART_Data;
-                gimbal_buff->decimal = (uint8_t)USART_Data;
-                serial_send_string((char)READY);
-            };
-            case 1: {
-                gimbal_buff->packets[1] = (uint8_t)USART_Data;
-                uint8_t last_decimal_bits;
-                uint8_t first_int_bits;
-                
-                for (int i=0; i < 8; i++) {
-                    if (i < 2) {
-                         last_decimal_bits += (uint8_t)USART_Data & mask;
-                         last_decimal_bits = last_decimal_bits << 1;
-                    }
-                    else {
-                        first_int_bits += (uint8_t)USART_Data & mask;
-                        first_int_bits = first_int_bits << 1;
-                    }
-                    mask = mask << 1;
-                }
-                gimbal_buff->integer = first_int_bits;
-                gimbal_buff->decimal += last_decimal_bits;
-                serial_send_string((char)READY);
-            };
-            case 2: {
-                gimbal_buff->packets[2] = (uint8_t)USART_Data;
-                uint8_t last_int_bits;
-                uint8_t checksum_bits;
-
-                for (int i=0; i < 8; i++) {
-                    if (i < 3) {
-                         last_int_bits += (uint8_t)USART_Data & mask;
-                         last_int_bits = last_int_bits << 1;
-                    }
-                    else {
-                        checksum_bits += (uint8_t)USART_Data & mask;
-                        checksum_bits = checksum_bits << 1;
-                    }
-                    mask = mask << 1;
-                }
-                gimbal_buff.checksum = checksum_bits;
-                serial_send_string(&READY);
-            }
-            default:
-                serial_send_string(&READY);
-        }
- 
-		// This just echos everything back once a CR (carriage return)
+        
+        // This just echos everything back once a CR (carriage return)
 		// character (13 in ascii) is received. Windows (or Putty, idk)
 		// appends a CR to enter/return so it should work 
-		if (USART_Data == 13) {
-			buffer_rx[count_rx] = 0;
-			serial_send_string(buffer_rx);
+        /*
+		if (UART_Data == 13) {
+			UART8_buffer_rx[UART8_count_rx] = 0;
+			vision_send_string(UART8_buffer_rx);
 			
-			count_rx = 0;
+			UART8_count_rx = 0;
 			for (int i = 0; i < 100; i++) {
-				buffer_rx[i] = 0;
+				UART8_buffer_rx[i] = 0;
 			}
 			
-		} else if (count_rx < 100 - 1) {
-			buffer_rx[count_rx++] = USART_Data;
+		} else if (UART8_count_rx < 100 - 1) {
+			UART8_buffer_rx[UART8_count_rx++] = UART_Data;
 		} else {
-			count_rx = 0;
+			UART8_count_rx = 0;
 			for (int i = 0; i < 100; i++) {
-				buffer_rx[i] = 0;
+				UART8_buffer_rx[i] = 0;
 			}
 		}
-		
+        */
 	}
 }
-*/
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

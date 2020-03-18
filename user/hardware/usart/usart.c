@@ -89,7 +89,7 @@ void USART_8_INIT(void)
 	USART_DeInit(UART8);
 
 	// Configure UART - this all needs to match the config on the Pi
-	USART_InitStructure.USART_BaudRate = 9600;  // idk what max is so 9600 to be safe
+	USART_InitStructure.USART_BaudRate = 115200;  // idk what max is so 9600 to be safe
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;			// These are the default settings
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;					// All set by USART_StructInit()
 	USART_InitStructure.USART_Parity = USART_Parity_No;					// These details are here for clarity
