@@ -34,9 +34,9 @@
      through STLINK MCO pin of STM32F103 microcontroller. The frequency cannot be changed
      and is fixed at 8 MHz. 
      Hardware configuration needed for Nucleo Board:
-     – SB54, SB55 OFF
-     – R35 removed
-     – SB16, SB50 ON */
+     „1¤7 SB54, SB55 OFF
+     „1¤7 R35 removed
+     „1¤7 SB16, SB50 ON */
 /* #define USE_HSE_BYPASS */
 
 #if defined(USE_HSE_BYPASS)     
@@ -180,7 +180,7 @@ void SystemInit(void)
   *           frequency in the chip. It is calculated based on the predefined 
   *           constant and the selected clock source:
   *             
-  *           - If SYSCLK source is HSI, SystemCoreClock will contain the HSI_VALUE(*)
+  *           - If  source is HSI, SystemCoreClock will contain the HSI_VALUE(*)
   *                                              
   *           - If SYSCLK source is HSE, SystemCoreClock will contain the HSE_VALUE(**)
   *                          
