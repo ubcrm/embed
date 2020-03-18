@@ -19,6 +19,7 @@
 
 /*************** Converts between motor position and degrees *****************/
 #define Motor_Ecd_to_Rad 0.000766990394f /* 2PI / 8191 */
+#define Degree_To_Rad 0.0087266389;
 #define FALSE 0
 #define TRUE 1
 
@@ -84,6 +85,7 @@ typedef struct
 } Gimbal_t;
 
 /////////////////////////
+// Degrees relative
 typedef struct
 {
     uint8_t new_angle_flag;

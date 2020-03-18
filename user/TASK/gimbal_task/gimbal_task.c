@@ -187,16 +187,14 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     
     //yaw:
     //rc -> theta -> complex rotation -> new setpoint
-
+    
     // TODO: FIX
     if(gimbal_set->rc_update->rc.s[0] == RC_SW_MID || gimbal_set->rc_update->rc.s[0] == RC_SW_UP){
-        fp32 theta = -1 * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
-                * Motor_Ecd_to_Rad / 80.0f;
+        fp32 theta = gimbal_angles.yaw_angle * Degree_To_Rad;
         fp32 rotation[2] = {cos(theta), sin(theta)}; // TODO: consider alternative {cos{theta}, sin{theta}}
         multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
         make_unit_length(gimbal_set->yaw_setpoint);
-
-        gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 80.0f;
+        gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_angles.pitch_angle, -DEADBAND, DEADBAND) / 80.0f;
     }
     
     char print[30];
