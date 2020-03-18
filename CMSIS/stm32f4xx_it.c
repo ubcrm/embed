@@ -36,8 +36,6 @@
 volatile char buffer_rx[BUFFER_SIZE]; //holds 100 bytes
 int count_rx = 0;
 
-Gimbal_Angles* gimbal_angles;
-
 /** @addtogroup Template_Project
   * @{
   */
@@ -183,25 +181,24 @@ void USART6_IRQHandler(void)
 	// make sure USART6 was intended to be called for this interrupt
 	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET) {
 		uint16_t USART_Data = USART_ReceiveData(USART6);
- 
+		
 		// This just echos everything back once a CR (carriage return)
-		// character (13 in ascii) is received. Useful if debugging 
-        // from Putty which appends CR if enter key is pressed.
+		// character (13 in ascii) is received. Windows (or Putty, idk)
+		// appends a CR to enter/return so it should work 
 		if (USART_Data == 13) {
 			buffer_rx[count_rx] = 0;
 			serial_send_string(buffer_rx);
 			
-            // clear the buffer and counter
 			count_rx = 0;
-			for (int i = 0; i < BUFFER_SIZE; i++) {
+			for (int i = 0; i < 100; i++) {
 				buffer_rx[i] = 0;
 			}
 			
-		} else if (count_rx < BUFFER_SIZE - 1) {
+		} else if (count_rx < 100 - 1) {
 			buffer_rx[count_rx++] = USART_Data;
 		} else {
 			count_rx = 0;
-			for (int i = 0; i < BUFFER_SIZE; i++) {
+			for (int i = 0; i < 100; i++) {
 				buffer_rx[i] = 0;
 			}
 		}
@@ -210,26 +207,42 @@ void USART6_IRQHandler(void)
 }
 
 int hex_char_to_int(char c){
-    switch(c) {
-        case '0': return 0b0000;
-        case '1': return 0b0001;
-        case '2': return 0b0010;
-        case '3': return 0b0011;
-        case '4': return 0b0100;
-        case '5': return 0b0101;
-        case '6': return 0b0110;
-        case '7': return 0b0111;
-        case '8': return 0b1000;
-        case '9': return 0b1001;
-        case 'a': return 0b1010;
-        case 'b': return 0b1011;
-        case 'c': return 0b1100;
-        case 'd': return 0b1101;
-        case 'e': return 0b1110;
-        case 'f': return 0b1111;
-        default: return 0;
-    }
-    return 0;
+    int num;
+    if (c == '0') 
+        num = 0x0;
+    else if (c == '1') 
+        num = 0x1;
+    else if (c == '2') 
+        num = 0x2;
+    else if (c == '3') 
+        num = 0x3;
+    else if (c == '4') 
+        num = 0x4;
+    else if (c == '5') 
+        num = 0x5;
+    else if (c == '6') 
+        num = 0x6;
+    else if (c =='7') 
+        num = 0x7;
+    else if (c =='8') 
+        num = 0x8;
+    else if (c =='9') 
+        num = 0x9;
+    else if (c =='a') 
+        num = 0xa;
+    else if (c == 'b')  
+        num = 0xb;
+    else if (c == 'c') 
+        num = 0xc;
+    else if (c == 'd') 
+        num = 0xd;
+    else if (c == 'e')  
+        num = 0xe;
+    else if (c =='f') 
+        num = 0xf;
+    else 
+        num = 0;
+    return num;
 }
 
 void clear_gimbal_buffer(void) {
@@ -263,6 +276,7 @@ void USART8_IRQHandler(void)
 		// Once a carriage return is read, move data into struct, and
         // clear the buffer
 		if (USART_Data == 13 || gimbal_angles->count_rx >= BUFFER_SIZE-1) {
+            vision_send_string(gimbal_angles->buffer_rx); //echo
             clear_gimbal_buffer();
 		} 
         else {

@@ -38,7 +38,7 @@ Gimbal_Angles gimbal_angles;
 
 //UART mailbox
 char str[32] = {0}; // TODO: figure out why ins_task is using this... delete and compile to reproduce
-static char message[64] = {0};
+//static char message[64] = {0};
 static int loop_counter = 0;
 
 /******************** Functions ********************/
@@ -48,7 +48,8 @@ static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
 static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
 
-extern const Gimbal_Angles* get_gimbal_angle_buffer(void)
+
+Gimbal_Angles* get_gimbal_angle_struct(void)
 {
     return &gimbal_angles;
 }
@@ -88,7 +89,7 @@ void gimbal_task(void* parameters){
     
     while(1){	
         //send_to_uart(&gimbal);
-        send_vision_angle();
+        //send_vision_angle();
         
         /* For now using strictly encoder feedback for position */
         
@@ -242,24 +243,6 @@ static void increment_PID(Gimbal_t *gimbal_pid){
     
 }
 
-/** 
- * @brief  Reads vision instruction from UART and cap to certin values
- * @param  None
- * @retval Vision signal in range of 0 and 8191
- */
-int get_vision_signal(void) {
-    int vision_signal = 5700;  // TODO: Get real values from vision
-        
-    while (vision_signal > 8191) {
-        vision_signal -= 8191;
-    }
-    while (vision_signal < 0) {
-        vision_signal+= 8192;
-    }
-    return vision_signal;
-}
-
-
 
 
 /** 
@@ -306,9 +289,10 @@ static void send_feedback_to_uart(Gimbal_t *gimbal){
     counter = (counter + 1) % 1000; */
     
 }
-
+/*
 void send_vision_angle() {
     char hex[5];
     sprintf(hex, "%x", gimbal_angles.yaw_angle);
     vision_send_string(hex);
 }
+*/

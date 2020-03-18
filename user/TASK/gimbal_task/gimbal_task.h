@@ -100,10 +100,10 @@ typedef struct
 int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
 extern void send_to_uart(Gimbal_t *gimbal); 
-void send_vision_angle();
+//void send_vision_angle();
 
 // get a pointer to the gimbal struct
-extern const Gimbal_Angles* get_gimbal_angle_struct(void);
+extern Gimbal_Angles* get_gimbal_angle_struct(void);
 
 /******************************* Variable Declarations ***********************/
 // These will later be produced from RC
