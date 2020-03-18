@@ -373,7 +373,8 @@ void INS_task(void *pvParameters)
 
 extern Gimbal_t gimbal;
 extern Gimbal_Motor_t gimbal_pitch_motor;
-extern char str[];
+
+static char message[32];
 
 /**
  * @brief  Reading angle, gyro, and accelerometer data and printing to serial
@@ -390,34 +391,34 @@ void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t accel){
     
     if (angle == TRUE) {        
         //Sending angle data via UART
-        sprintf(str, "Angle yaw: %f\n\r", gimbal.angle_update[INS_YAW_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Angle pitch: %f\n\r", gimbal.angle_update[INS_PITCH_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Angle roll: %f\n\r", gimbal.angle_update[INS_ROLL_ADDRESS_OFFSET]);
-        serial_send_string(str);
+        sprintf(message, "Angle yaw: %f\n\r", gimbal.angle_update[INS_YAW_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Angle pitch: %f\n\r", gimbal.angle_update[INS_PITCH_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Angle roll: %f\n\r", gimbal.angle_update[INS_ROLL_ADDRESS_OFFSET]);
+        serial_send_string(message);
         serial_send_string("\n");
     }
     
     if (gyro == TRUE) {
         //Sending gyro data via UART
-        sprintf(str, "Gyro X: %f\n\r", gimbal.gyro_update[INS_GYRO_X_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Gyro Y: %f\n\r", gimbal.gyro_update[INS_GYRO_Y_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Gyro Z: %f\n\r", gimbal.gyro_update[INS_GYRO_Z_ADDRESS_OFFSET]);
-        serial_send_string(str);
+        sprintf(message, "Gyro X: %f\n\r", gimbal.gyro_update[INS_GYRO_X_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Gyro Y: %f\n\r", gimbal.gyro_update[INS_GYRO_Y_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Gyro Z: %f\n\r", gimbal.gyro_update[INS_GYRO_Z_ADDRESS_OFFSET]);
+        serial_send_string(message);
         serial_send_string("\n");
     }
  
     if (accel == TRUE) {        
         //Sending accelerometer data via UART
-        sprintf(str, "Acce X: %f\n\r", gimbal.accel_update[INS_ACCEL_X_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Acce Y: %f\n\r", gimbal.accel_update[INS_ACCEL_Y_ADDRESS_OFFSET]);
-        serial_send_string(str);
-        sprintf(str, "Acce Z: %f\n\r", gimbal.accel_update[INS_ACCEL_Z_ADDRESS_OFFSET]);
-        serial_send_string(str);
+        sprintf(message, "Acce X: %f\n\r", gimbal.accel_update[INS_ACCEL_X_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Acce Y: %f\n\r", gimbal.accel_update[INS_ACCEL_Y_ADDRESS_OFFSET]);
+        serial_send_string(message);
+        sprintf(message, "Acce Z: %f\n\r", gimbal.accel_update[INS_ACCEL_Z_ADDRESS_OFFSET]);
+        serial_send_string(message);
         serial_send_string("\n");
     }
 }

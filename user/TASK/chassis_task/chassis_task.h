@@ -17,7 +17,7 @@
 #include "pid.h"
 
 /******************************* Task Delays *********************************/
-#define CHASSIS_TASK_DELAY 1
+#define CHASSIS_TASK_DELAY 5
 #define CHASSIS_INIT_DELAY 20
 
 /******************** User Definitions ********************/
@@ -28,21 +28,34 @@
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
 
-#define MULTIPLIER 3
+#define MULTIPLIER 5
 
-// RC channels
-#define RC_X 2
+// RC channels -- this indicated strafe drive
+// left stick: rotation
+// right stick: fwd/rev, left/right
+#define RC_X 0 
 #define RC_Y 1
-#define RC_Z 0
+#define RC_Z 2
+// For 
 
 //M3508 motors max and min CAN output
-#define M3508_MAX_OUT 1000
+#define M3508_MAX_OUT 10000
 #define M3508_MIN_OUT 50.0
+#define M3508_MAX_IOUT 40
 //M3508 speed PID constants
-#define M3508_KP 0.02
-#define M3508_KI 0.00
-#define M3508_KD 0.1
+#define M3508_KP 0.002f
+#define M3508_KI 0.00f
+#define M3508_KD 0.0f
+// Current Limiting Constants
+#define HYSTERESIS_PERIOD 5
+#define CURRENT_LIMIT 25000
 
+typedef enum{
+    FULL_CURRENT,  
+    HALF_CURRENT,
+    QUARTER_CURRENT,
+    NO_CURRENT,
+} current_limiter_state;
 
 typedef enum{
     CHASSIS_VECTOR_RAW,
@@ -56,16 +69,21 @@ typedef struct
     const motor_measure_t *motor_feedback;
     
     //Current speed read from motors
-    int16_t pos_read;
+    uint16_t pos_read;
     int16_t speed_read;
     int16_t current_read;
     
     //Target speed set by user/remote control
     int16_t pos_set;
     int16_t speed_set;
+    // TODO: check if these should be unsigned /exist at all
     
     //Final output speed
     int16_t current_out;
+    
+    // Current limiting parameters
+    int8_t limiter_counter;
+    current_limiter_state limiter;
 	
     //Control
     PidTypeDef pid_controller;

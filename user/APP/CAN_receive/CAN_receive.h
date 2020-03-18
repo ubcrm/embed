@@ -51,7 +51,7 @@ typedef struct
 {
     uint16_t ecd;
     int16_t speed_rpm;
-    int16_t given_current;
+    int16_t current_read;
     uint8_t temperate;
     int16_t last_ecd;
 } motor_measure_t;
