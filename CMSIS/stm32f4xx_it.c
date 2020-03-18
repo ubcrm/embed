@@ -33,6 +33,7 @@
 #include "gimbal_task.h"
 #include "USART_comms.h"
 #include <string.h>
+#include <stdio.h>
 
 volatile char buffer_rx[BUFFER_SIZE]; //holds 100 bytes
 int count_rx = 0;
@@ -215,8 +216,12 @@ void USART6_IRQHandler(void)
 
 
 void clear_gimbal_buffer(void) {
+    char str[20];
     Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
+    
     uint16_t angle = atoi(gimbal_angles->buffer_rx);
+    sprintf(str, "delta angle: %d\n\r", angle);
+    vision_send_string(str);
     
     gimbal_angles->yaw_angle = angle; 
     gimbal_angles->new_angle_flag = 1;
@@ -241,9 +246,11 @@ void UART8_IRQHandler(void)
 		// Once a carriage return is read or the buffer full, move 
         // data into struct, and clear the buffer
 		if (UART_Data == 13 || gimbal_angles->count_rx >= BUFFER_SIZE-1) {
-            vision_send_string(gimbal_angles->buffer_rx); //echo
-            vision_send_string(new_line);
+            //vision_send_string(gimbal_angles->buffer_rx); //echo
+            //vision_send_string(new_line);
             clear_gimbal_buffer();
+            //vision_send_string(gimbal_angles->buffer_rx); //echo
+            //vision_send_string(new_line);
 		} 
         else {
 			gimbal_angles->buffer_rx[gimbal_angles->count_rx++] = UART_Data;

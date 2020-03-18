@@ -95,7 +95,11 @@ void gimbal_task(void* parameters){
         
         get_new_data(&gimbal);
         //send_to_uart(&gimbal);
-        update_setpoints(&gimbal);
+        
+        if (gimbal_angles.new_angle_flag) {
+            update_setpoints(&gimbal);
+            gimbal_angles.new_angle_flag = 0;
+        }
         //send_to_uart(&gimbal);
         increment_PID(&gimbal);
         //send_to_uart(&gimbal);
@@ -139,6 +143,8 @@ static void initialization(Gimbal_t *gimbal_ptr, Gimbal_Angles *gimbal_angles){
     
     gimbal_angles->count_rx = 0;
     gimbal_angles->new_angle_flag = 0;
+    gimbal_angles->pitch_angle = 0;
+    gimbal_angles->yaw_angle = 0;
     // TODO: find better bounds on Pitch
 }
 
