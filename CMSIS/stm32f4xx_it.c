@@ -216,12 +216,12 @@ void USART6_IRQHandler(void)
 
 
 void clear_gimbal_buffer(void) {
-    char str[20];
     Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
     
-    uint16_t angle = atoi(gimbal_angles->buffer_rx);
-    sprintf(str, "delta angle: %d\n\r", angle);
-    vision_send_string(str);
+    int angle = atoi(gimbal_angles->buffer_rx);
+    
+    if (angle<-180) angle=-180;
+    else if (angle>180) angle=180;
     
     gimbal_angles->yaw_angle = angle; 
     gimbal_angles->new_angle_flag = 1;
@@ -240,7 +240,6 @@ void UART8_IRQHandler(void)
 	// make sure UART8 was intended to be called for this interrupt
 	if(USART_GetITStatus(UART8, USART_IT_RXNE) != RESET) {
 		uint16_t UART_Data = USART_ReceiveData(UART8);
-        
         Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
  
 		// Once a carriage return is read or the buffer full, move 
@@ -255,31 +254,9 @@ void UART8_IRQHandler(void)
         else {
 			gimbal_angles->buffer_rx[gimbal_angles->count_rx++] = UART_Data;
 		} 
-        
-        // This just echos everything back once a CR (carriage return)
-		// character (13 in ascii) is received. Windows (or Putty, idk)
-		// appends a CR to enter/return so it should work 
-        /*
-		if (UART_Data == 13) {
-			UART8_buffer_rx[UART8_count_rx] = 0;
-			vision_send_string(UART8_buffer_rx);
-			
-			UART8_count_rx = 0;
-			for (int i = 0; i < 100; i++) {
-				UART8_buffer_rx[i] = 0;
-			}
-			
-		} else if (UART8_count_rx < 100 - 1) {
-			UART8_buffer_rx[UART8_count_rx++] = UART_Data;
-		} else {
-			UART8_count_rx = 0;
-			for (int i = 0; i < 100; i++) {
-				UART8_buffer_rx[i] = 0;
-			}
-		}
-        */
 	}
 }
+
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

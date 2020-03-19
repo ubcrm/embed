@@ -89,8 +89,8 @@ typedef struct
 typedef struct
 {
     uint8_t new_angle_flag;
-    uint16_t yaw_angle;
-    uint16_t pitch_angle;
+    int yaw_angle;
+    int pitch_angle;
     uint8_t count_rx;
     char buffer_rx[BUFFER_SIZE];
 } Gimbal_Angles;

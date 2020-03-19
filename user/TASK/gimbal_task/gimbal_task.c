@@ -97,6 +97,8 @@ void gimbal_task(void* parameters){
         //send_to_uart(&gimbal);
         
         if (gimbal_angles.new_angle_flag) {
+            sprintf(str, "delta angle: %d\n\r", gimbal_angles.yaw_angle);
+            serial_send_string(str);
             update_setpoints(&gimbal);
             gimbal_angles.new_angle_flag = 0;
         }
