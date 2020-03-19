@@ -43,7 +43,7 @@ static int loop_counter = 0;
 
 /******************** Functions ********************/
 static void initialization(Gimbal_t *gimbal, Gimbal_Angles *gimbal_angles);
-static void get_new_data(Gimbal_t *gimbal);
+static void get_new_encoder_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
 static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
@@ -93,7 +93,7 @@ void gimbal_task(void* parameters){
         
         /* For now using strictly encoder feedback for position */
         
-        get_new_data(&gimbal);
+        get_new_encoder_data(&gimbal);
         //send_to_uart(&gimbal);
         
         if (gimbal_angles.new_angle_flag) {
@@ -155,7 +155,7 @@ static void initialization(Gimbal_t *gimbal_ptr, Gimbal_Angles *gimbal_angles){
  * @param  None
  * @retval None
  */
-static void get_new_data(Gimbal_t *gimbal_data){  
+static void get_new_encoder_data(Gimbal_t *gimbal_data){  
      
     // Get CAN received data 
     gimbal_data->pitch_motor.pos_read = gimbal_data->pitch_motor.motor_feedback->ecd;
@@ -208,6 +208,8 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     
     char print[30];
     sprintf(print, "Constrain pitch %d between %d, %d \n\r", gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
+    serial_send_string(print);
+    sprintf(print, "New set point: %d \n\r", gimbal_set->pitch_motor.pos_set);
     serial_send_string(print);
     //int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
     gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
