@@ -89,10 +89,10 @@ void gimbal_task(void* parameters){
         increment_PID(&gimbal);
         //send_to_uart(&gimbal);
         // Turn gimbal motor
-        CAN_CMD_GIMBAL( (int16_t) gimbal.yaw_motor.current_out, 
-                        (int16_t) gimbal.pitch_motor.current_out,
-                        (int16_t) gimbal.launcher->trigger_motor.speed_set, 
-                        (int16_t) gimbal.launcher->hopper_motor.speed_set);
+        CAN_CMD_GIMBAL(gimbal.yaw_motor.current_out, 
+                       gimbal.pitch_motor.current_out,
+                       gimbal.launcher->trigger_motor.speed_set, 
+                       gimbal.launcher->hopper_motor.speed_set);
         
           //Sending data via UART
         vTaskDelay(GIMBAL_TASK_DELAY);
