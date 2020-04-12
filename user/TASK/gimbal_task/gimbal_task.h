@@ -17,7 +17,7 @@
 
 
 /*************** Converts between motor position and degrees *****************/
-#define Motor_Ecd_to_Rad 0.000766990394f /* 2PI / 8191 */
+#define MOTOR_ECD_TO_RAD 0.000766990394f /* 2PI / 8191 */
 #define FALSE 0
 #define TRUE 1
 
@@ -42,23 +42,22 @@
 #define RC_MAX 660
 #define ENCODER_MIN 0
 #define ENCODER_MAX 8191
-#define YAW_MIN 2359
-#define YAW_MAX 6576
 #define PITCH_MIN 2020
 #define PITCH_MAX 3000
 #define ERROR_MULTIPLIER 2048
+#define GIMBAL_PITCH_INITIAL_POSITION 3000
 
 
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
-	const motor_measure_t *motor_feedback;
+	const motor_feedback_t *motor_feedback;
 	uint16_t pos_read;
 	int16_t speed_read;
 	int16_t current_read;
 
     int16_t pos_set;
-    int16_t current_out; // TODO: update to voltage out
+    int16_t voltage_out; // TODO: update to voltage out
 
     PidTypeDef pid_controller;
 } Gimbal_Motor_t;

@@ -55,7 +55,7 @@
 
 typedef struct
 {
-    const motor_measure_t *shoot_motor_raw;
+    const motor_feedback_t *shoot_motor_raw;
 	uint16_t pos_raw;
     uint16_t last_pos_raw;
 	int16_t speed_raw;

@@ -28,7 +28,7 @@
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
 
-#define MULTIPLIER 5
+#define SETPOINT_SENSITIVITY 5
 
 // RC channels -- this indicated strafe drive
 // left stick: rotation
@@ -55,7 +55,7 @@ typedef enum{
     HALF_CURRENT,
     QUARTER_CURRENT,
     NO_CURRENT,
-} current_limiter_state;
+} current_limiter_state_e;
 
 typedef enum{
     CHASSIS_VECTOR_RAW,
@@ -66,7 +66,7 @@ typedef enum{
 
 typedef struct 
 {
-    const motor_measure_t *motor_feedback;
+    const motor_feedback_t *motor_feedback;
     
     //Current speed read from motors
     uint16_t pos_read;
@@ -74,7 +74,6 @@ typedef struct
     int16_t current_read;
     
     //Target speed set by user/remote control
-    int16_t pos_set;
     int16_t speed_set;
     // TODO: check if these should be unsigned /exist at all
     
@@ -83,7 +82,7 @@ typedef struct
     
     // Current limiting parameters
     int8_t limiter_counter;
-    current_limiter_state limiter;
+    current_limiter_state_e limiter;
 	
     //Control
     PidTypeDef pid_controller;

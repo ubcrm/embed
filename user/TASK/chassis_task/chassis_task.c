@@ -32,7 +32,7 @@ static void set_control_mode(Chassis_t *chassis);
 static void calculate_chassis_motion_setpoints(Chassis_t *chassis_set);
 static void calculate_motor_setpoints(Chassis_t *chassis_motors);
 static void increment_PID(Chassis_t *chassis_pid);
-static void send_feedback_to_uart(Chassis_t *chassis);
+static void send_feedback_over_uart(Chassis_t *chassis);
 static void check_allowed_current(Chassis_t *chassis_feedback);
 static void limit_current(Chassis_Motor_t *motor);
 
@@ -68,7 +68,7 @@ void chassis_task(void *pvParameters){
         calculate_motor_setpoints(&chassis);
         increment_PID(&chassis);
         check_allowed_current(&chassis);
-        send_feedback_to_uart(&chassis);
+        send_feedback_over_uart(&chassis);
         //output
         CAN_CMD_CHASSIS(chassis.motor[FRONT_RIGHT].current_out, 
                         chassis.motor[FRONT_LEFT].current_out, 
@@ -104,7 +104,7 @@ static void chassis_init(Chassis_t *chassis_init){
     
     //Link pointers with CAN motors
     for (int i = 0; i < 4; i++) {
-        chassis_init->motor[i].motor_feedback = get_Chassis_Motor_Measure_Point(i);
+        chassis_init->motor[i].motor_feedback = get_chassis_motor_feedback_pointer(i);
         chassis_init->motor[i].speed_read = chassis_init->motor[i].motor_feedback->speed_rpm;
         chassis_init->motor[i].pos_read = chassis_init->motor[i].motor_feedback->ecd;
         chassis_init->motor[i].current_read = chassis_init->motor[i].motor_feedback->current_read;
@@ -194,10 +194,10 @@ static void calculate_chassis_motion_setpoints(Chassis_t *chassis_set){
 static void calculate_motor_setpoints(Chassis_t *chassis_motors){
 	//Take x_speed_set etc and handle mechanum wheels
     //Put results into Chassis_Motor_t speed_set (and/or pos_set)
-    chassis_motors->motor[FRONT_LEFT].speed_set = MULTIPLIER * (chassis_motors->y_speed_set + chassis_motors->z_speed_set + chassis_motors->x_speed_set);
-    chassis_motors->motor[BACK_LEFT].speed_set = MULTIPLIER * (chassis_motors->y_speed_set + chassis_motors->z_speed_set - chassis_motors->x_speed_set);
-    chassis_motors->motor[FRONT_RIGHT].speed_set = MULTIPLIER * (-chassis_motors->y_speed_set + chassis_motors->z_speed_set + chassis_motors->x_speed_set);
-    chassis_motors->motor[BACK_RIGHT].speed_set = MULTIPLIER * (-chassis_motors->y_speed_set + chassis_motors->z_speed_set - chassis_motors->x_speed_set);
+    chassis_motors->motor[FRONT_LEFT].speed_set = SETPOINT_SENSITIVITY * (chassis_motors->y_speed_set + chassis_motors->z_speed_set + chassis_motors->x_speed_set);
+    chassis_motors->motor[BACK_LEFT].speed_set = SETPOINT_SENSITIVITY * (chassis_motors->y_speed_set + chassis_motors->z_speed_set - chassis_motors->x_speed_set);
+    chassis_motors->motor[FRONT_RIGHT].speed_set = SETPOINT_SENSITIVITY * (-chassis_motors->y_speed_set + chassis_motors->z_speed_set + chassis_motors->x_speed_set);
+    chassis_motors->motor[BACK_RIGHT].speed_set = SETPOINT_SENSITIVITY * (-chassis_motors->y_speed_set + chassis_motors->z_speed_set - chassis_motors->x_speed_set);
 }
 
 
@@ -211,39 +211,29 @@ char pid_out[64];
  * @retval None
  */
 static void increment_PID(Chassis_t *chassis_pid){
-    
     for(int i = 0; i < 4; i++){
         chassis_pid->motor[i].current_out = chassis_pid->motor[i].speed_set;
     }
-	
-    //translation
-    //rotation
-	fp32 front_right;
-    fp32 back_right;
-    fp32 front_left;
-    fp32 back_left;
     
-    // TODO: eliminate in place declaration & cast of floats 
-
-	front_right = PID_Calc(&chassis_pid->motor[FRONT_RIGHT].pid_controller, 
-	chassis_pid->motor[FRONT_RIGHT].speed_read,
-	chassis_pid->motor[FRONT_RIGHT].speed_set);
-	chassis_pid->motor[FRONT_RIGHT].current_out += front_right;
+	chassis_pid->motor[FRONT_RIGHT].current_out += 
+        PID_Calc(&chassis_pid->motor[FRONT_RIGHT].pid_controller, 
+        chassis_pid->motor[FRONT_RIGHT].speed_read,
+        chassis_pid->motor[FRONT_RIGHT].speed_set);
 	
-	back_right = PID_Calc(&chassis_pid->motor[BACK_RIGHT].pid_controller, 
-	chassis_pid->motor[BACK_RIGHT].speed_read, 
-	chassis_pid->motor[BACK_RIGHT].speed_set);
-	chassis_pid->motor[BACK_RIGHT].current_out += back_right;
+	chassis_pid->motor[BACK_RIGHT].current_out += 
+        PID_Calc(&chassis_pid->motor[BACK_RIGHT].pid_controller, 
+        chassis_pid->motor[BACK_RIGHT].speed_read, 
+        chassis_pid->motor[BACK_RIGHT].speed_set);
 	
-	front_left = PID_Calc(&chassis_pid->motor[FRONT_LEFT].pid_controller, 
-	chassis_pid->motor[FRONT_LEFT].speed_read, 
-	chassis_pid->motor[FRONT_LEFT].speed_set);
-	chassis_pid->motor[FRONT_LEFT].current_out += front_left;
+	chassis_pid->motor[FRONT_LEFT].current_out += 
+        PID_Calc(&chassis_pid->motor[FRONT_LEFT].pid_controller, 
+        chassis_pid->motor[FRONT_LEFT].speed_read, 
+        chassis_pid->motor[FRONT_LEFT].speed_set);;
 	
-	back_left = PID_Calc(&chassis_pid->motor[BACK_LEFT].pid_controller, 
-	chassis_pid->motor[BACK_LEFT].speed_read, 
-	chassis_pid->motor[BACK_LEFT].speed_set);
-	chassis_pid->motor[BACK_LEFT].current_out += back_left;
+	chassis_pid->motor[BACK_LEFT].current_out += 
+        PID_Calc(&chassis_pid->motor[BACK_LEFT].pid_controller, 
+        chassis_pid->motor[BACK_LEFT].speed_read, 
+        chassis_pid->motor[BACK_LEFT].speed_set);;
 	
     if (DEBUG == 1) {
         sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
@@ -333,18 +323,14 @@ static void limit_current(Chassis_Motor_t *motor){
         case NO_CURRENT:
             motor->current_out = 0;
             break;
+        default:
+            motor->current_out = 0;
+            break; 
     }
     
 }
 
-//static void under_current_limit(Chassis_Motor_t motor
-    
-
-    
-
-
-
-static void send_feedback_to_uart(Chassis_t *chassis){
+static void send_feedback_over_uart(Chassis_t *chassis){
     if(counter == 0){
         sprintf(message, "chassis rpm is: %i \n\r", chassis->motor[0].motor_feedback->speed_rpm);
         serial_send_string(message);
@@ -355,5 +341,4 @@ static void send_feedback_to_uart(Chassis_t *chassis){
     }
     
     counter = (counter + 1) % 1000;
-    
 }

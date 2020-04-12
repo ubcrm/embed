@@ -44,8 +44,11 @@ static void get_new_data(void);
 // user defines
 static uint16_t pwm_target = Fric_OFF;
 static uint16_t pwm_output = Fric_OFF;
-
 static PidTypeDef trigger_motor_pid;   
+
+static uint16_t shoot_count = 0;
+#define SHOOT_COUNT_MAX 1250
+#define SHOOT_COUNT_SWTICH 750
 
 /******************** Task/Functions Called from Outside ********************/
 
@@ -209,11 +212,6 @@ static void shoot_reversed_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *
     trigger_motor->speed_set = TRIGGER_SPEED * DIR_REVERSED;
 }
 
-
-static uint16_t shoot_count = 0;
-#define SHOOT_COUNT_MAX 1250
-#define SHOOT_COUNT_SWTICH 750
-
 /**
  * @brief Trigger motor and hopper motor continuously spinning to allow for rapid firing
  * @param Trigger motor and hopper motor structs
@@ -228,11 +226,13 @@ static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
         hopper_motor->speed_set = HOPPER_SPEED;
 
     }
-    if(shoot_count > SHOOT_COUNT_SWTICH){
+    if(shoot_count > SHOOT_COUNT_SWTICH){ 
+            /* Reverse to unjam */
             hopper_motor->speed_set = HOPPER_SPEED * -0.5f;
     }
     else {
-        hopper_motor->speed_set = HOPPER_SPEED;;
+        /*FWD motion*/
+        hopper_motor->speed_set = HOPPER_SPEED;
     }
     
     trigger_motor->speed_set = TRIGGER_SPEED;
