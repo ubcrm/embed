@@ -36,9 +36,6 @@
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
 
-//UART mailbox
-char str[32] = {0}; // TODO: figure out why ins_task is using this... delete and compile to reproduce
-static char message[64] = {0};
 static int loop_counter = 0;
 
 /******************** Functions ********************/
