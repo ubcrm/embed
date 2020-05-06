@@ -68,14 +68,18 @@ typedef struct
     const RC_ctrl_t *rc_update;
 	Gimbal_Motor_t yaw_motor;
 	Gimbal_Motor_t pitch_motor;
+    
+    // based on accelerometer, gyro, and magnetometer (?) data
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
-    // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
     
     fp32 yaw_setpoint[2]; // {real, imaj}
     fp32 yaw_position[2]; // {real, imaj}
     fp32 yaw_error;
+
+    fp32 absolute_angle[3];
+    fp32 encoder_angle[3];
     
     Shoot_t *launcher;
 } Gimbal_t;

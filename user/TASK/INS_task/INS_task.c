@@ -389,7 +389,7 @@ void test_imu_readings(uint8_t angle, uint8_t gyro, uint8_t accel){
     gimbal.gyro_update = get_MPU6500_Gyro_Data_Point();
 	gimbal.accel_update = get_MPU6500_Accel_Data_Point();
     
-    if (angle == TRUE) {        
+    if (angle == TRUE) {
         //Sending angle data via UART
         sprintf(message, "Angle yaw: %f\n\r", gimbal.angle_update[INS_YAW_ADDRESS_OFFSET]);
         serial_send_string(message);

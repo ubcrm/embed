@@ -29,6 +29,7 @@
 #include "pid.h"
 #include "shoot_task.h"
 #include <math.h>
+#include "INS_Task.h"
 
 #define DEADBAND 1
 
@@ -109,6 +110,7 @@ static void initialization(Gimbal_t *gimbal_ptr){
     gimbal_ptr->pitch_motor.motor_feedback = get_Pitch_Gimbal_Motor_Measure_Point();
     gimbal_ptr->yaw_motor.motor_feedback = get_Yaw_Gimbal_Motor_Measure_Point(); 
     gimbal_ptr->launcher = get_launcher_pointer();
+    gimbal_ptr->angle_update = get_INS_angle_point();
     fp32 pid_constants_yaw[3] = {pid_kp_yaw, pid_ki_yaw, pid_kd_yaw};
     fp32 pid_constants_pitch[3] = {pid_kp_pitch, pid_ki_pitch, pid_kd_pitch};
     
@@ -117,6 +119,12 @@ static void initialization(Gimbal_t *gimbal_ptr){
     gimbal_ptr->yaw_position[0] = 0.0;
     gimbal_ptr->yaw_position[1] = -1.0;
     gimbal_ptr->yaw_error = 0.0;
+    
+    // jTODO - determine initial angles
+    for(int i = 0; i < 3; ++i) {
+        gimbal_ptr->absolute_angle[i] = 0.0f;
+        gimbal_ptr->encoder_angle[i] = 0.0f;
+    }
     
     PID_Init(&(gimbal_ptr->pitch_motor.pid_controller), PID_POSITION, pid_constants_pitch, max_out_pitch, max_i_term_out_pitch);
     PID_Init(&(gimbal_ptr->yaw_motor.pid_controller), PID_POSITION, pid_constants_yaw, max_out_yaw, max_i_term_out_yaw);
@@ -171,6 +179,9 @@ static void make_unit_length(fp32 n[2]){
  * @retval None
  */
 static void update_setpoints(Gimbal_t *gimbal_set){
+    
+    // jTODO add/subtract board angle from setpoint to get actual encoder setpoint
+    //       need to experiment to find signs
     
     //yaw:
     //rc -> theta -> complex rotation -> new setpoint
