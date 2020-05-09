@@ -55,28 +55,6 @@ Gimbal_Angles* get_gimbal_angle_struct(void)
 }
 
 /**
-* Slew Control
-* While the current is over a limiting constant:
-* Reduce control signal by 0.5 every 5 ms
-* When current returns the acceptable range, double the 
-* allowed current every 5 ms until it returns to full output. 
-* 
-* Disable/reset I-term at this time whenever current limiting is active.\
-* 
-* Do we want reductions to follow : 1/2, 1/4, 1/8, ... 
-*                                    or 1/2, 1/4 , OFF
-* Or mutliply out put constant
-* Tunable Parameters
-* redutions factor: e.g. reduce current by 0.5
-* reduction time: e.g. reduce current every 5 ms
-* increase factor
-* increase time
-* I-term off/reset
-* hysteresis time: how long should the current limiter 
-*       wait before starting to increase/decrease current.
-*/
-
-/**
  * @brief Initializes PID and fetches Gimbal motor data to ensure 
  *  gimbal points in direction specified. 
  * @param FreeRTOS parameters
@@ -193,27 +171,20 @@ static void make_unit_length(fp32 n[2]){
  * @retval None
  */
 static void update_setpoints(Gimbal_t *gimbal_set){
-    
-    //yaw:
-    //rc -> theta -> complex rotation -> new setpoint
-    
-    // TODO: FIX
-    if(gimbal_set->rc_update->rc.s[0] == RC_SW_MID || gimbal_set->rc_update->rc.s[0] == RC_SW_UP){
+    if(1){
         fp32 theta = gimbal_angles.yaw_angle * Degree_To_Rad;
-        fp32 rotation[2] = {cos(theta), sin(theta)}; // TODO: consider alternative {cos{theta}, sin{theta}}
+        fp32 rotation[2] = {cos(theta), sin(theta)};
         multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
         make_unit_length(gimbal_set->yaw_setpoint);
+        
         gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_angles.pitch_angle, -DEADBAND, DEADBAND) / 80.0f;
     }
+    gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
     
     char print[30];
-    sprintf(print, "Constrain pitch %d between %d, %d \n\r", gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
+    sprintf(print, "Yaw setpoint x: %.4f y: %.4f \n\r", gimbal_set->yaw_setpoint[0], gimbal_set->yaw_setpoint[1]);
     serial_send_string(print);
-    sprintf(print, "New set point: %d \n\r", gimbal_set->pitch_motor.pos_set);
-    serial_send_string(print);
-    //int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
-    gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
-    sprintf(print, "Constrained to %d \n\r", gimbal_set->pitch_motor.pos_set);
+    sprintf(print, "Pitch setpoint: %d (encoder position 0-8191)\n\r", gimbal_set->pitch_motor.pos_set);
     serial_send_string(print);
 }
 
@@ -236,21 +207,13 @@ static int16_t get_error_sign(fp32 actual_position[2], fp32 set_position[2]){
  * @retval None
  */
 static void increment_PID(Gimbal_t *gimbal_pid){
-    /* Get error sign
-        get error val
-        insert into pid*/
-    // error magnitude 1 * ERROR_MULTIPLIER corresponds to gimbal being 90 degrees out of place --> jump action observed by pedram
-    // TODO: consider revising PID to eliminate the ERROR_MULTIPLIER constant
-    // TODO: retune PID currently very slow
     fp32 error = get_error_sign(gimbal_pid->yaw_position, gimbal_pid->yaw_setpoint) 
                     * (1 - a_dot_b(gimbal_pid->yaw_position,gimbal_pid->yaw_setpoint))
                     * ERROR_MULTIPLIER;
-    // TODO: Modify pid to reject massive d term spike this could create. 
-    // TODO: Consider how this isn't quite a linear error (dot product)
+
     gimbal_pid->yaw_motor.current_out = PID_Calc(&gimbal_pid->yaw_motor.pid_controller, 0.0f, error);
     
     gimbal_pid->pitch_motor.current_out = PID_Calc(&gimbal_pid->pitch_motor.pid_controller, gimbal_pid->pitch_motor.pos_read, gimbal_pid->pitch_motor.pos_set);
-    
 }
 
 
