@@ -75,7 +75,6 @@ typedef struct
     
     //Target speed set by user/remote control
     int16_t speed_set;
-    // TODO: check if these should be unsigned /exist at all
     
     //Final output speed
     int16_t current_out;

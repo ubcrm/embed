@@ -57,7 +57,7 @@ typedef struct
 	int16_t current_read;
 
     int16_t pos_set;
-    int16_t voltage_out; // TODO: update to voltage out
+    int16_t voltage_out;
 
     PidTypeDef pid_controller;
 } Gimbal_Motor_t;

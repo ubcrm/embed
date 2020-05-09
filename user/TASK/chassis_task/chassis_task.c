@@ -130,9 +130,9 @@ static void chassis_init(Chassis_t *chassis_init){
  */
 static void get_new_data(Chassis_t *chassis_update){
 		for (int i = 0; i < 4; i++) {
-        chassis_update->motor[i].speed_read = chassis_update->motor[i].motor_feedback->speed_rpm;
-        chassis_update->motor[i].pos_read = chassis_update->motor[i].motor_feedback->ecd;
-        chassis_update->motor[i].current_read = chassis_update->motor[i].motor_feedback->current_read;
+            chassis_update->motor[i].speed_read = chassis_update->motor[i].motor_feedback->speed_rpm;
+            chassis_update->motor[i].pos_read = chassis_update->motor[i].motor_feedback->ecd;
+            chassis_update->motor[i].current_read = chassis_update->motor[i].motor_feedback->current_read;
 		}
 }
 
@@ -228,12 +228,12 @@ static void increment_PID(Chassis_t *chassis_pid){
 	chassis_pid->motor[FRONT_LEFT].current_out += 
         PID_Calc(&chassis_pid->motor[FRONT_LEFT].pid_controller, 
         chassis_pid->motor[FRONT_LEFT].speed_read, 
-        chassis_pid->motor[FRONT_LEFT].speed_set);;
+        chassis_pid->motor[FRONT_LEFT].speed_set);
 	
 	chassis_pid->motor[BACK_LEFT].current_out += 
         PID_Calc(&chassis_pid->motor[BACK_LEFT].pid_controller, 
         chassis_pid->motor[BACK_LEFT].speed_read, 
-        chassis_pid->motor[BACK_LEFT].speed_set);;
+        chassis_pid->motor[BACK_LEFT].speed_set);
 	
     if (DEBUG == 1) {
         sprintf(pid_out, "Front Right - target: %d, sensor: %d, output: %d \n\r", 
@@ -321,11 +321,9 @@ static void limit_current(Chassis_Motor_t *motor){
             motor->current_out *= 0.25f;
             break;
         case NO_CURRENT:
-            motor->current_out = 0;
-            break;
         default:
             motor->current_out = 0;
-            break; 
+            break;
     }
     
 }

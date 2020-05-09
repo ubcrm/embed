@@ -224,13 +224,12 @@ static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hop
     if(shoot_count > SHOOT_COUNT_MAX){
         shoot_count = 0;
         hopper_motor->speed_set = HOPPER_SPEED;
-
     }
+    
     if(shoot_count > SHOOT_COUNT_SWTICH){ 
-            /* Reverse to unjam */
-            hopper_motor->speed_set = HOPPER_SPEED * -0.5f;
-    }
-    else {
+        /* Reverse to unjam */
+        hopper_motor->speed_set = HOPPER_SPEED * -0.5f;
+    } else {
         /*FWD motion*/
         hopper_motor->speed_set = HOPPER_SPEED;
     }

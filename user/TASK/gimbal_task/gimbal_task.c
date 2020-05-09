@@ -32,6 +32,7 @@
 #include <math.h>
 
 #define DEADBAND 1
+            
 
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
@@ -152,8 +153,9 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     if(gimbal_set->rc_update->rc.s[0] == RC_SW_MID || gimbal_set->rc_update->rc.s[0] == RC_SW_UP){
         fp32 theta = -1 * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
                 * MOTOR_ECD_TO_RAD / 80.0f;
-        fp32 rotation[2] = {arm_cos_f32(theta), arm_sin_f32(theta)};
-        multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
+        
+        fp32 yaw_delta_rotation[2] = {arm_cos_f32(theta), arm_sin_f32(theta)};
+        multiply_complex_a_by_b(gimbal_set->yaw_setpoint, yaw_delta_rotation);
         make_unit_length(gimbal_set->yaw_setpoint);
 
         gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 80.0f;
@@ -211,9 +213,6 @@ int get_vision_signal(void) {
     }
     return vision_signal;
 }
-
-
-
 
 /** 
  * @brief Updates Uart with position information on the yaw motor and the PID settings
