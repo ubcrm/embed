@@ -15,7 +15,10 @@
 #include "CAN_receive.h"
 
 #ifndef SHOOT_TASK_H
-#define SHOOT_TASK_H	
+#define SHOOT_TASK_H
+
+#define SHOOT_TASK_DELAY 1
+#define SHOOT_INIT_DELAY 2000
 
 //Time between ramp steps, in seconds
 #define RAMP_PRD 0.001
@@ -33,7 +36,7 @@
 #define HOPPER_OFF 0
 
 //Trigger motor PID
-#define TRIGGER_MAX_OUT 5000.0f
+#define TRIGGER_MAX_OUT 8000.0f
 #define TRIGGER_MAX_IOUT 2500.0f
 #define TRIGGER_ANGLE_PID_KP 800.0f
 #define TRIGGER_ANGLE_PID_KI 0.5f
@@ -52,7 +55,7 @@
 
 typedef struct
 {
-    const motor_measure_t *shoot_motor_raw;
+    const motor_feedback_t *shoot_motor_raw;
 	uint16_t pos_raw;
     uint16_t last_pos_raw;
 	int16_t speed_raw;

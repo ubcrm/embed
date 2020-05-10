@@ -51,10 +51,10 @@ typedef struct
 {
     uint16_t ecd;
     int16_t speed_rpm;
-    int16_t given_current;
+    int16_t current_read;
     uint8_t temperate;
     int16_t last_ecd;
-} motor_measure_t;
+} motor_feedback_t;
 
 
 
@@ -67,15 +67,15 @@ extern void CAN_CMD_GIMBAL(int16_t yaw, int16_t pitch, int16_t trigger, int16_t 
 //Send to chassis
 extern void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 //Return a pointer to yaw motor data
-extern const motor_measure_t *get_Yaw_Gimbal_Motor_Measure_Point(void);
+extern const motor_feedback_t *get_yaw_gimbal_motor_feedback_pointer(void);
 //Return a pointer to pitch motor data
-extern const motor_measure_t *get_Pitch_Gimbal_Motor_Measure_Point(void);
+extern const motor_feedback_t *get_pitch_motor_feedback_pointer(void);
 //Return a pointer to trigger motor data
-extern const motor_measure_t *get_Trigger_Motor_Measure_Point(void);
+extern const motor_feedback_t *get_Trigger_Motor_Measure_Point(void);
 //Return a pointer to trigger motor data
-extern const motor_measure_t *get_Revolver_Motor_Measure_Point(void);
+extern const motor_feedback_t *get_Revolver_Motor_Measure_Point(void);
 //Return a pointer to chassis motors data
-extern const motor_measure_t *get_Chassis_Motor_Measure_Point(uint8_t i);
+extern const motor_feedback_t *get_chassis_motor_feedback_pointer(uint8_t i);
 
 #if GIMBAL_MOTOR_6020_CAN_LOSE_SLOVE
 extern void GIMBAL_lose_slove(void);

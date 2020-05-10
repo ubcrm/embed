@@ -35,26 +35,21 @@
 
 /******************** Private Defines for Receiving ********************/
 
-#define get_motor_measure(ptr, rx_message)                                                     \
+#define fill_motor_readings(ptr, rx_message)                                                     \
     {                                                                                          \
         (ptr)->last_ecd = (ptr)->ecd;                                                          \
         (ptr)->ecd = (uint16_t)((rx_message)->Data[0] << 8 | (rx_message)->Data[1]);           \
         (ptr)->speed_rpm = (uint16_t)((rx_message)->Data[2] << 8 | (rx_message)->Data[3]);     \
-        (ptr)->given_current = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]); \
+        (ptr)->current_read = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]); \
         (ptr)->temperate = (rx_message)->Data[6];                                              \
     }
 
-
-		/// TODO: Make similar get_motor_measure for M3508 and P36
-		
-		
-		
 /******************** Private User Declarations ********************/
 		
 //CAN received data handler
 static void CAN_hook(CanRxMsg *rx_message);
 //motor measure pointers declaration
-static motor_measure_t motor_yaw, motor_pit, motor_trigger, motor_hopper, motor_chassis[4];
+static motor_feedback_t motor_yaw, motor_pit, motor_trigger, motor_hopper, motor_chassis[4];
 //CAN transmit message struct declaration
 static CanTxMsg GIMBAL_TxMessage;
 		
@@ -171,31 +166,31 @@ void CAN_CMD_CHASSIS(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 /******************* Public CAN Read Functions *******************/
 
 //Return a pointer to yaw motor data
-const motor_measure_t *get_Yaw_Gimbal_Motor_Measure_Point(void)
+const motor_feedback_t *get_yaw_gimbal_motor_feedback_pointer(void)
 {
     return &motor_yaw;
 }
 
 //Return a pointer to pitch motor data
-const motor_measure_t *get_Pitch_Gimbal_Motor_Measure_Point(void)
+const motor_feedback_t *get_pitch_motor_feedback_pointer(void)
 {
     return &motor_pit;
 }
 
 //Return a pointer to trigger trigger motor data
-const motor_measure_t *get_trigger_Motor_Measure_Point(void)
+const motor_feedback_t *get_trigger_motor_feedback_pointer(void)
 {
     return &motor_trigger;
 }
 
 //Return a pointer to revolver motor data
-const motor_measure_t *get_hopper_Motor_Measure_Point(void)
+const motor_feedback_t *get_hopper_motor_feedback_pointer(void)
 {
     return &motor_hopper;
 }
 
 //Return a pointer to chassis motor data
-const motor_measure_t *get_Chassis_Motor_Measure_Point(uint8_t i)
+const motor_feedback_t *get_chassis_motor_feedback_pointer(uint8_t i)
 {
     return &motor_chassis[(i & 0x03)];
 }
@@ -254,22 +249,22 @@ static void CAN_hook(CanRxMsg *rx_message)
     {
     case CAN_YAW_MOTOR_ID:
     {
-        get_motor_measure(&motor_yaw, rx_message);
+        fill_motor_readings(&motor_yaw, rx_message);
         break;
     }
     case CAN_PIT_MOTOR_ID:
     {
-        get_motor_measure(&motor_pit, rx_message);
+        fill_motor_readings(&motor_pit, rx_message);
         break;
     }
     case CAN_TRIGGER_MOTOR_ID:
     {
-        get_motor_measure(&motor_trigger, rx_message);
+        fill_motor_readings(&motor_trigger, rx_message);
         break;
     }
 		case CAN_HOPPER_MOTOR_ID:
     {
-        get_motor_measure(&motor_hopper, rx_message);
+        fill_motor_readings(&motor_hopper, rx_message);
         break;
     }
     case CAN_3508_M1_ID:
@@ -279,7 +274,7 @@ static void CAN_hook(CanRxMsg *rx_message)
     {
         static uint8_t i = 0;
         i = rx_message->StdId - CAN_3508_M1_ID; //get motor ID
-        get_motor_measure(&motor_chassis[i], rx_message); //Use motor ID as index of array
+        fill_motor_readings(&motor_chassis[i], rx_message); //Use motor ID as index of array
         break;
     }
 
