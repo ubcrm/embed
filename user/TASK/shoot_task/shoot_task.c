@@ -122,7 +122,7 @@ static void shoot_init(Shoot_t *shoot_init) {
  */
 static void set_control_mode(void) {
     //Gets outcome of rc
-    if (shoot.rc->rc.s[POWER_SWITCH] == RC_SW_UP || shoot.rc->rc.s[POWER_SWITCH] == RC_SW_DOWN) {
+    if (shoot.rc->rc.s[POWER_SWITCH] == RC_SW_UP) {
         if (shoot.rc->rc.s[SHOOT_SWITCH] == RC_SW_MID) {
             pwm_target = Fric_DOWN;
             // no shoot
@@ -210,6 +210,10 @@ static void shoot_reversed_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *
 }
 
 
+static uint16_t shoot_count = 0;
+#define SHOOT_COUNT_MAX 1250
+#define SHOOT_COUNT_SWTICH 750
+
 /**
  * @brief Trigger motor and hopper motor continuously spinning to allow for rapid firing
  * @param Trigger motor and hopper motor structs
@@ -217,8 +221,20 @@ static void shoot_reversed_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *
  */
 static void shoot_rapid_control(Shoot_Motor_t *trigger_motor, Shoot_Motor_t *hopper_motor)
 {
-    //Hopper and trigger motor both spinning, used for clearing bullets
-    hopper_motor->speed_set = HOPPER_SPEED;
+    shoot_count++;
+    
+    if(shoot_count > SHOOT_COUNT_MAX){
+        shoot_count = 0;
+        hopper_motor->speed_set = HOPPER_SPEED;
+
+    }
+    if(shoot_count > SHOOT_COUNT_SWTICH){
+            hopper_motor->speed_set = HOPPER_SPEED * -0.5f;
+    }
+    else {
+        hopper_motor->speed_set = HOPPER_SPEED;;
+    }
+    
     trigger_motor->speed_set = TRIGGER_SPEED;
 }
 

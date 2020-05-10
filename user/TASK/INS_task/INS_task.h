@@ -18,6 +18,8 @@
 
 #define MPU6500_USE_SPI_DMA //是否使用SPI的DMA传输，不使用注释定义
 
+#define INS_TASK_DELAY 10
+
 //如果用了IST8310，DMA传输23个字节，如果不用，少7个字节，为16个字节
 #if defined(USE_IST8310)
 #define DMA_RX_NUM 23

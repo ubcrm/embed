@@ -20,7 +20,6 @@
 #include "task.h"
 #include "start_task.h"
 
-
 /******************** User Includes ********************/
 #include "CAN_Receive.h"
 #include "user_lib.h"
@@ -29,21 +28,31 @@
 #include <stdio.h>
 #include "pid.h"
 #include "shoot_task.h"
+#include <math.h>
 
-#define DEADBAND 10
+#define DEADBAND 1
 
 // This is accessbile globally and some data is loaded from INS_task
 Gimbal_t gimbal;
+Gimbal_Angles gimbal_angles;
 
 //UART mailbox
-char str[32] = {0};
+char str[32] = {0}; // TODO: figure out why ins_task is using this... delete and compile to reproduce
+//static char message[64] = {0};
+static int loop_counter = 0;
 
 /******************** Functions ********************/
-static void initialization(Gimbal_t *gimbal);
-static void get_new_data(Gimbal_t *gimbal);
+static void initialization(Gimbal_t *gimbal, Gimbal_Angles *gimbal_angles);
+static void get_new_encoder_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
+static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
 
+
+Gimbal_Angles* get_gimbal_angle_struct(void)
+{
+    return &gimbal_angles;
+}
 
 /**
  * @brief Initializes PID and fetches Gimbal motor data to ensure 
@@ -54,16 +63,23 @@ static void increment_PID(Gimbal_t *gimbal);
 void gimbal_task(void* parameters){
 
     vTaskDelay(GIMBAL_INIT_DELAY);
-	initialization(&gimbal);
+	initialization(&gimbal, &gimbal_angles);
     
     while(1){	
         //send_to_uart(&gimbal);
+        //send_vision_angle();
         
         /* For now using strictly encoder feedback for position */
         
-        get_new_data(&gimbal);
+        get_new_encoder_data(&gimbal);
         //send_to_uart(&gimbal);
-        update_setpoints(&gimbal);
+        
+        if (gimbal_angles.new_angle_flag) {
+            sprintf(str, "delta angle: %d\n\r", gimbal_angles.yaw_angle);
+            serial_send_string(str);
+            update_setpoints(&gimbal);
+            gimbal_angles.new_angle_flag = 0;
+        }
         //send_to_uart(&gimbal);
         increment_PID(&gimbal);
         //send_to_uart(&gimbal);
@@ -75,6 +91,7 @@ void gimbal_task(void* parameters){
         
           //Sending data via UART
         vTaskDelay(GIMBAL_TASK_DELAY);
+        send_to_uart(&gimbal);
 	}
 }
 
@@ -83,20 +100,32 @@ void gimbal_task(void* parameters){
  * @param  None
  * @retval None
  */
-static void initialization(Gimbal_t *gimbal_ptr){
+static void initialization(Gimbal_t *gimbal_ptr, Gimbal_Angles *gimbal_angles){
     gimbal_ptr->pitch_motor.motor_feedback = get_Pitch_Gimbal_Motor_Measure_Point();
     gimbal_ptr->yaw_motor.motor_feedback = get_Yaw_Gimbal_Motor_Measure_Point(); 
     gimbal_ptr->launcher = get_launcher_pointer();
     fp32 pid_constants_yaw[3] = {pid_kp_yaw, pid_ki_yaw, pid_kd_yaw};
     fp32 pid_constants_pitch[3] = {pid_kp_pitch, pid_ki_pitch, pid_kd_pitch};
-
+    
+    gimbal_ptr->yaw_setpoint[0] = 0.0;
+    gimbal_ptr->yaw_setpoint[1] = -1.0;
+    gimbal_ptr->yaw_position[0] = 0.0;
+    gimbal_ptr->yaw_position[1] = -1.0;
+    gimbal_ptr->yaw_error = 0.0;
+    
     PID_Init(&(gimbal_ptr->pitch_motor.pid_controller), PID_POSITION, pid_constants_pitch, max_out_pitch, max_i_term_out_pitch);
     PID_Init(&(gimbal_ptr->yaw_motor.pid_controller), PID_POSITION, pid_constants_yaw, max_out_yaw, max_i_term_out_yaw);
     
     gimbal_ptr->rc_update = get_remote_control_point();
     
-    gimbal_ptr->pitch_motor.pos_set = 5500;
+    gimbal_ptr->pitch_motor.pos_set = 3000;
     gimbal_ptr->yaw_motor.pos_set = 6000;
+    
+    gimbal_angles->count_rx = 0;
+    gimbal_angles->new_angle_flag = 0;
+    gimbal_angles->pitch_angle = 0;
+    gimbal_angles->yaw_angle = 0;
+    // TODO: find better bounds on Pitch
 }
 
 /** 
@@ -104,14 +133,36 @@ static void initialization(Gimbal_t *gimbal_ptr){
  * @param  None
  * @retval None
  */
-static void get_new_data(Gimbal_t *gimbal_data){
-        // Get CAN received data 
-        gimbal_data->pitch_motor.pos_read = gimbal_data->pitch_motor.motor_feedback->ecd;
-        gimbal_data->pitch_motor.speed_read = gimbal_data->pitch_motor.motor_feedback->speed_rpm;
+static void get_new_encoder_data(Gimbal_t *gimbal_data){  
+     
+    // Get CAN received data 
+    gimbal_data->pitch_motor.pos_read = gimbal_data->pitch_motor.motor_feedback->ecd;
+    gimbal_data->pitch_motor.speed_read = gimbal_data->pitch_motor.motor_feedback->speed_rpm;
 
-        gimbal_data->yaw_motor.pos_read = gimbal_data->yaw_motor.motor_feedback->ecd;
-        gimbal_data->yaw_motor.speed_read = gimbal_data->yaw_motor.motor_feedback->speed_rpm;
+    gimbal_data->yaw_motor.pos_read = gimbal_data->yaw_motor.motor_feedback->ecd;
+    gimbal_data->yaw_motor.speed_read = gimbal_data->yaw_motor.motor_feedback->speed_rpm;
     
+    fill_complex_equivalent(gimbal_data->yaw_position, gimbal_data->yaw_motor.pos_read);
+}
+
+
+static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value){
+    fp32 theta = ecd_value * Motor_Ecd_to_Rad;
+    position[0] = cos(theta);
+    position[1] = sin(theta);
+}
+
+static void multiply_complex_a_by_b(fp32 a[2], fp32 b[2]){
+    fp32 real = a[0] * b[0] - a[1] * b[1];
+    fp32 imaj = a[0] * b[1] + a[1] * b[0];
+    a[0] = real;
+    a[1] = imaj;
+}
+
+static void make_unit_length(fp32 n[2]){
+    fp32 length = sqrt(n[0] * n[0] + n[1] * n[1]);
+    n[0] = n[0] / length;
+    n[1] = n[1] / length;
 }
 
 /** 
@@ -120,16 +171,35 @@ static void get_new_data(Gimbal_t *gimbal_data){
  * @retval None
  */
 static void update_setpoints(Gimbal_t *gimbal_set){
+    if(1){
+        fp32 theta = gimbal_angles.yaw_angle * Degree_To_Rad;
+        fp32 rotation[2] = {cos(theta), sin(theta)};
+        multiply_complex_a_by_b(gimbal_set->yaw_setpoint, rotation);
+        make_unit_length(gimbal_set->yaw_setpoint);
+        
+        gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_angles.pitch_angle, -DEADBAND, DEADBAND) / 80.0f;
+    }
+    gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
     
-    gimbal_set->yaw_motor.pos_set += (-1) * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND) / 10;
-    gimbal_set->pitch_motor.pos_set += int16_deadzone(gimbal_set->rc_update->rc.ch[3], -DEADBAND, DEADBAND) / 10;
-    
-    int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
-    int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
-
-    //TODO: worry about the case where pos_set is unsigned and rc channel manages to push it    
-    // negative for a moment, causing the position to wrap from below 0 to a maxvalue. 
+    char print[30];
+    sprintf(print, "Yaw setpoint x: %.4f y: %.4f \n\r", gimbal_set->yaw_setpoint[0], gimbal_set->yaw_setpoint[1]);
+    serial_send_string(print);
+    sprintf(print, "Pitch setpoint: %d (encoder position 0-8191)\n\r", gimbal_set->pitch_motor.pos_set);
+    serial_send_string(print);
 }
+
+static fp32 a_dot_b(fp32 a[2], fp32 b[2]){
+    return a[0] * b[0] + a[1] * b[1];
+}
+
+static fp32 length_of_a_cross_b(fp32 a[2], fp32 b[2]){
+    return a[0] * b[1] - a[1] * b[0];
+}
+
+static int16_t get_error_sign(fp32 actual_position[2], fp32 set_position[2]){
+    return length_of_a_cross_b(actual_position, set_position) >= 0 ? 1 : -1;
+}    
+
 
 /** 
  * @brief  Increments PID loop based on latest setpoints and latest positions
@@ -137,26 +207,16 @@ static void update_setpoints(Gimbal_t *gimbal_set){
  * @retval None
  */
 static void increment_PID(Gimbal_t *gimbal_pid){
+    fp32 error = get_error_sign(gimbal_pid->yaw_position, gimbal_pid->yaw_setpoint) 
+                    * (1 - a_dot_b(gimbal_pid->yaw_position,gimbal_pid->yaw_setpoint))
+                    * ERROR_MULTIPLIER;
+
+    gimbal_pid->yaw_motor.current_out = PID_Calc(&gimbal_pid->yaw_motor.pid_controller, 0.0f, error);
+    
     gimbal_pid->pitch_motor.current_out = PID_Calc(&gimbal_pid->pitch_motor.pid_controller, gimbal_pid->pitch_motor.pos_read, gimbal_pid->pitch_motor.pos_set);
-    gimbal_pid->yaw_motor.current_out = PID_Calc(&gimbal_pid->yaw_motor.pid_controller, gimbal_pid->yaw_motor.pos_read, gimbal_pid->yaw_motor.pos_set);
 }
 
-/** 
- * @brief  Reads vision instruction from UART and cap to certin values
- * @param  None
- * @retval Vision signal in range of 0 and 8191
- */
-int get_vision_signal(void) {
-    int vision_signal = 5700;  // TODO: Get real values from vision
-        
-    while (vision_signal > 8191) {
-        vision_signal -= 8191;
-    }
-    while (vision_signal < 0) {
-        vision_signal+= 8192;
-    }
-    return vision_signal;
-}
+
 
 /** 
  * @brief Updates Uart with position information on the yaw motor and the PID settings
@@ -168,20 +228,44 @@ int get_vision_signal(void) {
  */
 void send_to_uart(Gimbal_t *gimbal_msg) 	
 {
-    //char str[20]; //uart data buffer
 
     //TODO - fix below / fill as needed
-
+    
+    if(loop_counter == 0){
+        /*sprintf(str, "yaw position re: %.2f im: %.2f \n\r", gimbal_msg->yaw_position[0], gimbal_msg->yaw_position[1]);
+        serial_send_string(str);
+        sprintf(message, "yaw setpoint re: %.2f im: %.2f \n\r", gimbal_msg->yaw_setpoint[0], gimbal_msg->yaw_setpoint[1]);
+        serial_send_string(message);
+        sprintf(message, "--- \n\r");
+        serial_send_string(message);
+        sprintf(message, "pitch: %i", gimbal_msg->pitch_motor.pos_read);
+        serial_send_string(message);*/
+    }
+    loop_counter = (loop_counter + 1) % 1000;
+    
+    
+    /*
+    sprintf(str, "we are not infected");
+    serial_send_string(str);*/
 /*
     sprintf(str, "yaw speed read: %d\n\r", gimbal->yaw_motor->speed_read);
     serial_send_string(str);       
 
-    sprintf(str, "yaw current read: %d\n\r", gimbal->yaw_motor->current_read);
-    serial_send_string(str);
-*/  
-    //sprintf(str, "yaw setpoint: %d\n\r", gimbal->yaw_motor->pos_set);
-    //serial_send_string(str);
+static void send_feedback_to_uart(Gimbal_t *gimbal){
+    if(counter == 0){
+        sprintf(message, "(2,3) yaw rpm is: %i \n\r", gimbal->yaw_motor.motor_feedback->speed_rpm);
+        serial_send_string(message);
+        sprintf(message, "(4,5) yaw torque current is: %i \n\r", gimbal->yaw_motor.motor_feedback->current_read);
+        serial_send_string(message);
+    }
     
-    //sprintf(str, "yaw current out: %d\n\r", gimbal->yaw_motor->current_out);
-    //serial_send_string(str);
+    counter = (counter + 1) % 1000; */
+    
 }
+/*
+void send_vision_angle() {
+    char hex[5];
+    sprintf(hex, "%x", gimbal_angles.yaw_angle);
+    vision_send_string(hex);
+}
+*/

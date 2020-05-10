@@ -30,12 +30,20 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 #include "main.h"
-
+#include "gimbal_task.h"
 #include "USART_comms.h"
+#include <string.h>
+#include <stdio.h>
 
-volatile char buffer_rx[100];
+volatile char buffer_rx[BUFFER_SIZE]; //holds 100 bytes
 int count_rx = 0;
 
+volatile char UART8_buffer_rx[100];
+int UART8_count_rx = 0;
+
+char rando[] = "hello\n\r";
+char new_line[] = "\n\r";
+int atoi(const char *str);
 /** @addtogroup Template_Project
   * @{
   */
@@ -171,10 +179,11 @@ void SysTick_Handler(void)
 /**
   * @}
   */ 
-	
+  
 
 // Interrupt handler for USART 6. This is called on the reception of every
 // byte on USART6
+// Note: USART_Data only holds 1 byte of data despite being a uint16_t variable
 void USART6_IRQHandler(void)
 {
 	// make sure USART6 was intended to be called for this interrupt
@@ -204,6 +213,50 @@ void USART6_IRQHandler(void)
 		
 	}
 }
+
+
+void clear_gimbal_buffer(void) {
+    Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
+    
+    int angle = atoi(gimbal_angles->buffer_rx);
+    
+    if (angle<-180) angle=-180;
+    else if (angle>180) angle=180;
+    
+    gimbal_angles->yaw_angle = angle; 
+    gimbal_angles->new_angle_flag = 1;
+    gimbal_angles->count_rx = 0;
+    
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        gimbal_angles->buffer_rx[i] = 0;
+    }
+}
+
+// Interrupt handler for UART 8. This is called on the reception of every
+// byte on UART8
+// Note: USART_Data only holds 1 byte of data despite being a uint16_t variable
+void UART8_IRQHandler(void)
+{
+	// make sure UART8 was intended to be called for this interrupt
+	if(USART_GetITStatus(UART8, USART_IT_RXNE) != RESET) {
+		uint16_t UART_Data = USART_ReceiveData(UART8);
+        Gimbal_Angles *gimbal_angles = get_gimbal_angle_struct();
+ 
+		// Once a carriage return is read or the buffer full, move 
+        // data into struct, and clear the buffer
+		if (UART_Data == 13 || gimbal_angles->count_rx >= BUFFER_SIZE-1) {
+            //vision_send_string(gimbal_angles->buffer_rx); //echo
+            //vision_send_string(new_line);
+            clear_gimbal_buffer();
+            //vision_send_string(gimbal_angles->buffer_rx); //echo
+            //vision_send_string(new_line);
+		} 
+        else {
+			gimbal_angles->buffer_rx[gimbal_angles->count_rx++] = UART_Data;
+		} 
+	}
+}
+
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

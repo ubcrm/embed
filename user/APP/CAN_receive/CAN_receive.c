@@ -35,17 +35,26 @@
 
 /******************** Private Defines for Receiving ********************/
 
-#define get_motor_measure(ptr, rx_message)                                                     \
+#define fill_motor_readings(ptr, rx_message)                                                     \
     {                                                                                          \
         (ptr)->last_ecd = (ptr)->ecd;                                                          \
         (ptr)->ecd = (uint16_t)((rx_message)->Data[0] << 8 | (rx_message)->Data[1]);           \
         (ptr)->speed_rpm = (uint16_t)((rx_message)->Data[2] << 8 | (rx_message)->Data[3]);     \
-        (ptr)->given_current = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]); \
+        (ptr)->current_read = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]); \
         (ptr)->temperate = (rx_message)->Data[6];                                              \
     }
 
-
-		/// TODO: Make similar get_motor_measure for M3508 and P36
+#define fill_gimbal_motor_readings(ptr, rx_message)                                              \
+    {                                                                                          \
+        (ptr)->last_ecd = (ptr)->ecd;                                                          \
+        (ptr)->ecd = (uint16_t)((rx_message)->Data[0] << 8 | (rx_message)->Data[1]);           \
+        (ptr)->current_read = (uint16_t)((rx_message)->Data[2] << 8 | (rx_message)->Data[3]); \
+        (ptr)->speed_rpm = (uint16_t)((rx_message)->Data[4] << 8 | (rx_message)->Data[5]);     \
+        (ptr)->temperate = (rx_message)->Data[6];                                              \
+    }
+		// TODO: Check real message format -> most likely delete the gimbal version
+        // The ordering of current_read and speed_rpm in the documentation and the dji code do not match
+  
 		
 		
 		
@@ -254,22 +263,22 @@ static void CAN_hook(CanRxMsg *rx_message)
     {
     case CAN_YAW_MOTOR_ID:
     {
-        get_motor_measure(&motor_yaw, rx_message);
+        fill_gimbal_motor_readings(&motor_yaw, rx_message);
         break;
     }
     case CAN_PIT_MOTOR_ID:
     {
-        get_motor_measure(&motor_pit, rx_message);
+        fill_gimbal_motor_readings(&motor_pit, rx_message);
         break;
     }
     case CAN_TRIGGER_MOTOR_ID:
     {
-        get_motor_measure(&motor_trigger, rx_message);
+        fill_motor_readings(&motor_trigger, rx_message);
         break;
     }
 		case CAN_HOPPER_MOTOR_ID:
     {
-        get_motor_measure(&motor_hopper, rx_message);
+        fill_motor_readings(&motor_hopper, rx_message);
         break;
     }
     case CAN_3508_M1_ID:
@@ -279,7 +288,7 @@ static void CAN_hook(CanRxMsg *rx_message)
     {
         static uint8_t i = 0;
         i = rx_message->StdId - CAN_3508_M1_ID; //get motor ID
-        get_motor_measure(&motor_chassis[i], rx_message); //Use motor ID as index of array
+        fill_motor_readings(&motor_chassis[i], rx_message); //Use motor ID as index of array
         break;
     }
 

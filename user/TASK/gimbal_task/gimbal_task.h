@@ -10,6 +10,7 @@
 #include "pid.h"
 #include "shoot_task.h"
 #include "remote_control.h"
+#include "USART_comms.h"
 
 /******************************* Task Delays *********************************/
 #define GIMBAL_TASK_DELAY 1
@@ -17,16 +18,17 @@
 
 
 /*************** Converts between motor position and degrees *****************/
-#define Motor_Ecd_to_Rad 0.000766990394f
+#define Motor_Ecd_to_Rad 0.000766990394f /* 2PI / 8191 */
+#define Degree_To_Rad 0.0087266389;
 #define FALSE 0
 #define TRUE 1
 
 
 /****************************** PID Constants ********************************/
-#define pid_kp_yaw 40.0f
+#define pid_kp_yaw 250.0f
 #define pid_ki_yaw 0.0f
-#define pid_kd_yaw 0.0f
-#define max_out_yaw 5000.0f
+#define pid_kd_yaw 250.0f
+#define max_out_yaw 15000.0f
 #define max_i_term_out_yaw 1000.0f
 
 #define pid_kp_pitch 40.0f
@@ -44,20 +46,22 @@
 #define ENCODER_MAX 8191
 #define YAW_MIN 2359
 #define YAW_MAX 6576
-#define PITCH_MIN 5500
-#define PITCH_MAX 7000
+#define PITCH_MIN 2020
+#define PITCH_MAX 3000
+#define ERROR_MULTIPLIER 2048
 
+#define BUFFER_SIZE 100
 
 /************************** Gimbal Data Structures ***************************/
 typedef struct 
 {
 	const motor_measure_t *motor_feedback;
-	int16_t pos_read;
+	uint16_t pos_read;
 	int16_t speed_read;
 	int16_t current_read;
 
     int16_t pos_set;
-    int16_t current_out;
+    int16_t current_out; // TODO: update to voltage out
 
     PidTypeDef pid_controller;
 } Gimbal_Motor_t;
@@ -70,18 +74,36 @@ typedef struct
     const fp32 *angle_update;
 	const fp32 *gyro_update;
 	const fp32 *accel_update;
+    const uint32_t current_angle;
     // TODO: Add gimbal angles when we care about orientation of robot in 3-d space
+    
+    fp32 yaw_setpoint[2]; // {real, imaj}
+    fp32 yaw_position[2]; // {real, imaj}
+    fp32 yaw_error;
     
     Shoot_t *launcher;
 } Gimbal_t;
+
+/////////////////////////
+// Degrees relative
+typedef struct
+{
+    uint8_t new_angle_flag;
+    int yaw_angle;
+    int pitch_angle;
+    uint8_t count_rx;
+    char buffer_rx[BUFFER_SIZE];
+} Gimbal_Angles;
 
 
 /******************************* Function Declarations ***********************/
 int get_vision_signal(void);
 extern void gimbal_task(void *pvParameters);
 extern void send_to_uart(Gimbal_t *gimbal); 
+//void send_vision_angle();
 
-
+// get a pointer to the gimbal struct
+extern Gimbal_Angles* get_gimbal_angle_struct(void);
 
 /******************************* Variable Declarations ***********************/
 // These will later be produced from RC
