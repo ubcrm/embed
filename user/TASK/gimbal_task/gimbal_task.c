@@ -45,6 +45,11 @@ static void get_new_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
 static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
+static void multiply_complex_a_by_b(fp32 a[2], fp32 b[2]);
+static void make_unit_length(fp32 n[2]);
+static fp32 a_dot_b(fp32 a[2], fp32 b[2]);
+static fp32 length_of_a_cross_b(fp32 a[2], fp32 b[2]);
+static int16_t get_error_sign(fp32 actual_position[2], fp32 set_position[2]);
 
 /**
  * @brief Initializes PID and fetches Gimbal motor data to ensure 
@@ -74,9 +79,9 @@ void gimbal_task(void* parameters){
                         (int16_t) gimbal.launcher->trigger_motor.speed_set, 
                         (int16_t) gimbal.launcher->hopper_motor.speed_set);
         
-          //Sending data via UART
+        //Sending data via UART
         vTaskDelay(GIMBAL_TASK_DELAY);
-        send_to_uart(&gimbal);
+        //send_to_uart(&gimbal);
 	}
 }
 
@@ -123,26 +128,6 @@ static void get_new_data(Gimbal_t *gimbal_data){
     fill_complex_equivalent(gimbal_data->yaw_position, gimbal_data->yaw_motor.pos_read);
 }
 
-
-static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value){
-    fp32 theta = ecd_value * MOTOR_ECD_TO_RAD;
-    position[0] = cos(theta);
-    position[1] = sin(theta);
-}
-
-static void multiply_complex_a_by_b(fp32 a[2], fp32 b[2]){
-    fp32 real = a[0] * b[0] - a[1] * b[1];
-    fp32 imaj = a[0] * b[1] + a[1] * b[0];
-    a[0] = real;
-    a[1] = imaj;
-}
-
-static void make_unit_length(fp32 n[2]){
-    fp32 length = sqrt(n[0] * n[0] + n[1] * n[1]);
-    n[0] = n[0] / length;
-    n[1] = n[1] / length;
-}
-
 /** 
  * @brief  Updates desired setpoints from RC signal
  * @param  Gimbal struct containing info on Gimbal
@@ -150,7 +135,7 @@ static void make_unit_length(fp32 n[2]){
  */
 static void update_setpoints(Gimbal_t *gimbal_set){
     
-    if(gimbal_set->rc_update->rc.s[0] == RC_SW_MID || gimbal_set->rc_update->rc.s[0] == RC_SW_UP){
+    if(gimbal_set->rc_update->rc.s[RC_SWITCH_RIGHT] == RC_SW_MID || gimbal_set->rc_update->rc.s[RC_SWITCH_RIGHT] == RC_SW_UP){
         fp32 theta = -1 * int16_deadzone(gimbal_set->rc_update->rc.ch[2], -DEADBAND, DEADBAND)
                 * MOTOR_ECD_TO_RAD / 80.0f;
         
@@ -162,20 +147,7 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     }
     
     gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
-}
-
-static fp32 a_dot_b(fp32 a[2], fp32 b[2]){
-    return a[0] * b[0] + a[1] * b[1];
-}
-
-static fp32 length_of_a_cross_b(fp32 a[2], fp32 b[2]){
-    return a[0] * b[1] - a[1] * b[0];
-}
-
-static int16_t get_error_sign(fp32 actual_position[2], fp32 set_position[2]){
-    return length_of_a_cross_b(actual_position, set_position) >= 0 ? 1 : -1;
-}    
-
+}  
 
 /** 
  * @brief  Increments PID loop based on latest setpoints and latest positions
@@ -224,7 +196,50 @@ int get_vision_signal(void) {
  */
 void send_to_uart(Gimbal_t *gimbal_msg) 	
 {
+    static char debug_message[64] = {0};
+    
     if(loop_counter == 0){
+        sprintf(debug_message, "yaw position re: %.2f im: %.2f \n\r", gimbal_msg->yaw_position[0], gimbal_msg->yaw_position[1]);
+        serial_send_string(debug_message);
+        sprintf(debug_message, "yaw setpoint re: %.2f im: %.2f \n\r", gimbal_msg->yaw_setpoint[0], gimbal_msg->yaw_setpoint[1]);
+        serial_send_string(debug_message);
+        sprintf(debug_message, "--- \n\r");
+        serial_send_string(debug_message);
+        sprintf(debug_message, "pitch: %i", gimbal_msg->pitch_motor.pos_read);
+        serial_send_string(debug_message);
+        
+        // can add a lot more here if you want to
     }
     loop_counter = (loop_counter + 1) % 1000;
+}
+
+static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value){
+    fp32 theta = ecd_value * MOTOR_ECD_TO_RAD;
+    position[0] = cos(theta);
+    position[1] = sin(theta);
+}
+
+static void multiply_complex_a_by_b(fp32 a[2], fp32 b[2]){
+    fp32 real = a[0] * b[0] - a[1] * b[1];
+    fp32 imaj = a[0] * b[1] + a[1] * b[0];
+    a[0] = real;
+    a[1] = imaj;
+}
+
+static void make_unit_length(fp32 n[2]){
+    fp32 length = sqrt(n[0] * n[0] + n[1] * n[1]);
+    n[0] = n[0] / length;
+    n[1] = n[1] / length;
+}
+
+static fp32 a_dot_b(fp32 a[2], fp32 b[2]){
+    return a[0] * b[0] + a[1] * b[1];
+}
+
+static fp32 length_of_a_cross_b(fp32 a[2], fp32 b[2]){
+    return a[0] * b[1] - a[1] * b[0];
+}
+
+static int16_t get_error_sign(fp32 actual_position[2], fp32 set_position[2]){
+    return length_of_a_cross_b(actual_position, set_position) >= 0 ? 1 : -1;
 }

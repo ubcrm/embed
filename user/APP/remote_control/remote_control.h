@@ -36,6 +36,8 @@
 #define switch_is_down(s) (s == RC_SW_DOWN)
 #define switch_is_mid(s) (s == RC_SW_MID)
 #define switch_is_up(s) (s == RC_SW_UP)
+#define RC_SWITCH_LEFT 1
+#define RC_SWITCH_RIGHT 0
 /* ----------------------- PC Key Definition-------------------------------- */
 #define KEY_PRESSED_OFFSET_W ((uint16_t)1 << 0)
 #define KEY_PRESSED_OFFSET_S ((uint16_t)1 << 1)
