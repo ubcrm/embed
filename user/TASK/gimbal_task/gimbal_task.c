@@ -43,7 +43,7 @@ static void initialization(Gimbal_t *gimbal);
 static void get_new_data(Gimbal_t *gimbal);
 static void update_setpoints(Gimbal_t *gimbal);
 static void increment_PID(Gimbal_t *gimbal);
-static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value);
+static void fill_complex_equivalent(fp32 position[2], uint16_t angle, fp32 scale);
 
 /**
 * Slew Control
@@ -150,12 +150,16 @@ static void get_new_data(Gimbal_t *gimbal_data){
     gimbal_data->yaw_motor.pos_read = gimbal_data->yaw_motor.motor_feedback->ecd;
     gimbal_data->yaw_motor.speed_read = gimbal_data->yaw_motor.motor_feedback->speed_rpm;
     
-    fill_complex_equivalent(gimbal_data->yaw_position, gimbal_data->yaw_motor.pos_read);
+    fill_complex_equivalent(gimbal_data->yaw_position, gimbal_data->yaw_motor.pos_read, Motor_Ecd_to_Rad);
+    
+    gimbal_data->absolute_angle[0] = gimbal_data->angle_update[0];
+    gimbal_data->absolute_angle[1] = gimbal_data->angle_update[1];
+    gimbal_data->absolute_angle[2] = gimbal_data->angle_update[2];
 }
 
 
-static void fill_complex_equivalent(fp32 position[2], uint16_t ecd_value){
-    fp32 theta = ecd_value * Motor_Ecd_to_Rad;
+static void fill_complex_equivalent(fp32 position[2], uint16_t angle, fp32 scale){
+    fp32 theta = angle * scale;
     position[0] = cos(theta);
     position[1] = sin(theta);
 }
@@ -200,6 +204,7 @@ static void update_setpoints(Gimbal_t *gimbal_set){
     char print[30];
     sprintf(print, "Constrain pitch %d between %d, %d \n\r", gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
     serial_send_string(print);
+    
     //int16_constrain(gimbal_set->yaw_motor.pos_set, YAW_MIN, YAW_MAX);
     gimbal_set->pitch_motor.pos_set = int16_constrain(gimbal_set->pitch_motor.pos_set, PITCH_MIN, PITCH_MAX);
     sprintf(print, "Constrained to %d \n\r", gimbal_set->pitch_motor.pos_set);
@@ -304,5 +309,5 @@ static void send_feedback_to_uart(Gimbal_t *gimbal){
     }
     
     counter = (counter + 1) % 1000; */
-    
+    test_imu_readings(TRUE, TRUE, TRUE);
 }

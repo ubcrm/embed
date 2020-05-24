@@ -79,7 +79,6 @@ typedef struct
     fp32 yaw_error;
 
     fp32 absolute_angle[3];
-    fp32 encoder_angle[3];
     
     Shoot_t *launcher;
 } Gimbal_t;
